@@ -80,11 +80,10 @@ for metric in selected_metrics:
 comparison_df = pd.concat(comparison_data) # output the comparison dataframe
 comparison_df = comparison_df.drop(columns=["Period"], errors='ignore')  # ensure dataframe doesn't have a "Period" column prior to the merge operation to add one
 comparison_df = pd.merge(comparison_df, filtered_data.drop_duplicates(subset="Date", keep="first")[["Date", "Period"]], on="Date", how="left") # add "Period" column to be used for plotting
-comparison_df = comparison_df.set_index("Period")
 
 # Display comparison table and sort by "Period" and "Metric"
 st.write("Airline Comparison")
-st.write(comparison_df.drop(columns=["Date"]).sort_values(by=["Period", "Metric"], ascending=True))
+st.write(comparison_df.drop(columns=["Date"]).sort_values(by=["Period", "Metric"].set_index("Period"), ascending=True))
 
 # Plotting selected metrics over time
 for metric in selected_metrics:
