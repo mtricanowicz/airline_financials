@@ -41,16 +41,18 @@ else:
 # Allow user to select year and quarter
 years = data["Year"].unique()
 quarters = data["Quarter"].unique()
-selected_years = st.multiselect("Select Year(s) for Comparison", years, default=years[:])
+selected_years = st.multiselect("Select Year(s) for Comparison", years, default=years)
 if not selected_years:
-    selected_years=years
-selected_quarters = st.multiselect("Select Quarter(s) for Comparison", quarters, default=quarters[:])
+    selected_years=years # prevents empty set from triggering an error, displays all years if none are selected
+selected_quarters = st.multiselect("Select Quarter(s) for Comparison", quarters, default=quarters)
 if not selected_quarters:
-    selected_quarters=quarters
+    selected_quarters=quarters # prevents empty set from triggering an error, displays all quarters if none are selected
 
 # Allow user to select airlines to compare
 airlines = data["Airline"].unique()
-selected_airlines = st.multiselect("Select Airline(s) for Comparison", airlines, default=airlines[0:1])
+selected_airlines = st.multiselect("Select Airline(s) for Comparison", airlines, default=["AAL"])
+if not selected_airlines:
+    selected_airlines=["AAL"] # prevents empty set from triggering an error, displays AAL if none are selected
 
 # Allow user to select a base airline
 base_airline = st.selectbox("Select Baseline Airline", selected_airlines)
@@ -115,6 +117,8 @@ for metric in selected_metrics:
     comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
     if metric in ["Total Revenue", "Total Revenue per Available Seat Mile (TRASM)", "Net Income", "Profit Sharing"]:
         comparison_display[metric] = comparison_display[metric].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.4f}") # reformat currency columns to show $ sign
+    if len(selected_airlines) <= 1:
+        comparison_display = comparison_display.drop(columns=[f"Difference vs {base_airline}"]) # do not display percent difference column if only 1 airline is selected
     st.dataframe(comparison_display.set_index("Period").drop(columns=["Date"]).sort_values(by=["Period"], ascending=True))
 
     # Time series line plot for the metric's change over time if more than one time period (quarter or year) is selected.
