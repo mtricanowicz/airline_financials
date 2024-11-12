@@ -16,6 +16,7 @@ airline_financials["Available Seat Miles (ASM)"] = airline_financials["Available
 airline_financials.rename(columns={"Available Seat Miles (ASM)":"Available Seat Miles (ASM) (billions)"}, inplace=True)
 airline_financials["Profit Sharing"] = airline_financials["Profit Sharing"]/1000000
 airline_financials.rename(columns={"Profit Sharing":"Profit Sharing (millions)"}, inplace=True)
+airline_financials["Total Revenue per Available Seat Mile (TRASM)"] = airline_financials["Total Revenue per Available Seat Mile (TRASM)"]*100
 
 # Split data into full-year and quarterly DataFrames
 airline_financials_fy = airline_financials[airline_financials["Quarter"] == "FY"].copy()
@@ -149,7 +150,7 @@ for metric in selected_metrics:
     if metric in ["Total Revenue (billions)", "Net Income (billions)", "Profit Sharing (millions)"]:
         comparison_display[metric] = comparison_display[metric].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.2f}") # reformat currency columns to show $ sign
     elif metric in ["Total Revenue per Available Seat Mile (TRASM)"]:
-        comparison_display[metric] = comparison_display[metric].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.4f}") # reformat currency columns to show $ sign
+        comparison_display[metric] = comparison_display[metric].apply(lambda x: f"{x:,.2f}\u00A2") # reformat currency columns to show $ sign
     elif metric in ["Net Margin"]:
         comparison_display[metric] = comparison_display[metric].apply(lambda x: f"{x:,.2f}%") # reformat margin columns to show % sign
     else:
