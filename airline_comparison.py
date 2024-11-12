@@ -3,6 +3,27 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# Set custom page configuration including the "About" section
+st.set_page_config(
+    page_title="US Airline Financial Metrics Comparison",  # Custom title in the browser tab
+    page_icon=":airplane:",  # Custom icon for the browser tab
+    layout="centered",  # Use a wide layout for the app
+    initial_sidebar_state="auto",  # Sidebar state when app loads
+    menu_items={
+        "About": """
+        ## US Airline Financial Metrics Comparison App
+        This app enables quick and intuitive comparisons of the financial performance of major US commercial airlines. Several selected metrics can be evaluated over chosen reporting periods. All data is sourced from the 10Q (quarterly filings) and 10K (annual filing) forms reported to the SEC and available on the airlines' investor relations sites.
+        
+        - **Version:** 1.0.0
+        - **Author:** Michael Tricanowicz
+        - **License:** MIT
+        - **GitHub:** [airline_financials](https://github.com/mtricanowicz/airline_financials)
+        
+        Streamlit makes it easy to build and share custom web apps for machine learning and data science.
+        """
+    }
+)
+
 # Load the CSV data
 file_path = "airline_financial_data.csv"
 airline_financials = pd.read_csv(file_path)
