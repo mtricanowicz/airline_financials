@@ -29,6 +29,10 @@ airline_colors = {
 # Streamlit app interface
 st.title("Airline Financial Metrics Comparison")
 
+# Reset button
+if st.button("Reset to Default"):
+    st.experimental_rerun()  # Refreshes the app to reset selectors
+
 # Allow users to select full-year or quarterly data
 data_type = st.selectbox("Select Data Type", ["Full Year (FY)", "Quarterly"])
 if data_type == "Full Year (FY)":
