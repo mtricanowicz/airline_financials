@@ -83,7 +83,7 @@ comparison_df = pd.merge(comparison_df, filtered_data.drop_duplicates(subset="Da
 
 # Display comparison table and sort by "Period" and "Metric"
 st.write("Airline Comparison")
-st.write(comparison_df.drop(columns=["Date"]).sort_values(by=["Period", "Metric"], ascending=True)).set_index("Period")
+st.write(comparison_df.set_index("Period").drop(columns=["Date"]).sort_values(by=["Period", "Metric"], ascending=True))
 
 # Plotting selected metrics over time
 for metric in selected_metrics:
