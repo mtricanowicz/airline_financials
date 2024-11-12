@@ -3,11 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Define a function to reload the app
-def refresh_page():
-    for key in st.session_state.keys():
-        del st.session_state[key]
-
 # Load the CSV data
 file_path = "airline_financial_data.csv"
 airline_financials = pd.read_csv(file_path)
@@ -33,11 +28,6 @@ airline_colors = {
 
 # Streamlit app interface
 st.title("Airline Financial Metrics Comparison")
-
-# Reset button
-if st.button("Reload App to Reset Selections"):
-    refresh_page()
-    #st.experimental_rerun()  # Refreshes the app to reset selectors
 
 # Allow users to select full-year or quarterly data
 data_type = st.selectbox("Select Data Type", ["Full Year (FY)", "Quarterly"])
