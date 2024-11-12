@@ -139,7 +139,7 @@ for metric in selected_metrics:
         return f"color: {airline_colors.get(val, '')}" if val in airline_colors else ""
 
     # Display table for the metric to allow review of the data
-    st.title(f"{metric} Comparison")
+    st.title(f"{metric}")
     comparison_display = comparison_df[comparison_df["Metric"] == metric] # prepare a copy of the comparison table to be used for display
     comparison_display = comparison_display.rename(columns={"Value":metric}) # rename value column to make it more understandable
     comparison_display["Percent Difference"] = comparison_display["Percent Difference"].apply(lambda x: f"{x}%") # reformat percent difference column to show % sign
