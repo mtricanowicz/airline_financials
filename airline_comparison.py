@@ -41,7 +41,7 @@ years = data["Year"].unique()
 quarters = data["Quarter"].unique()
 selected_years = st.multiselect("Select Year(s) for Comparison", years, default=years[:])
 if selected_years==None:
-    selected_years=year[:]
+    selected_years=years[:]
 selected_quarters = st.multiselect("Select Quarter(s) for Comparison", quarters, default=quarters[:])
 if selected_quarters==None:
     selected_quarters=quarters[:]
