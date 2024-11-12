@@ -66,13 +66,15 @@ filtered_data = data[data["Airline"].isin(selected_airlines)][data["Year"].isin(
 def pct_diff(base, comparison):
     # Handle cases where base is zero to avoid division by zero
     if base == 0:
-        return float('inf') if comparison != 0 else 0
-
+        return float("inf") if comparison != 0 else 0
     # Calculate the percentage difference using absolute values
     percent_change = round(abs((comparison - base) / abs(base)) * 100, 2)
-
     # Determine if the change should be considered positive or negative
-    if (base < 0 < comparison) or (base > 0 > comparison):
+    if base < 0 < comparison:
+        return percent_change
+    elif base > 0 > comparison:
+        return -percent_change
+    elif base > comparison:
         return -percent_change
     else:
         return percent_change
