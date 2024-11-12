@@ -98,22 +98,34 @@ comparison_df = pd.concat(comparison_data) # output the comparison dataframe
 comparison_df = comparison_df.drop(columns=["Period"], errors='ignore')  # ensure dataframe doesn't have a "Period" column prior to the merge operation to add one
 comparison_df = pd.merge(comparison_df, filtered_data.drop_duplicates(subset="Date", keep="first")[["Date", "Period"]], on="Date", how="left") # add "Period" column to be used for plotting
 
-# Display comparison table and sort by "Period" and "Metric"
-st.write("Airline Comparison")
-st.write(comparison_df.set_index("Period").drop(columns=["Date"]).sort_values(by=["Period", "Metric"], ascending=True))
+# Display comparison table and sort by "Period" and "Metric". Overall view of the data. Not used because separate tables are shown for each selected metric to improve readability of the data.
+#st.write("Airline Comparison")
+#st.write(comparison_df.set_index("Period").drop(columns=["Date"]).sort_values(by=["Period", "Metric"], ascending=True))
 
 # Plotting selected metrics over time
 for metric in selected_metrics:
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.lineplot(data=filtered_data, x="Period", y=metric, hue="Airline", palette=airline_colors, ax=ax)
-    plt.xticks(rotation=45, ha="right", va="top")
-    ax.set_title(f"{metric} Over Time")
-    ax.set_xlabel(None)
-    ax.set_ylabel(metric)
-    ax.legend(title="Airline")
-    st.pyplot(fig)
+    
+    # Display table for the metric to allow review of the data
+    st.write(f"{metric} Comparison")
+    comparison_display = comparison_df[comparison_df["Metric"] == metric]
+    comparison_display = comparison_display.rename(columns={"Value":metric})
+    comparison_display = comparison_display.drop(columns=["Metric"])
+    if metric in ["Total Revenue", "Total Revenue per Available Seat Mile (TRASM)", "Net Income", "Profit Sharing"]:
+        comparison_display[metric] = comparison_display[metric].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.4f}")
+    st.write(comparison_display.set_index("Period").drop(columns=["Date"]).sort_values(by=["Period"], ascending=True))
 
-    # Bar plot for % difference if more than one airline is selected
+    # Time series line plot for the metric's change over time if more than one time period (quarter or year) is selected.
+    if len(selected_years)>1 or len(selected_quarters)>1:
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.lineplot(data=filtered_data, x="Period", y=metric, hue="Airline", palette=airline_colors, ax=ax)
+        plt.xticks(rotation=45, ha="right", va="top")
+        ax.set_title(f"{metric} Over Time")
+        ax.set_xlabel(None)
+        ax.set_ylabel(metric)
+        ax.legend(title="Airline")
+        st.pyplot(fig)
+
+    # Bar plot for % difference if more than one airline is selected.
     if len(selected_airlines) > 1:
         fig, ax = plt.subplots(figsize=(10, 6))
         sns.barplot(data=comparison_df[comparison_df["Metric"] == metric], x="Period", y="Percent Difference", hue="Airline", palette=airline_colors, ax=ax)
