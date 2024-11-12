@@ -56,7 +56,7 @@ selected_airlines = st.multiselect("Select Airline(s) for Comparison", airlines,
 base_airline = st.selectbox("Select Baseline Airline", selected_airlines)
 
 # Allow user to select metrics to compare
-available_metrics = ["Total Revenue", "Available Seat Miles (ASM)", "Total Revenue per Available Seat Mile (TRASM)", "Net Income", "Net Margin", "Profit Sharing"]
+available_metrics = data.columns.drop(["Year", "Quarter", "Airline", "Period", "Date"])
 selected_metrics = st.multiselect("Select Metrics to Compare", available_metrics, default=available_metrics)
 
 # Filter data for selected airlines and metrics
