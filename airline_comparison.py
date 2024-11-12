@@ -137,12 +137,13 @@ for metric in selected_metrics:
         comparison_display[metric] = comparison_display[metric].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.4f}") # reformat currency columns to show $ sign
     elif metric in ["Net Margin"]:
         comparison_display[metric] = comparison_display[metric].apply(lambda x: f"{x:,.2f}%") # reformat margin columns to show % sign
-    if len(selected_airlines) <= 1:
-        comparison_display = comparison_display.drop(columns=[f"Difference vs {base_airline}"]) # do not display percent difference column if only 1 airline is selected
     comparison_display = comparison_display.drop(columns=["Date"]).sort_values(by=["Period"], ascending=True) # remove date column from display and sort dataframe by the period
     comparison_display = comparison_display.reset_index(drop=True) # reset the index
     comparison_display = comparison_display[["Period", "Airline", metric, f"Difference vs {base_airline}"]] # reorder the columns
-    comparison_display = comparison_display.style.applymap(color_airlines, subset=["Airline"]).applymap(color_positive_negative_zero, subset=[f"Difference vs {base_airline}"]) # map color of comparison column based on its sign and color of airline codes based on code
+    if len(selected_airlines) <= 1:
+        comparison_display = comparison_display.drop(columns=[f"Difference vs {base_airline}"]) # do not display percent difference column if only 1 airline is selected
+    if len(selected_airlines) > 1:
+        comparison_display = comparison_display.style.applymap(color_airlines, subset=["Airline"]).applymap(color_positive_negative_zero, subset=[f"Difference vs {base_airline}"]) # map color of comparison column based on its sign and color of airline codes based on code
     st.dataframe(comparison_display) 
 
     # Time series line plot for the metric's change over time if more than one time period (quarter or year) is selected.
