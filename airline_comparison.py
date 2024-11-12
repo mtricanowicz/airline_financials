@@ -19,6 +19,13 @@ airline_financials_q["Period"] = airline_financials_q["Year"].astype(str) + "Q" 
 airline_financials_q["Date"] = pd.to_datetime(airline_financials_q["Year"].astype(str) + "-" + (airline_financials_q["Quarter"]*3).astype(str) + "-01") + pd.offsets.MonthEnd(0)
 airline_financials_q["Net Margin"] = (airline_financials_q["Net Income"] / airline_financials_q["Total Revenue"]) * 100
 
+# Color palette to use for visualizaitons
+airline_colors = {
+    "AAL": "red",
+    "DAL": "purple",
+    "UAL": "blue"
+}
+
 # Streamlit app interface
 st.title("Airline Financial Metrics Comparison")
 
@@ -67,7 +74,7 @@ st.write(comparison_df)
 # Plotting
 for metric in selected_metrics:
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.lineplot(data=filtered_data, x="Date", y=metric, hue="Airline", ax=ax)
+    sns.lineplot(data=filtered_data, x="Date", y=metric, hue="Airline", palette=airline_colors, ax=ax)
     ax.set_title(f"{metric} Over Time")
     ax.set_ylabel(metric)
     ax.legend(title="Airline")
@@ -78,7 +85,7 @@ for metric in selected_metrics:
         fig, ax = plt.subplots(figsize=(10, 6))
         sns.barplot(
             data=comparison_df[comparison_df["Metric"] == metric],
-            x="Date", y="Pct Difference", hue="Airline", ax=ax
+            x="Date", y="Pct Difference", hue="Airline", palette=airline_colors, ax=ax
         )
         ax.set_title(f"Percentage Difference in {metric} Compared to {base_airline}")
         ax.set_ylabel("Percentage Difference (%)")
