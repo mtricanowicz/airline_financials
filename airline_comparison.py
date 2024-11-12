@@ -84,7 +84,7 @@ for metric in selected_metrics:
     if len(selected_airlines) > 1:
         fig, ax = plt.subplots(figsize=(10, 6))
         sns.barplot(
-            data=comparison_df[comparison_df["Metric"] == metric & comparison_df["Airline"]!=base_airline],
+            data=comparison_df[comparison_df["Metric"] == metric][comparison_df["Airline"]!=base_airline],
             x="Date", y="Pct Difference", hue="Airline", palette=airline_colors, ax=ax
         )
         ax.set_title(f"Percentage Difference in {metric} Compared to {base_airline}")
