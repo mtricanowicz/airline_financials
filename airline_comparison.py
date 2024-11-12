@@ -56,7 +56,7 @@ for metric in selected_metrics:
     base_values = filtered_data[filtered_data["Airline"] == base_airline].set_index("Period")[metric]
     for airline in selected_airlines:
         airline_values = filtered_data[filtered_data["Airline"] == airline].set_index("Period")[metric]
-        pct_diff = ((airline_values - base_values) / base_values) * 100
+        pct_diff = round(((airline_values - base_values) / base_values) * 100, 2)
         comparison_data.append(pd.DataFrame({
             "Period": airline_values.index,
             "Airline": airline,
@@ -89,5 +89,5 @@ for metric in selected_metrics:
         )
         ax.set_title(f"Percentage Difference in {metric} Compared to {base_airline}")
         ax.set_ylabel("Percentage Difference (%)")
-        ax.axhline(0, color='gray', linestyle='--')
+        ax.axhline(0, color="gray", linestyle="--")
         st.pyplot(fig)
