@@ -40,7 +40,11 @@ else:
 years = data["Year"].unique()
 quarters = data["Quarter"].unique()
 selected_years = st.multiselect("Select Year(s) for Comparison", years, default=years[:])
+if selected_years==[]:
+    selected_years=year[:]
 selected_quarters = st.multiselect("Select Quarter(s) for Comparison", quarters, default=quarters[:])
+if selected_quarters==[]:
+    selected_quarters=quarters[:]
 
 # Allow user to select airlines to compare
 airlines = data["Airline"].unique()
@@ -58,20 +62,18 @@ filtered_data = data[data["Airline"].isin(selected_airlines)][data["Year"].isin(
 
 # Calculate percentage difference from the base airline
 comparison_data = []
-for year in selected_years:
-    for quarter in selected_quarters:
-        for metric in selected_metrics:
-            base_values = filtered_data[filtered_data["Airline"] == base_airline].set_index("Period")[metric]
-            for airline in selected_airlines:
-                airline_values = filtered_data[filtered_data["Airline"] == airline].set_index("Period")[metric]
-                pct_diff = round(((airline_values - base_values) / base_values) * 100, 2)
-                comparison_data.append(pd.DataFrame({
-                    "Period": airline_values.index,
-                    "Airline": airline,
-                    "Metric": metric,
-                    "Value": airline_values.values,
-                    "Percent Difference": pct_diff.values
-                }))
+for metric in selected_metrics:
+    base_values = filtered_data[filtered_data["Airline"] == base_airline].set_index("Period")[metric]
+    for airline in selected_airlines:
+        airline_values = filtered_data[filtered_data["Airline"] == airline].set_index("Period")[metric]
+        pct_diff = round(((airline_values - base_values) / base_values) * 100, 2)
+        comparison_data.append(pd.DataFrame({
+            "Period": airline_values.index,
+            "Airline": airline,
+            "Metric": metric,
+            "Value": airline_values.values,
+            "Percent Difference": pct_diff.values
+        }))
 
 comparison_df = pd.concat(comparison_data)
 
