@@ -62,16 +62,16 @@ for year in selected_years:
     for quarter in selected_quarters:
         for metric in selected_metrics:
             base_values = filtered_data[filtered_data["Airline"] == base_airline].set_index("Period")[metric]
-        for airline in selected_airlines:
-            airline_values = filtered_data[filtered_data["Airline"] == airline].set_index("Period")[metric]
-            pct_diff = round(((airline_values - base_values) / base_values) * 100, 2)
-            comparison_data.append(pd.DataFrame({
-                "Period": airline_values.index,
-                "Airline": airline,
-                "Metric": metric,
-                "Value": airline_values.values,
-                "Percent Difference": pct_diff.values
-            }))
+            for airline in selected_airlines:
+                airline_values = filtered_data[filtered_data["Airline"] == airline].set_index("Period")[metric]
+                pct_diff = round(((airline_values - base_values) / base_values) * 100, 2)
+                comparison_data.append(pd.DataFrame({
+                    "Period": airline_values.index,
+                    "Airline": airline,
+                    "Metric": metric,
+                    "Value": airline_values.values,
+                    "Percent Difference": pct_diff.values
+                }))
 
 comparison_df = pd.concat(comparison_data)
 
