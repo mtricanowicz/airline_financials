@@ -137,6 +137,8 @@ for metric in selected_metrics:
         comparison_display[metric] = comparison_display[metric].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.4f}") # reformat currency columns to show $ sign
     elif metric in ["Net Margin"]:
         comparison_display[metric] = comparison_display[metric].apply(lambda x: f"{x:,.2f}%") # reformat margin columns to show % sign
+    else:
+        comparison_display[metric] = comparison_display[metric].apply(lambda x: f"{x:,.0f}") # ensure any other metric is displayed as a unitless integer
     comparison_display = comparison_display.drop(columns=["Date"]).sort_values(by=["Period"], ascending=True) # remove date column from display and sort dataframe by the period
     comparison_display = comparison_display.set_index(["Period", "Airline"])
     if len(selected_airlines) <= 1:
