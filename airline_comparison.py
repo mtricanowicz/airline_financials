@@ -41,35 +41,35 @@ airlines = data["Airline"].unique()
 selected_airlines = st.multiselect("Select Airlines for Comparison", airlines, default=airlines[0:1])
 
 # Allow user to select a base airline
-base_airline = st.selectbox("Select Base Airline", selected_airlines)
+base_airline = st.selectbox("Select Baseline Airline", selected_airlines)
 
 # Allow user to select metrics to compare
 available_metrics = ["Total Revenue", "Available Seat Miles (ASM)", "Total Revenue per Available Seat Mile (TRASM)", "Net Income", "Net Margin", "Profit Sharing"]
 selected_metrics = st.multiselect("Select Metrics to Compare", available_metrics, default=available_metrics)
 
 # Filter data for selected airlines and metrics
-filtered_data = data[data['Airline'].isin(selected_airlines)].copy()
+filtered_data = data[data["Airline"].isin(selected_airlines)].copy()
 
 # Calculate percentage difference from the base airline
 comparison_data = []
 for metric in selected_metrics:
-    base_values = filtered_data[filtered_data['Airline'] == base_airline].set_index('Date')[metric]
+    base_values = filtered_data[filtered_data["Airline"] == base_airline].set_index("Period")[metric]
     for airline in selected_airlines:
-        airline_values = filtered_data[filtered_data['Airline'] == airline].set_index('Date')[metric]
+        airline_values = filtered_data[filtered_data["Airline"] == airline].set_index("Period")[metric]
         pct_diff = ((airline_values - base_values) / base_values) * 100
         comparison_data.append(pd.DataFrame({
-            'Date': airline_values.index,
-            'Airline': airline,
-            'Metric': metric,
-            'Value': airline_values.values,
-            'Pct Difference': pct_diff.values
+            "Period": airline_values.index,
+            "Airline": airline,
+            "Metric": metric,
+            "Value": airline_values.values,
+            "Pct Difference": pct_diff.values
         }))
 
 comparison_df = pd.concat(comparison_data)
 
 # Display comparison table
 st.write("Comparison Data")
-st.write(comparison_df.sort_values(by="Date", ascending=True))
+st.write(comparison_df.sort_values(by=["Period", "Metric"], ascending=True))
 
 # Plotting
 for metric in selected_metrics:
