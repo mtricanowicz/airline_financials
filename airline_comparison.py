@@ -54,16 +54,16 @@ available_metrics = ["Total Revenue", "Available Seat Miles (ASM)", "Total Reven
 selected_metrics = st.multiselect("Select Metrics to Compare", available_metrics, default=available_metrics)
 
 # Filter data for selected airlines and metrics
-filtered_data = data[data["Airline"].isin(selected_airlines)].copy()
+filtered_data = data[data["Airline"].isin(selected_airlines)][data["Year"].isin(selected_years)][data["Quarter"].isin(selected_quarters)].copy()
 
 # Calculate percentage difference from the base airline
 comparison_data = []
 for year in selected_years:
     for quarter in selected_quarters:
         for metric in selected_metrics:
-            base_values = filtered_data[filtered_data["Airline"] == base_airline].set_index("Date")[metric]
+            base_values = filtered_data[filtered_data["Airline"] == base_airline].set_index("Period")[metric]
             for airline in selected_airlines:
-                airline_values = filtered_data[filtered_data["Airline"] == airline].set_index("Date")[metric]
+                airline_values = filtered_data[filtered_data["Airline"] == airline].set_index("Period")[metric]
                 pct_diff = round(((airline_values - base_values) / base_values) * 100, 2)
                 comparison_data.append(pd.DataFrame({
                     "Period": airline_values.index,
