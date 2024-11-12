@@ -40,6 +40,21 @@ if data_type == "Full Year":
 else:
     data = airline_financials_q
 
+# Allow user to select airlines to compare
+airlines = data["Airline"].unique()
+selected_airlines = st.multiselect("Select Airline(s) for Comparison", airlines, default=["AAL"])
+if not selected_airlines:
+    selected_airlines=["AAL"] # prevents empty set from triggering an error, displays AAL if none are selected
+
+# Allow user to select a base airline to compare others against
+if len(selected_airlines) > 1:
+    base_airline = st.selectbox("Select Airline to Compare Against", selected_airlines)
+else:
+    base_airline = selected_airlines[0]
+
+# Tie base airline selection to a theme color (to be used to dynamically change app interface element colors in future)
+base_color = airline_colors[base_airline]
+
 # Allow user to select years for comparison
 years = data["Year"].unique()
 selected_years = st.multiselect("Select Year(s) for Comparison", years, default=years)
@@ -54,18 +69,6 @@ if data_type == "Quarterly":
         selected_quarters=quarters
 elif data_type == "Full Year":
     selected_quarters=quarters
-
-# Allow user to select airlines to compare
-airlines = data["Airline"].unique()
-selected_airlines = st.multiselect("Select Airline(s) for Comparison", airlines, default=["AAL"])
-if not selected_airlines:
-    selected_airlines=["AAL"] # prevents empty set from triggering an error, displays AAL if none are selected
-
-# Allow user to select a base airline to compare others against
-if len(selected_airlines) > 1:
-    base_airline = st.selectbox("Select Airline to Compare Against", selected_airlines)
-else:
-    base_airline = selected_airlines[0]
 
 # Allow user to select metrics to compare
 available_metrics = data.columns.drop(["Year", "Quarter", "Airline", "Period", "Date"])
@@ -144,7 +147,7 @@ for metric in selected_metrics:
     if len(selected_airlines) <= 1:
         comparison_display = comparison_display.drop(columns=[f"Difference vs {base_airline}"]) # do not display percent difference column if only 1 airline is selected
     if len(selected_airlines) > 1:
-        comparison_display = comparison_display.style.applymap_index(color_airlines, level="Airline").applymap(color_positive_negative_zero, subset=[f"Difference vs {base_airline}"]) # map color of comparison column based on its sign and color of airline codes based on code
+        comparison_display = comparison_display.style.applymap_index(color_airlines, level="Airline").applymap(color_positive_negative_zero, subset=[f"Difference vs {base_airline}"]) # map color of comparison column based on its sign and color of airline codes based on code (streamlit doesn't directly support color text in an index)
     st.dataframe(comparison_display) 
 
     # Time series line plot for the metric's change over time if more than one time period (quarter or year) is selected.
