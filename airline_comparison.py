@@ -65,12 +65,12 @@ filtered_data = data[data["Airline"].isin(selected_airlines)][data["Year"].isin(
 # Calculate percentage difference from the base airline
 comparison_data = []
 for metric in selected_metrics:
-    base_values = filtered_data[filtered_data["Airline"] == base_airline].set_index("Period")[metric]
+    base_values = filtered_data[filtered_data["Airline"] == base_airline].set_index("Date")[metric]
     for airline in selected_airlines:
-        airline_values = filtered_data[filtered_data["Airline"] == airline].set_index("Period")[metric]
+        airline_values = filtered_data[filtered_data["Airline"] == airline].set_index("Date")[metric]
         pct_diff = round(((airline_values - base_values) / base_values+.0000000000000000000000000000001) * 100, 2)
         comparison_data.append(pd.DataFrame({
-            "Period": airline_values.index,
+            "Date": airline_values.index,
             "Airline": airline,
             "Metric": metric,
             "Value": airline_values.values,
