@@ -9,12 +9,14 @@ airline_financials = pd.read_csv(file_path)
 
 # Split data into full-year and quarterly DataFrames
 airline_financials_fy = airline_financials[airline_financials["Quarter"] == "FY"].copy()
+airline_financials_q["Profit Sharing"] = airline_financials_q["Quarter"].astype(float64)
 airline_financials_fy["Period"] = airline_financials_fy["Year"].astype(str) + airline_financials_fy["Quarter"].astype(str)
 airline_financials_fy["Date"] = pd.to_datetime(airline_financials_fy["Year"].astype(str) + "-12-31")
 airline_financials_fy["Net Margin"] = (airline_financials_fy["Net Income"] / airline_financials_fy["Total Revenue"]) * 100
 
 airline_financials_q = airline_financials[airline_financials["Quarter"] != "FY"].copy()
 airline_financials_q["Quarter"] = airline_financials_q["Quarter"].astype(int)
+airline_financials_q["Profit Sharing"] = airline_financials_q["Quarter"].astype(float64)
 airline_financials_q["Period"] = airline_financials_q["Year"].astype(str) + "Q" + airline_financials_q["Quarter"].astype(str)
 airline_financials_q["Date"] = pd.to_datetime(airline_financials_q["Year"].astype(str) + "-" + (airline_financials_q["Quarter"]*3).astype(str) + "-01") + pd.offsets.MonthEnd(0)
 airline_financials_q["Net Margin"] = (airline_financials_q["Net Income"] / airline_financials_q["Total Revenue"]) * 100
