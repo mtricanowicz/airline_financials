@@ -69,7 +69,7 @@ comparison_df = pd.concat(comparison_data)
 
 # Display comparison table
 st.write("Comparison Data")
-st.write(comparison_df)
+st.write(comparison_df.sort_values(by="Date", ascending=True))
 
 # Plotting
 for metric in selected_metrics:
