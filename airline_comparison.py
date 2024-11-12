@@ -119,6 +119,8 @@ for metric in selected_metrics:
     comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
     if metric in ["Total Revenue", "Total Revenue per Available Seat Mile (TRASM)", "Net Income", "Profit Sharing"]:
         comparison_display[metric] = comparison_display[metric].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.4f}") # reformat currency columns to show $ sign
+    elif metric in ["Net Margin"]:
+        comparison_display[metric] = comparison_display[metric].apply(lambda x: f"{x:,.2f}%") # reformat margin columns to show % sign
     if len(selected_airlines) <= 1:
         comparison_display = comparison_display.drop(columns=[f"Difference vs {base_airline}"]) # do not display percent difference column if only 1 airline is selected
     st.dataframe(comparison_display.set_index("Period").drop(columns=["Date"]).sort_values(by=["Period"], ascending=True))
