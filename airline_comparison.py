@@ -164,7 +164,7 @@ for metric in selected_metrics:
 
     # Time series line plot for the metric's change over time if more than one time period (quarter or year) is selected.
     if len(selected_years)>1 or len(selected_quarters)>1:
-        fig, ax = plt.subplots(figsize=(20, 10))
+        fig, ax = plt.subplots(figsize=(12, 6))
         sns.lineplot(data=filtered_data, x="Period", y=metric, hue="Airline", palette=airline_colors, ax=ax)
         plt.xticks(rotation=45, ha="right", va="top")
         ax.set_title(f"{metric} Over Time")
@@ -176,7 +176,7 @@ for metric in selected_metrics:
 
     # Bar plot for % difference if more than one airline is selected.
     if len(selected_airlines) > 1:
-        fig, ax = plt.subplots(figsize=(20, 10))
+        fig, ax = plt.subplots(figsize=(12, 6))
         sns.barplot(data=comparison_df[comparison_df["Metric"] == metric], x="Period", y="Percent Difference", hue="Airline", palette=airline_colors, ax=ax)
         plt.xticks(rotation=45, ha="right", va="top")
         ax.set_title(f"Percentage Difference in {metric} Compared to {base_airline}")
