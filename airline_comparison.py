@@ -87,7 +87,7 @@ st.write(comparison_df.sort_values(by=["Date", "Metric"], ascending=True))
 for metric in selected_metrics:
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.lineplot(data=filtered_data, x="Date", y=metric, hue="Airline", palette=airline_colors, ax=ax)
-    plt.xticks(ticks=filtered_data["Date"].unique(), labels=filtered_data["Period"].unique())
+    plt.xticks(ticks=filtered_data["Date"].unique(), labels=filtered_data["Period"].unique(), rotation=45)
     ax.set_title(f"{metric} Over Time")
     ax.set_ylabel(metric)
     ax.legend(title="Airline")
