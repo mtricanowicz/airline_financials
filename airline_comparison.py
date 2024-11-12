@@ -28,7 +28,7 @@ airline_colors = {
     "UAL": "blue"
 }
 
-# Streamlit app interface
+# Streamlit app title
 st.title("Airline Financial Metrics Comparison")
 
 # Allow users to select full-year or quarterly data
@@ -54,8 +54,11 @@ selected_airlines = st.multiselect("Select Airline(s) for Comparison", airlines,
 if not selected_airlines:
     selected_airlines=["AAL"] # prevents empty set from triggering an error, displays AAL if none are selected
 
-# Allow user to select a base airline
-base_airline = st.selectbox("Select Baseline Airline", selected_airlines)
+# Allow user to select a base airline to compare others against
+if len(selected_airlines) > 1:
+    base_airline = st.selectbox("Select Airline to Compare Against", selected_airlines)
+else:
+    base_airline = selected_airlines[0]
 
 # Allow user to select metrics to compare
 available_metrics = data.columns.drop(["Year", "Quarter", "Airline", "Period", "Date"])
@@ -95,7 +98,6 @@ for metric in selected_metrics:
             "Value": airline_values.values,
             "Percent Difference": percent_difference.values
         }))
-
 comparison_df = pd.concat(comparison_data) # output the comparison dataframe
 comparison_df = comparison_df.drop(columns=["Period"], errors='ignore')  # ensure dataframe doesn't have a "Period" column prior to the merge operation to add one
 comparison_df = pd.merge(comparison_df, filtered_data.drop_duplicates(subset="Date", keep="first")[["Date", "Period"]], on="Date", how="left") # add "Period" column to be used for plotting
