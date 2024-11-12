@@ -88,8 +88,8 @@ st.write(comparison_df.set_index("Period").drop(columns=["Date"]).sort_values(by
 # Plotting selected metrics over time
 for metric in selected_metrics:
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.lineplot(data=filtered_data, x="Date", y=metric, hue="Airline", palette=airline_colors, ax=ax)
-    plt.xticks(ticks=filtered_data["Date"].unique(), labels=filtered_data["Period"].unique(), rotation=45, ha="right", va="top")
+    sns.lineplot(data=filtered_data, x="Period", y=metric, hue="Airline", palette=airline_colors, ax=ax)
+    plt.xticks(rotation=45, ha="right", va="top")
     ax.set_title(f"{metric} Over Time")
     ax.set_xlabel(None)
     ax.set_ylabel(metric)
@@ -99,11 +99,8 @@ for metric in selected_metrics:
     # Bar plot for % difference if more than one airline is selected
     if len(selected_airlines) > 1:
         fig, ax = plt.subplots(figsize=(10, 6))
-        sns.barplot(
-            data=comparison_df[comparison_df["Metric"] == metric],
-            x="Date", y="Percent Difference", hue="Airline", palette=airline_colors, ax=ax
-        )
-        plt.xticks(ticks=comparison_df["Date"], labels=comparison_df["Period"], rotation=45, ha="right", va="top")
+        sns.barplot(data=comparison_df[comparison_df["Metric"] == metric], x="Period", y="Percent Difference", hue="Airline", palette=airline_colors, ax=ax)
+        plt.xticks(rotation=45, ha="right", va="top")
         ax.set_title(f"Percentage Difference in {metric} Compared to {base_airline}")
         ax.set_xlabel(None)
         ax.set_ylabel("Percentage Difference (%)")
