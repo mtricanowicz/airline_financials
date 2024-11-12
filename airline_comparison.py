@@ -99,6 +99,7 @@ for metric in selected_metrics:
             data=comparison_df[comparison_df["Metric"] == metric],
             x="Date", y="Percent Difference", hue="Airline", palette=airline_colors, ax=ax
         )
+        plt.xticks(labels=filtered_data["Period"])
         ax.set_title(f"Percentage Difference in {metric} Compared to {base_airline}")
         ax.set_ylabel("Percentage Difference (%)")
         ax.axhline(0, color="gray", linestyle="--")
