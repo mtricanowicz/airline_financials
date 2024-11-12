@@ -116,6 +116,15 @@ comparison_df = pd.merge(comparison_df, filtered_data.drop_duplicates(subset="Da
 # Display selected data
 for metric in selected_metrics:
     
+    # Define function to alter color of the comparison column values based on sign
+    def color_positive_negative_zero(val):
+        color = "green" if float(val[:-1]) > 0 else "red" if float(val[:-1]) < 0 else "black"
+        return f"color: {color}"
+
+    # Function to apply color based on the airline code
+    def color_airlines(val):
+        return f"color: {airline_colors.get(val, '')}" if val in airline_colors else ""
+
     # Display table for the metric to allow review of the data
     st.write(f"{metric} Comparison")
     comparison_display = comparison_df[comparison_df["Metric"] == metric] # prepare a copy of the comparison table to be used for display
@@ -130,7 +139,11 @@ for metric in selected_metrics:
         comparison_display[metric] = comparison_display[metric].apply(lambda x: f"{x:,.2f}%") # reformat margin columns to show % sign
     if len(selected_airlines) <= 1:
         comparison_display = comparison_display.drop(columns=[f"Difference vs {base_airline}"]) # do not display percent difference column if only 1 airline is selected
-    st.dataframe(comparison_display.set_index("Period").drop(columns=["Date"]).sort_values(by=["Period"], ascending=True))
+    comparison_display = comparison_display.drop(columns=["Date"]).sort_values(by=["Period"], ascending=True) # remove date column from display and sort dataframe by the period
+    comparison_display = comparison_display.reset_index(drop=True) # reset the index
+    comparison_display = comparison_display[["Period", "Airline", metric, f"Difference vs {base_airline}"]] # reorder the columns
+    comparison_display = comparison_display.style.applymap(color_airlines, subset=["Airline"]).applymap(color_positive_negative_zero, subset=[f"Difference vs {base_airline}"]) # map color of comparison column based on its sign and color of airline codes based on code
+    st.dataframe(comparison_display) 
 
     # Time series line plot for the metric's change over time if more than one time period (quarter or year) is selected.
     if len(selected_years)>1 or len(selected_quarters)>1:
