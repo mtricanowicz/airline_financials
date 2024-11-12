@@ -146,7 +146,7 @@ for metric in selected_metrics:
     #comparison_display = comparison_display.style.set_table_styles([{"subset": ["Percent Difference"], "props": [("text-align", "right")]}])
     comparison_display = comparison_display.rename(columns={"Percent Difference":f"Difference vs {base_airline}"}) # rename percent difference column to make it more understandable
     comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
-    if metric in ["Total Revenue (billions)", "Total Revenue per Available Seat Mile (TRASM)", "Net Income (billions)", "Profit Sharing (millions)"]:
+    if metric in ["Total Revenue (billions)", "Net Income (billions)", "Profit Sharing (millions)"]:
         comparison_display[metric] = comparison_display[metric].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.2f}") # reformat currency columns to show $ sign
     elif metric in ["Total Revenue per Available Seat Mile (TRASM)"]:
         comparison_display[metric] = comparison_display[metric].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.4f}") # reformat currency columns to show $ sign
@@ -184,3 +184,10 @@ for metric in selected_metrics:
         ax.set_ylabel("Percentage Difference (%)")
         ax.axhline(0, color="gray", linestyle="--")
         st.pyplot(fig)
+
+
+
+
+
+
+0
