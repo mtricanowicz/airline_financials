@@ -23,9 +23,11 @@ airline_financials_q["Net Margin"] = (airline_financials_q["Net Income"] / airli
 
 # Color palette to use for visualizaitons
 airline_colors = {
-    "AAL": "red",
-    "DAL": "purple",
-    "UAL": "blue"
+    "AAL": "#A5B5BE",
+    "DAL": "#9B1631",
+    "UAL": "#005daa",
+    "ALK": "#00385f",
+    "LUV": "#f9b612"
 }
 
 # Streamlit app title
