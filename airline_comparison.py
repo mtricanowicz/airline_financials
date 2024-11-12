@@ -48,8 +48,11 @@ if not selected_years:
 
 # Allow user to select quarters for comparison
 quarters = data["Quarter"].unique()
-selected_quarters = st.multiselect("Select Quarter(s) for Comparison", quarters, default=quarters)
-if not selected_quarters: # prevents empty set from triggering an error, displays all quarters if none are selected
+if data_type == "Quarterly":
+    selected_quarters = st.multiselect("Select Quarter(s) for Comparison", quarters, default=quarters)
+    if not selected_quarters: # prevents empty set from triggering an error, displays all quarters if none are selected
+        selected_quarters=quarters
+elif data_type == "Full Year":
     selected_quarters=quarters
 
 # Allow user to select airlines to compare
