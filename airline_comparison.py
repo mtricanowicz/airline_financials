@@ -34,7 +34,7 @@ airline_colors = {
 st.title("Airline Financial Metrics Comparison")
 
 # Allow users to select full-year or quarterly data
-data_type = st.selectbox("View Full Year or Quaterly Data?", ["Full Year", "Quarterly"])
+data_type = st.selectbox("View Full Year or Quarterly Data?", ["Full Year", "Quarterly"])
 if data_type == "Full Year":
     data = airline_financials_fy
 else:
@@ -126,7 +126,7 @@ for metric in selected_metrics:
         return f"color: {airline_colors.get(val, '')}" if val in airline_colors else ""
 
     # Display table for the metric to allow review of the data
-    st.write(f"{metric} Comparison")
+    st.title(f"{metric} Comparison")
     comparison_display = comparison_df[comparison_df["Metric"] == metric] # prepare a copy of the comparison table to be used for display
     comparison_display = comparison_display.rename(columns={"Value":metric}) # rename value column to make it more understandable
     comparison_display["Percent Difference"] = comparison_display["Percent Difference"].apply(lambda x: f"{x}%") # reformat percent difference column to show % sign
@@ -138,17 +138,16 @@ for metric in selected_metrics:
     elif metric in ["Net Margin"]:
         comparison_display[metric] = comparison_display[metric].apply(lambda x: f"{x:,.2f}%") # reformat margin columns to show % sign
     comparison_display = comparison_display.drop(columns=["Date"]).sort_values(by=["Period"], ascending=True) # remove date column from display and sort dataframe by the period
-    comparison_display = comparison_display.reset_index(drop=True) # reset the index
-    comparison_display = comparison_display[["Period", "Airline", metric, f"Difference vs {base_airline}"]] # reorder the columns
+    comparison_display = comparison_display.set_index(["Period", "Airline"])
     if len(selected_airlines) <= 1:
         comparison_display = comparison_display.drop(columns=[f"Difference vs {base_airline}"]) # do not display percent difference column if only 1 airline is selected
     if len(selected_airlines) > 1:
-        comparison_display = comparison_display.style.applymap(color_airlines, subset=["Airline"]).applymap(color_positive_negative_zero, subset=[f"Difference vs {base_airline}"]) # map color of comparison column based on its sign and color of airline codes based on code
+        comparison_display = comparison_display.style.applymap_index(color_airlines, level="Airline").applymap(color_positive_negative_zero, subset=[f"Difference vs {base_airline}"]) # map color of comparison column based on its sign and color of airline codes based on code
     st.dataframe(comparison_display) 
 
     # Time series line plot for the metric's change over time if more than one time period (quarter or year) is selected.
     if len(selected_years)>1 or len(selected_quarters)>1:
-        fig, ax = plt.subplots(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(20, 10))
         sns.lineplot(data=filtered_data, x="Period", y=metric, hue="Airline", palette=airline_colors, ax=ax)
         plt.xticks(rotation=45, ha="right", va="top")
         ax.set_title(f"{metric} Over Time")
@@ -159,7 +158,7 @@ for metric in selected_metrics:
 
     # Bar plot for % difference if more than one airline is selected.
     if len(selected_airlines) > 1:
-        fig, ax = plt.subplots(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(20, 10))
         sns.barplot(data=comparison_df[comparison_df["Metric"] == metric], x="Period", y="Percent Difference", hue="Airline", palette=airline_colors, ax=ax)
         plt.xticks(rotation=45, ha="right", va="top")
         ax.set_title(f"Percentage Difference in {metric} Compared to {base_airline}")
