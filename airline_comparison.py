@@ -81,7 +81,7 @@ comparison_df = pd.concat(comparison_data)
 
 # Display comparison table
 st.write("Airline Comparison")
-st.write(comparison_df.sort_values(by=["Period", "Metric"], ascending=True))
+st.write(comparison_df.sort_values(by=["Date", "Metric"], ascending=True))
 
 # Plotting selected metrics over time
 for metric in selected_metrics:
