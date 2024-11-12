@@ -29,10 +29,6 @@ airline_colors = {
 # Streamlit app interface
 st.title("Airline Financial Metrics Comparison")
 
-# Reset button
-if st.button("Reset to Default"):
-    st.experimental_rerun()  # Refreshes the app to reset selectors
-
 # Allow users to select full-year or quarterly data
 data_type = st.selectbox("Select Data Type", ["Full Year (FY)", "Quarterly"])
 if data_type == "Full Year (FY)":
@@ -60,6 +56,10 @@ base_airline = st.selectbox("Select Baseline Airline", selected_airlines)
 # Allow user to select metrics to compare
 available_metrics = ["Total Revenue", "Available Seat Miles (ASM)", "Total Revenue per Available Seat Mile (TRASM)", "Net Income", "Net Margin", "Profit Sharing"]
 selected_metrics = st.multiselect("Select Metrics to Compare", available_metrics, default=available_metrics)
+
+# Reset button
+if st.button("Reset Selections"):
+    st.experimental_rerun()  # Refreshes the app to reset selectors
 
 # Filter data for selected airlines and metrics
 filtered_data = data[data["Airline"].isin(selected_airlines)][data["Year"].isin(selected_years)][data["Quarter"].isin(selected_quarters)].copy()
