@@ -56,7 +56,7 @@ for metric in selected_metrics:
     base_values = filtered_data[filtered_data["Airline"] == base_airline].set_index("Period")[metric]
     for airline in selected_airlines:
         airline_values = filtered_data[filtered_data["Airline"] == airline].set_index("Period")[metric]
-        pct_diff = round(((airline_values - base_values) / base_values) * 100, 2)
+        pct_diff = if(airline==base_airline, "Baseline", round(((airline_values - base_values) / base_values) * 100, 2))
         comparison_data.append(pd.DataFrame({
             "Period": airline_values.index,
             "Airline": airline,
@@ -68,10 +68,10 @@ for metric in selected_metrics:
 comparison_df = pd.concat(comparison_data)
 
 # Display comparison table
-st.write("Comparison Data")
+st.write("Airline Comparison")
 st.write(comparison_df.sort_values(by=["Period", "Metric"], ascending=True))
 
-# Plotting
+# Plotting selected metrics over time
 for metric in selected_metrics:
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.lineplot(data=filtered_data, x="Date", y=metric, hue="Airline", palette=airline_colors, ax=ax)
@@ -84,7 +84,7 @@ for metric in selected_metrics:
     if len(selected_airlines) > 1:
         fig, ax = plt.subplots(figsize=(10, 6))
         sns.barplot(
-            data=comparison_df[comparison_df["Metric"] == metric],
+            data=comparison_df[comparison_df["Metric"] == metric & comparison_df["Airline"]!=base_airline],
             x="Date", y="Pct Difference", hue="Airline", palette=airline_colors, ax=ax
         )
         ax.set_title(f"Percentage Difference in {metric} Compared to {base_airline}")
