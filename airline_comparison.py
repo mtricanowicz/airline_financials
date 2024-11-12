@@ -50,7 +50,7 @@ if not selected_quarters:
 
 # Allow user to select airlines to compare
 airlines = data["Airline"].unique()
-selected_airlines = st.multiselect("Select Airlines for Comparison", airlines, default=airlines[0:1])
+selected_airlines = st.multiselect("Select Airline(s) for Comparison", airlines, default=airlines[0:1])
 
 # Allow user to select a base airline
 base_airline = st.selectbox("Select Baseline Airline", selected_airlines)
@@ -100,7 +100,7 @@ for metric in selected_metrics:
             data=comparison_df[comparison_df["Metric"] == metric],
             x="Date", y="Percent Difference", hue="Airline", palette=airline_colors, ax=ax
         )
-        plt.xticks(ticks=comparison_df["Date"].unique(), labels=filtered_data["Period"].unique(), rotation=45, ha="right", va="top")
+        #plt.xticks(ticks=comparison_df["Date"].unique(), labels=filtered_data["Period"].unique(), rotation=45, ha="right", va="top")
         ax.set_title(f"Percentage Difference in {metric} Compared to {base_airline}")
         ax.set_ylabel("Percentage Difference (%)")
         ax.axhline(0, color="gray", linestyle="--")
