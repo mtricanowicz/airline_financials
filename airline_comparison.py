@@ -68,7 +68,7 @@ for metric in selected_metrics:
     base_values = filtered_data[filtered_data["Airline"] == base_airline].set_index("Date")[metric]
     for airline in selected_airlines:
         airline_values = filtered_data[filtered_data["Airline"] == airline].set_index("Date")[metric]
-        pct_diff = round(((airline_values - base_values) / base_values+.0000000000000000000000000000001) * 100, 2)
+        pct_diff = round(((airline_values - base_values) / base_values) * 100, 2)
         comparison_data.append(pd.DataFrame({
             "Date": airline_values.index,
             "Airline": airline,
