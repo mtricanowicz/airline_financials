@@ -32,21 +32,23 @@ airline_colors = {
 st.title("Airline Financial Metrics Comparison")
 
 # Allow users to select full-year or quarterly data
-data_type = st.selectbox("Select Data Type", ["Full Year (FY)", "Quarterly"])
-if data_type == "Full Year (FY)":
+data_type = st.selectbox("View Full Year or Quaterly Data?", ["Full Year", "Quarterly"])
+if data_type == "Full Year":
     data = airline_financials_fy
 else:
     data = airline_financials_q
 
-# Allow user to select year and quarter
+# Allow user to select years for comparison
 years = data["Year"].unique()
-quarters = data["Quarter"].unique()
 selected_years = st.multiselect("Select Year(s) for Comparison", years, default=years)
 if not selected_years:
     selected_years=years # prevents empty set from triggering an error, displays all years if none are selected
+
+# Allow user to select quarters for comparison
+quarters = data["Quarter"].unique()
 selected_quarters = st.multiselect("Select Quarter(s) for Comparison", quarters, default=quarters)
-if not selected_quarters:
-    selected_quarters=quarters # prevents empty set from triggering an error, displays all quarters if none are selected
+if not selected_quarters: # prevents empty set from triggering an error, displays all quarters if none are selected
+    selected_quarters=quarters
 
 # Allow user to select airlines to compare
 airlines = data["Airline"].unique()
