@@ -7,19 +7,29 @@ import seaborn as sns
 file_path = "airline_financial_data.csv"
 airline_financials = pd.read_csv(file_path)
 
+# Adjust some of the metrics to scale better
+airline_financials["Net Income"] = airline_financials["Net Income"]/1000000000
+airline_financials.rename(columns={"Net Income":"Net Income (billions)"}, inplace=True)
+airline_financials["Total Revenue"] = airline_financials["Total Revenue"]/1000000000
+airline_financials.rename(columns={"Total Revenue":"Total Revenue (billions)"}, inplace=True)
+airline_financials["Available Seat Miles (ASM)"] = airline_financials["Available Seat Miles (ASM)"]/1000000000
+airline_financials.rename(columns={"Available Seat Miles (ASM)":"Available Seat Miles (ASM) (billions)"}, inplace=True)
+airline_financials["Profit Sharing"] = airline_financials["Profit Sharing"]/1000000
+airline_financials.rename(columns={"Profit Sharing":"Profit Sharing (millions)"}, inplace=True)
+
 # Split data into full-year and quarterly DataFrames
 airline_financials_fy = airline_financials[airline_financials["Quarter"] == "FY"].copy()
-airline_financials_fy["Profit Sharing"] = airline_financials_fy["Profit Sharing"].astype(float)
+airline_financials_fy["Profit Sharing (millions)"] = airline_financials_fy["Profit Sharing (millions)"].astype(float)
 airline_financials_fy["Period"] = airline_financials_fy["Year"].astype(str) + airline_financials_fy["Quarter"].astype(str)
 airline_financials_fy["Date"] = pd.to_datetime(airline_financials_fy["Year"].astype(str) + "-12-31")
-airline_financials_fy["Net Margin"] = (airline_financials_fy["Net Income"] / airline_financials_fy["Total Revenue"]) * 100
+airline_financials_fy["Net Margin"] = (airline_financials_fy["Net Income (billions)"] / airline_financials_fy["Total Revenue (billions)"]) * 100
 
 airline_financials_q = airline_financials[airline_financials["Quarter"] != "FY"].copy()
 airline_financials_q["Quarter"] = airline_financials_q["Quarter"].astype(int)
-airline_financials_q["Profit Sharing"] = airline_financials_q["Profit Sharing"].astype(float)
+airline_financials_q["Profit Sharing (millions)"] = airline_financials_q["Profit Sharing (millions)"].astype(float)
 airline_financials_q["Period"] = airline_financials_q["Year"].astype(str) + "Q" + airline_financials_q["Quarter"].astype(str)
 airline_financials_q["Date"] = pd.to_datetime(airline_financials_q["Year"].astype(str) + "-" + (airline_financials_q["Quarter"]*3).astype(str) + "-01") + pd.offsets.MonthEnd(0)
-airline_financials_q["Net Margin"] = (airline_financials_q["Net Income"] / airline_financials_q["Total Revenue"]) * 100
+airline_financials_q["Net Margin"] = (airline_financials_q["Net Income (billions)"] / airline_financials_q["Total Revenue (billions)"]) * 100
 
 # Color palette to use for visualizaitons
 airline_colors = {
@@ -136,7 +146,9 @@ for metric in selected_metrics:
     #comparison_display = comparison_display.style.set_table_styles([{"subset": ["Percent Difference"], "props": [("text-align", "right")]}])
     comparison_display = comparison_display.rename(columns={"Percent Difference":f"Difference vs {base_airline}"}) # rename percent difference column to make it more understandable
     comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
-    if metric in ["Total Revenue", "Total Revenue per Available Seat Mile (TRASM)", "Net Income", "Profit Sharing"]:
+    if metric in ["Total Revenue (billions)", "Total Revenue per Available Seat Mile (TRASM)", "Net Income (billions)", "Profit Sharing (millions)"]:
+        comparison_display[metric] = comparison_display[metric].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.2f}") # reformat currency columns to show $ sign
+    elif metric in ["Total Revenue per Available Seat Mile (TRASM)"]:
         comparison_display[metric] = comparison_display[metric].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.4f}") # reformat currency columns to show $ sign
     elif metric in ["Net Margin"]:
         comparison_display[metric] = comparison_display[metric].apply(lambda x: f"{x:,.2f}%") # reformat margin columns to show % sign
@@ -159,6 +171,7 @@ for metric in selected_metrics:
         ax.set_xlabel(None)
         ax.set_ylabel(metric)
         ax.legend(title="Airline")
+        ax.axhline(0, color="gray", linestyle="--")
         st.pyplot(fig)
 
     # Bar plot for % difference if more than one airline is selected.
