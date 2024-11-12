@@ -62,19 +62,34 @@ selected_metrics = st.multiselect("Select Metrics to Compare", available_metrics
 # Filter data for selected airlines and metrics
 filtered_data = data[data["Airline"].isin(selected_airlines)][data["Year"].isin(selected_years)][data["Quarter"].isin(selected_quarters)].copy()
 
-# Calculate percentage difference from the base airline
+# Define a function to compare values between airlines and output the percent difference
+def pct_diff(base, comparison):
+    # Handle cases where base is zero to avoid division by zero
+    if base == 0:
+        return float('inf') if comparison != 0 else 0
+
+    # Calculate the percentage difference using absolute values
+    percent_change = round(abs((comparison - base) / abs(base)) * 100, 2)
+
+    # Determine if the change should be considered positive or negative
+    if (base < 0 < comparison) or (base > 0 > comparison):
+        return -percent_change
+    else:
+        return percent_change
+
+# Calculate percentage difference from the base airline and generate a comparison table with chosen metrics
 comparison_data = []
 for metric in selected_metrics:
     base_values = filtered_data[filtered_data["Airline"] == base_airline].set_index("Date")[metric]
     for airline in selected_airlines:
         airline_values = filtered_data[filtered_data["Airline"] == airline].set_index("Date")[metric]
-        pct_diff = round(((airline_values - base_values) / base_values) * 100, 2)
+        percent_difference = pct_diff(base_values, airline_values)
         comparison_data.append(pd.DataFrame({
             "Date": airline_values.index,
             "Airline": airline,
             "Metric": metric,
             "Value": airline_values.values,
-            "Percent Difference": pct_diff.values
+            "Percent Difference": percent_difference.values
         }))
 
 comparison_df = pd.concat(comparison_data) # output the comparison dataframe
