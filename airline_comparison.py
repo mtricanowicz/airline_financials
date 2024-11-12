@@ -102,17 +102,20 @@ comparison_df = pd.merge(comparison_df, filtered_data.drop_duplicates(subset="Da
 #st.write("Airline Comparison")
 #st.write(comparison_df.set_index("Period").drop(columns=["Date"]).sort_values(by=["Period", "Metric"], ascending=True))
 
-# Plotting selected metrics over time
+# Display selected data
 for metric in selected_metrics:
     
     # Display table for the metric to allow review of the data
     st.write(f"{metric} Comparison")
-    comparison_display = comparison_df[comparison_df["Metric"] == metric]
-    comparison_display = comparison_display.rename(columns={"Value":metric})
-    comparison_display = comparison_display.drop(columns=["Metric"])
+    comparison_display = comparison_df[comparison_df["Metric"] == metric] # prepare a copy of the comparison table to be used for display
+    comparison_display = comparison_display.rename(columns={"Value":metric}) # rename value column to make it more understandable
+    comparison_display["Percent Difference"] = comparison_display["Percent Difference"].apply(lambda x: f"{x}%") # reformat percent difference column to show % sign
+    #comparison_display = comparison_display.style.set_table_styles([{"subset": ["Percent Difference"], "props": [("text-align", "right")]}])
+    comparison_display = comparison_display.rename(columns={"Percent Difference":f"Difference vs {base_airline}"}) # rename percent difference column to make it more understandable
+    comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
     if metric in ["Total Revenue", "Total Revenue per Available Seat Mile (TRASM)", "Net Income", "Profit Sharing"]:
-        comparison_display[metric] = comparison_display[metric].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.4f}")
-    st.write(comparison_display.set_index("Period").drop(columns=["Date"]).sort_values(by=["Period"], ascending=True))
+        comparison_display[metric] = comparison_display[metric].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.4f}") # reformat currency columns to show $ sign
+    st.dataframe(comparison_display.set_index("Period").drop(columns=["Date"]).sort_values(by=["Period"], ascending=True))
 
     # Time series line plot for the metric's change over time if more than one time period (quarter or year) is selected.
     if len(selected_years)>1 or len(selected_quarters)>1:
