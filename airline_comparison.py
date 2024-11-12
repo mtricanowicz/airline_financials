@@ -40,10 +40,10 @@ else:
 years = data["Year"].unique()
 quarters = data["Quarter"].unique()
 selected_years = st.multiselect("Select Year(s) for Comparison", years, default=years[:])
-if selected_years==[]:
+if selected_years==None:
     selected_years=year[:]
 selected_quarters = st.multiselect("Select Quarter(s) for Comparison", quarters, default=quarters[:])
-if selected_quarters==[]:
+if selected_quarters==None:
     selected_quarters=quarters[:]
 
 # Allow user to select airlines to compare
