@@ -36,6 +36,12 @@ if data_type == "Full Year (FY)":
 else:
     data = airline_financials_q
 
+# Allow user to select year and quarter
+years = data["Year"].unique()
+quarters = data["Quarter"].unique()
+selected_years = st.multiselect("Select Year(s) for Comparison", years, default=years[:])
+selected_quarters = st.multiselect("Select Quarter(s) for Comparison", quarters, default=quarters[:])
+
 # Allow user to select airlines to compare
 airlines = data["Airline"].unique()
 selected_airlines = st.multiselect("Select Airlines for Comparison", airlines, default=airlines[0:1])
