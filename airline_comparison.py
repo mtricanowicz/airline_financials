@@ -80,11 +80,11 @@ for metric in selected_metrics:
 comparison_df = pd.concat(comparison_data) # output the comparison dataframe
 comparison_df = comparison_df.drop(columns=["Period"], errors='ignore')  # ensure dataframe doesn't have a "Period" column prior to the merge operation to add one
 comparison_df = pd.merge(comparison_df, filtered_data.drop_duplicates(subset="Date", keep="first")[["Date", "Period"]], on="Date", how="left") # add "Period" column to be used for plotting
-comparison_display = comparison_df.set_index("Period").drop(columns=["Date"]).sort_values(by=["Period", "Metric"], ascending=True) # set a display dataframe with adjusted columns
+#comparison_display = comparison_df.set_index("Period").drop(columns=["Date"]).sort_values(by=["Period", "Metric"], ascending=True) # set a display dataframe with adjusted columns
 
 # Display comparison table and sort by "Period" and "Metric"
 st.write("Airline Comparison")
-st.write(comparison_display)
+st.write(comparison_df.set_index("Period").drop(columns=["Date"]).sort_values(by=["Period", "Metric"], ascending=True))
 
 # Plotting selected metrics over time
 for metric in selected_metrics:
@@ -104,7 +104,7 @@ for metric in selected_metrics:
             data=comparison_df[comparison_df["Metric"] == metric],
             x="Date", y="Percent Difference", hue="Airline", palette=airline_colors, ax=ax
         )
-        plt.xticks(ticks=comparison_df["Date"].unique(), labels=comparison_df["Period"].unique(), rotation=45, ha="right", va="top")
+        #plt.xticks(ticks=comparison_df["Date"].unique(), labels=comparison_df["Period"].unique(), rotation=45, ha="right", va="top")
         ax.set_title(f"Percentage Difference in {metric} Compared to {base_airline}")
         ax.set_xlabel(None)
         ax.set_ylabel("Percentage Difference (%)")
