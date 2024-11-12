@@ -87,7 +87,7 @@ st.write(comparison_df.sort_values(by=["Date", "Metric"], ascending=True))
 for metric in selected_metrics:
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.lineplot(data=filtered_data, x="Date", y=metric, hue="Airline", palette=airline_colors, ax=ax)
-    plt.xticks(ticks=filtered_data["Date"].unique(), labels=filtered_data["Period"].unique(), rotation=45)
+    plt.xticks(ticks=filtered_data["Date"].unique(), labels=filtered_data["Period"].unique(), rotation=45, ha="right", va="top")
     ax.set_title(f"{metric} Over Time")
     ax.set_ylabel(metric)
     ax.legend(title="Airline")
@@ -100,7 +100,7 @@ for metric in selected_metrics:
             data=comparison_df[comparison_df["Metric"] == metric],
             x="Date", y="Percent Difference", hue="Airline", palette=airline_colors, ax=ax
         )
-        plt.xticks(ticks=comparison_df["Date"].unique(), labels=filtered_data["Period"].unique())
+        plt.xticks(ticks=comparison_df["Date"].unique(), labels=filtered_data["Period"].unique(), rotation=45, ha="right", va="top")
         ax.set_title(f"Percentage Difference in {metric} Compared to {base_airline}")
         ax.set_ylabel("Percentage Difference (%)")
         ax.axhline(0, color="gray", linestyle="--")
