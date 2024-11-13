@@ -130,7 +130,7 @@ if show_definitions:
     st.write("Revenue Passenger Mile (RPM) - A basic measure of sales volume. One RPM represents one passenger flown one mile.")
     st.write("Available Seat Mile (ASM) - A basic measure of production. One ASM represents one seat flown one mile.")
     st.write("Long-Term Debt - Total long-term debt net of current maturities.")
-    st.write("Profit Sharing - Amount of income set aside to fund employee profit sharing programs.\nNOTE: AAL's reporting of this metric was inconsistent pre-COVID and has not been reported at all post-COVID. Data provided may have been obtained from internal sources. Additionally, zero profit sharing shown can either indicate no profit sharing or lack of reported data.")
+    st.write("Profit Sharing - Amount of income set aside to fund employee profit sharing programs.<br>NOTE: AAL's reporting of this metric was inconsistent pre-COVID and has not been reported at all post-COVID. Data provided may have been obtained from internal sources. Additionally, zero profit sharing shown can either indicate no profit sharing or lack of reported data.", unsafe_allow_html=True)
     st.write("Net Margin - Percentage of profit earned for each dollar in revenue.")
     st.write("Load Factor - The percentage of available seats that are filled with revenue passengers. RPMs divided by ASMs.")
     st.write("Yield - A measure of airline revenue derived by dividing Passenger Revenue by RPMs.")
