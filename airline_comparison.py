@@ -227,7 +227,7 @@ for metric in selected_metrics:
     
     if len(selected_airlines) <= 1:
         comparison_display = comparison_display.set_index(["Period", "Airline"])
-        comparison_display = comparison_display.drop(columns=[f"Difference vs {base_airline}"]) # do not display percent difference column if only 1 airline is selected
+        comparison_display = comparison_display.drop(columns=[f"vs {base_airline}"]) # do not display percent difference column if only 1 airline is selected
     if len(selected_airlines) > 1:
         comparison_display = comparison_display.set_index(["Period", "Airline"])
         comparison_display = comparison_display.unstack(level="Airline")
