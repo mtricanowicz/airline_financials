@@ -100,14 +100,25 @@ elif data_type == "Full Year":
 
 # Allow user to select metrics to compare with a "Select All" option
 available_metrics = data.columns.drop(["Year", "Quarter", "Airline", "Period"])
-select_all = st.checkbox("Select All Metrics")
-if select_all:
-    selected_metrics = st.multiselect("Add or Remove Metrics to Compare", available_metrics, default=available_metrics)
-else:
+metric_groups = ["Earnings", "Unit Performance", "All"]
+metric_group_select = st.radio("Preselected Metrics Categories:", metric_groups, index=metric_groups.index("Earnings"))
+# Provide preselected groups of metrics and allow user to customize selection
+# Inject custom CSS to style radio buttons horizontally
+st.markdown("""
+    <style>
+        .stRadio > div {display: flex; flex-direction: row;}
+        .stRadio > div > label {margin-right: 20px;}
+    </style>
+    """, unsafe_allow_html=True)
+if metric_group_select=="Earnings":
     selected_metrics = st.multiselect("Add or Remove Metrics to Compare", available_metrics, default=["Total Revenue", "Net Income", "Net Margin"])
+elif metric_group_select=="Unit Performance":
+    selected_metrics = st.multiselect("Add or Remove Metrics to Compare", available_metrics, default=["Yield", "TRASM", "PRASM", "CASM"])
+elif metric_group_select=="All":
+    selected_metrics = st.multiselect("Add or Remove Metrics to Compare", available_metrics, default=available_metrics)
+# Address empty selection
 if not selected_metrics:
-    selected_metrics=["Total Revenue", "Net Income", "Net Margin"] # prevents empty set from triggering an error, displays default metrics if none are selected
-
+    selected_metrics = ["Total Revenue", "Net Income", "Net Margin"] # prevents empty set from triggering an error, displays earnings metrics if none are selected
 
 # Add a toggle to display metric definitions for users who need them
 show_definitions = st.checkbox("Show definitions of the available metrics.")
