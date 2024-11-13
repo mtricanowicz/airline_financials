@@ -234,11 +234,9 @@ for metric in selected_metrics:
         comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
         comparison_display = comparison_display.sort_index(axis=1, level=0)
         comparison_display = comparison_display.drop(columns=pd.IndexSlice[base_airline, f"vs {base_airline}"])
+        conditional_color_columns = [(col, f"vs {base_airline}") for col in comparison_display.columns.levels[0] if (col, f"vs {base_airline}") in comparison_display.columns] # specify the percent difference columns for which to apply conditional color formatting
+        comparison_display = comparison_display.style.applymap(color_positive_negative_zero, subset=conditional_color_columns).applymap_index(color_airlines, axis="columns", level="Airline") # map color of comparison column based on its sign and color of airline codes based on code (streamlit doesn't directly support color text in an index)
 
-        #comparison_display = comparison_display.style.applymap(color_positive_negative_zero, subset=pd.IndexSlice[selected_airlines, f"vs {base_airline}"]).applymap_index(color_airlines, axis="columns", level="Airline") # map color of comparison column based on its sign and color of airline codes based on code (streamlit doesn't directly support color text in an index)
-
-    #st.write(comparison_display.columns)
-    #st.write(comparison_display.loc[:, pd.IndexSlice[:, f"vs {base_airline}"]])
     st.dataframe(comparison_display) 
 
     # Time series line plot for the metric's change over time if more than one time period (quarter or year) is selected.
