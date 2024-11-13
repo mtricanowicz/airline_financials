@@ -213,7 +213,7 @@ for metric in selected_metrics:
     comparison_display = comparison_display.rename(columns={"Value":metric_display}) # rename value column to make it more understandable
     comparison_display["Percent Difference"] = comparison_display["Percent Difference"].apply(lambda x: f"{x}%") # reformat percent difference column to show % sign
     #comparison_display = comparison_display.style.set_table_styles([{"subset": ["Percent Difference"], "props": [("text-align", "right")]}])
-    comparison_display = comparison_display.rename(columns={"Percent Difference":f"Difference vs {base_airline}"}) # rename percent difference column to make it more understandable
+    comparison_display = comparison_display.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column to make it more understandable
     comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
     if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing"]:
         comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.2f}") # reformat currency columns to show $ sign
@@ -224,11 +224,21 @@ for metric in selected_metrics:
     else:
         comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.0f}") # ensure any other metric is displayed as a unitless integer for readability
     comparison_display = comparison_display.sort_values(by=["Period", "Airline"], ascending=True) # sort dataframe by the period and airline
-    comparison_display = comparison_display.set_index(["Period", "Airline"])
+    
     if len(selected_airlines) <= 1:
+        comparison_display = comparison_display.set_index(["Period", "Airline"])
         comparison_display = comparison_display.drop(columns=[f"Difference vs {base_airline}"]) # do not display percent difference column if only 1 airline is selected
     if len(selected_airlines) > 1:
-        comparison_display = comparison_display.style.applymap_index(color_airlines, level="Airline").applymap(color_positive_negative_zero, subset=[f"Difference vs {base_airline}"]) # map color of comparison column based on its sign and color of airline codes based on code (streamlit doesn't directly support color text in an index)
+        comparison_display = comparison_display.set_index(["Period", "Airline"])
+        comparison_display = comparison_display.unstack(level="Airline")
+        comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
+        comparison_display = comparison_display.sort_index(axis=1, level=0)
+        comparison_display = comparison_display.drop(columns=pd.IndexSlice[base_airline, f"vs {base_airline}"])
+
+        #comparison_display = comparison_display.style.applymap(color_positive_negative_zero, subset=pd.IndexSlice[selected_airlines, f"vs {base_airline}"]).applymap_index(color_airlines, axis="columns", level="Airline") # map color of comparison column based on its sign and color of airline codes based on code (streamlit doesn't directly support color text in an index)
+
+    #st.write(comparison_display.columns)
+    #st.write(comparison_display.loc[:, pd.IndexSlice[:, f"vs {base_airline}"]])
     st.dataframe(comparison_display) 
 
     # Time series line plot for the metric's change over time if more than one time period (quarter or year) is selected.
@@ -246,7 +256,7 @@ for metric in selected_metrics:
     # Bar plot for % difference if more than one airline is selected.
     if len(selected_airlines) > 1:
         fig, ax = plt.subplots(figsize=(12, 6))
-        sns.barplot(data=comparison_df[comparison_df["Metric"] == metric_display], x="Period", y="Percent Difference", hue="Airline", palette=airline_colors, ax=ax)
+        sns.barplot(data=comparison_df[comparison_df["Airline"]!=base_airline][comparison_df["Metric"] == metric_display], x="Period", y="Percent Difference", hue="Airline", palette=airline_colors, ax=ax)
         plt.xticks(rotation=45, ha="right", va="top")
         ax.set_title(f"Percentage Difference in {metric} Compared to {base_airline}")
         ax.set_xlabel(None)
