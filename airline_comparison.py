@@ -126,7 +126,7 @@ if show_definitions:
     st.write("Total Revenue - Total amount of money earned from sales.")
     st.write("Passenger Revenue - Revenue primarily composed of passenger ticket sales, loyalty travel awards, and travel-related services performed in conjunction with a passenger's flight.")
     st.write("Total Expenses - Total amount of costs incurred.")
-    st.write("Net Income - Profit. Total Revenue minus Total Expenses.")
+    st.write("Net Income - Profit.")
     st.write("Revenue Passenger Mile (RPM) - A basic measure of sales volume. One RPM represents one passenger flown one mile.")
     st.write("Available Seat Mile (ASM) - A basic measure of production. One ASM represents one seat flown one mile.")
     st.write("Long-Term Debt - Total long-term debt net of current maturities.")
