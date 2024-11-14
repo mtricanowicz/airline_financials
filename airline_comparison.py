@@ -337,7 +337,7 @@ for metric in selected_metrics:
             y="Percent Difference", 
             color="Airline",
             barmode="group",
-            title=f"Percent Difference in {metric} Compared to {base_airline}",
+            title=f"Percent Difference in {metric} vs {base_airline}",
             color_discrete_map=airline_colors  # Apply custom color mapping
             )
         # Update plot layout features
