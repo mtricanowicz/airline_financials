@@ -8,7 +8,7 @@ import seaborn as sns
 st.set_page_config(
     page_title="US Airline Financial Metrics Comparison",  # Custom title in the browser tab
     page_icon=":airplane:",  # Custom icon for the browser tab
-    layout="centered",  # Use a wide layout for the app
+    layout="centered",  # Set the defaul layout for the app
     initial_sidebar_state="auto",  # Sidebar state when app loads
     menu_items={
         "About": """
@@ -41,10 +41,10 @@ airline_financials["Period"] = airline_financials["Year"].astype(str) + airline_
 
 # Split data into full-year and quarterly DataFrames
 airline_financials_fy = airline_financials[airline_financials["Quarter"] == "FY"].copy()
-#airline_financials_fy["Date"] = pd.to_datetime(airline_financials_fy["Year"].astype(str) + "-12-31") # date ended up not being needed
+#airline_financials_fy["Date"] = pd.to_datetime(airline_financials_fy["Year"].astype(str) + "-12-31") # date ended up not being needed, keeping for future use if necessary
 
 airline_financials_q = airline_financials[airline_financials["Quarter"] != "FY"].copy()
-#airline_financials_q["Date"] = pd.to_datetime(airline_financials_q["Year"].astype(str) + "-" + (airline_financials_q["Quarter"]*3).astype(str) + "-01") + pd.offsets.MonthEnd(0) # date ended up not being needed
+#airline_financials_q["Date"] = pd.to_datetime(airline_financials_q["Year"].astype(str) + "-" + (airline_financials_q["Quarter"]*3).astype(str) + "-01") + pd.offsets.MonthEnd(0) # date ended up not being needed, keeping for future use if necessary
 
 # Color palette to use for visualizaitons
 airline_colors = {
@@ -76,12 +76,16 @@ if not selected_airlines:
 
 # Allow user to select a base airline to compare others against
 if len(selected_airlines) > 1:
-    base_airline = st.selectbox("Select Airline to Compare Against", selected_airlines)
+    compare_yes_no = st.radio("Would you like to compare selected airlines' metrics against one of the airlines?", ["Yes", "No"])
+    if(compare_yes_no=="Yes"):
+        base_airline = st.selectbox("Select Airline to Compare Against", selected_airlines)
+    else:
+        base_airline = selected_airlines[0]
 else:
     base_airline = selected_airlines[0]
 
 # Tie base airline selection to a theme color (to be used to dynamically change app interface element colors in future)
-base_color = airline_colors[base_airline]
+#base_color = airline_colors[base_airline]
 
 # Allow user to select years for comparison
 years = data["Year"].unique()
@@ -121,22 +125,47 @@ if not selected_metrics:
     selected_metrics = ["Total Revenue", "Net Income", "Net Margin"] # prevents empty set from triggering an error, displays earnings metrics if none are selected
 
 # Add a toggle to display metric definitions for users who need them
-show_definitions = st.checkbox("Show definitions of the available metrics.")
-if show_definitions:
+# Custom CSS to reduce padding around the divider
+st.markdown("""
+    <style>
+    .custom-divider {
+        border-top: 1px solid #e0e0e0;
+        margin-top: 5px;   /* Adjusts the space above */
+        margin-bottom: 5px; /* Adjusts the space below */
+    }
+    </style>
+""", unsafe_allow_html=True)
+#show_definitions = st.checkbox("Show definitions of the available metrics.")
+with st.expander("Show definitions of the available metrics."):
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     st.write("Total Revenue - Total amount of money earned from sales.")
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     st.write("Passenger Revenue - Revenue primarily composed of passenger ticket sales, loyalty travel awards, and travel-related services performed in conjunction with a passenger's flight.")
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     st.write("Total Expenses - Total amount of costs incurred.")
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     st.write("Net Income - Profit.")
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     st.write("Revenue Passenger Mile (RPM) - A basic measure of sales volume. One RPM represents one passenger flown one mile.")
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     st.write("Available Seat Mile (ASM) - A basic measure of production. One ASM represents one seat flown one mile.")
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     st.write("Long-Term Debt - Total long-term debt net of current maturities.")
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     st.write("Profit Sharing - Amount of income set aside to fund employee profit sharing programs.<br>NOTE: AAL's reporting of this metric was inconsistent pre-COVID and has not been reported at all post-COVID. Data provided may have been obtained from internal sources. Additionally, zero profit sharing shown can either indicate no profit sharing or lack of reported data.", unsafe_allow_html=True)
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     st.write("Net Margin - Percentage of profit earned for each dollar in revenue.")
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     st.write("Load Factor - The percentage of available seats that are filled with revenue passengers. RPMs divided by ASMs.")
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     st.write("Yield - A measure of airline revenue derived by dividing Passenger Revenue by RPMs.")
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     st.write("Total Revenue per Available Seat Mile (TRASM) - Total Revenue divided by ASMs.")
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     st.write("Passenger Revenue per Available Seat Mile (PRASM) - Passenger Revenue divided by ASMs.")
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     st.write("Cost per Available Seat Mile (CASM) - Total Expenses divided by ASMs.")
+    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
 
 # Filter data for selected airlines and metrics
 filtered_data = data[data["Airline"].isin(selected_airlines)][data["Year"].isin(selected_years)][data["Quarter"].isin(selected_quarters)].copy()
@@ -208,27 +237,31 @@ for metric in selected_metrics:
         return f"color: {airline_colors.get(val, '')}" if val in airline_colors else ""
 
     # Display table for the metric to allow review of the data
-    st.title(f"{metric}")
+    st.header(f"{metric}", divider="gray")
     comparison_display = comparison_df[comparison_df["Metric"] == metric_display] # prepare a copy of the comparison table to be used for display
     comparison_display = comparison_display.rename(columns={"Value":metric_display}) # rename value column to make it more understandable
     comparison_display["Percent Difference"] = comparison_display["Percent Difference"].apply(lambda x: f"{x}%") # reformat percent difference column to show % sign
     #comparison_display = comparison_display.style.set_table_styles([{"subset": ["Percent Difference"], "props": [("text-align", "right")]}])
     comparison_display = comparison_display.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column to make it more understandable
     comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
+    # Column reformatting steps
     if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing"]:
         comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.2f}") # reformat currency columns to show $ sign
     elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
         comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.2f}\u00A2") # reformat unit currency columns to show cents sign
     elif metric in ["Net Margin", "Load Factor"]:
-        comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.2f}%") # reformat margin columns to show % sign
+        comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.2f}%") # reformat percent columns to show % sign
     else:
         comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.0f}") # ensure any other metric is displayed as a unitless integer for readability
     comparison_display = comparison_display.sort_values(by=["Period", "Airline"], ascending=True) # sort dataframe by the period and airline
-    
+    # Column display output
     if len(selected_airlines) <= 1:
         comparison_display = comparison_display.set_index(["Period", "Airline"])
         comparison_display = comparison_display.drop(columns=[f"vs {base_airline}"]) # do not display percent difference column if only 1 airline is selected
-    if len(selected_airlines) > 1:
+        comparison_display = comparison_display.unstack(level="Airline")
+        comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
+        comparison_display = comparison_display.sort_index(axis=1, level=0)
+    elif len(selected_airlines) > 1 and compare_yes_no=="Yes":
         comparison_display = comparison_display.set_index(["Period", "Airline"])
         comparison_display = comparison_display.unstack(level="Airline")
         comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
@@ -236,7 +269,12 @@ for metric in selected_metrics:
         comparison_display = comparison_display.drop(columns=pd.IndexSlice[base_airline, f"vs {base_airline}"])
         conditional_color_columns = [(col, f"vs {base_airline}") for col in comparison_display.columns.levels[0] if (col, f"vs {base_airline}") in comparison_display.columns] # specify the percent difference columns for which to apply conditional color formatting
         comparison_display = comparison_display.style.applymap(color_positive_negative_zero, subset=conditional_color_columns).applymap_index(color_airlines, axis="columns", level="Airline") # map color of comparison column based on its sign and color of airline codes based on code (streamlit doesn't directly support color text in an index)
-
+    elif len(selected_airlines) > 1 and compare_yes_no=="No":
+        comparison_display = comparison_display.set_index(["Period", "Airline"])
+        comparison_display = comparison_display.drop(columns=f"vs {base_airline}") # do not display percent difference column if user chooses not to compare
+        comparison_display = comparison_display.unstack(level="Airline")
+        comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
+        comparison_display = comparison_display.sort_index(axis=1, level=0)
     st.dataframe(comparison_display) 
 
     # Time series line plot for the metric's change over time if more than one time period (quarter or year) is selected.
@@ -252,7 +290,7 @@ for metric in selected_metrics:
         st.pyplot(fig)
 
     # Bar plot for % difference if more than one airline is selected.
-    if len(selected_airlines) > 1:
+    if len(selected_airlines) > 1 and compare_yes_no=="Yes":
         fig, ax = plt.subplots(figsize=(12, 6))
         sns.barplot(data=comparison_df[comparison_df["Airline"]!=base_airline][comparison_df["Metric"] == metric_display], x="Period", y="Percent Difference", hue="Airline", palette=airline_colors, ax=ax)
         plt.xticks(rotation=45, ha="right", va="top")
