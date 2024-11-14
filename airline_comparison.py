@@ -88,7 +88,8 @@ else:
     data = airline_financials_q
 
 # Remove metrics from the data that do not have data for the chosen reporting period
-data = data.dropna(axis=1, how="all")
+data = data.dropna(axis=1, how="all") # drop columns (metrics)
+# data = data.dropna(axis=0, how="all") # drop rows (individual airline reporting periods), not applied
 
 # Allow user to select airlines to compare
 airlines = data["Airline"].unique()
@@ -182,7 +183,7 @@ def pct_diff(base, comparison):
     if base == 0:
         return float(np.inf) if comparison != 0 else 0
     # Calculate the percentage difference using absolute values
-    percent_change = round(abs((comparison - base) / abs(base)) * 100, 2)
+    percent_change = round(abs((comparison - base) / (base)) * 100, 2)
     # Determine if the change should be considered positive or negative
     if base < 0 < comparison:
         return percent_change
@@ -196,7 +197,6 @@ def pct_diff(base, comparison):
 # Calculate percentage difference from the base airline and generate a comparison table with chosen metrics
 comparison_data = []
 for metric in selected_metrics:
-
     # Adjust some of the metrics to scale better for display
     if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing", "RPM", "ASM"]:
         filtered_data[metric] = filtered_data[metric] / 1000000
@@ -204,9 +204,9 @@ for metric in selected_metrics:
         metric = metric + " (millions)" 
     elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
         filtered_data[metric] = filtered_data[metric] * 100
-    # Incoporate base airline
+    # Initiate base airline data
     base_values = filtered_data[filtered_data["Airline"] == base_airline].set_index(["Period"])[metric]
-    # Incorporate other selected airlines
+    # Initiate all selected airline data and compare to the base airline
     for airline in selected_airlines:
         airline_values = filtered_data[filtered_data["Airline"] == airline].set_index(["Period"])[metric]
         percent_difference = pd.Series([pct_diff(base, comp) for base, comp in zip(base_values, airline_values)])
@@ -216,7 +216,8 @@ for metric in selected_metrics:
             "Metric": metric,
             "Value": airline_values.values,
             "Percent Difference": percent_difference.values
-        }))
+            })
+        )
 comparison_df = pd.concat(comparison_data) # output the comparison dataframe
 comparison_df = comparison_df.reset_index(drop=True)
 
@@ -224,145 +225,192 @@ comparison_df = comparison_df.reset_index(drop=True)
 #st.write("Airline Comparison")
 #st.dataframe(comparison_df.set_index(["Period", "Airline"]).sort_values(by=["Period", "Metric", "Airline"], ascending=True))
 
-# Display selected data
+tab1, tab2 = st.tabs(["Comparison", "Most Recent Period Summary"])
 
-for metric in selected_metrics:
-
-    # Set title for the metric display
-    st.header(f"{metric}", divider="gray")
-
-    col1, col2, col3 = st.columns(3)
-
-    # Reflect the renamed metrics new names
-    if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing", "RPM", "ASM"]:
-        metric_display = metric + " (millions)"
-    else:
-        metric_display = metric
-
-    # Define function to alter color of the comparison column values based on sign
-    def color_positive_negative_zero(val):
-        color = "green" if float(val[:-1]) > 0 else "red" if float(val[:-1]) < 0 else ""
-        return f"color: {color}"
-
-    # Function to apply color based on the airline code
-    def color_airlines(val):
-        return f"color: {airline_colors.get(val, '')}" if val in airline_colors else ""
-
-    with col1:
-        # Display table for the metric to allow review of the data
-        comparison_display = comparison_df[comparison_df["Metric"] == metric_display] # prepare a copy of the comparison table to be used for display
-        comparison_display = comparison_display.rename(columns={"Value":metric_display}) # rename value column to make it more understandable
-        comparison_display["Percent Difference"] = comparison_display["Percent Difference"].apply(lambda x: f"{x}%") # reformat percent difference column to show % sign
-        #comparison_display = comparison_display.style.set_table_styles([{"subset": ["Percent Difference"], "props": [("text-align", "right")]}])
-        comparison_display = comparison_display.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column to make it more understandable
-        comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
-        # Column reformatting steps
-        if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing"]:
-            comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.2f}") # reformat currency columns to show $ sign
-        elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
-            comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.2f}\u00A2") # reformat unit currency columns to show cents sign
-        elif metric in ["Net Margin", "Load Factor"]:
-            comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.2f}%") # reformat percent columns to show % sign
+# Display selected comparison data
+with tab1:
+    for metric in selected_metrics:
+        # Reflect the renamed metrics new names
+        if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing", "RPM", "ASM"]:
+            metric_display = metric + " (millions)"
         else:
-            comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.0f}") # ensure any other metric is displayed as a unitless integer for readability
-        comparison_display = comparison_display.sort_values(by=["Period", "Airline"], ascending=True) # sort dataframe by the period and airline
-        # Column display output
-        if len(selected_airlines) <= 1:
-            comparison_display = comparison_display.set_index(["Period", "Airline"])
-            comparison_display = comparison_display.drop(columns=[f"vs {base_airline}"]) # do not display percent difference column if only 1 airline is selected
-            comparison_display = comparison_display.unstack(level="Airline")
-            comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
-            comparison_display = comparison_display.sort_index(axis=1, level=0)
-        elif len(selected_airlines) > 1 and compare_yes_no=="Yes":
-            comparison_display = comparison_display.set_index(["Period", "Airline"])
-            comparison_display = comparison_display.unstack(level="Airline")
-            comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
-            comparison_display = comparison_display.sort_index(axis=1, level=0)
-            comparison_display = comparison_display.drop(columns=pd.IndexSlice[base_airline, f"vs {base_airline}"])
-            conditional_color_columns = [(col, f"vs {base_airline}") for col in comparison_display.columns.levels[0] if (col, f"vs {base_airline}") in comparison_display.columns] # specify the percent difference columns for which to apply conditional color formatting
-            comparison_display = comparison_display.style.applymap(color_positive_negative_zero, subset=conditional_color_columns).applymap_index(color_airlines, axis="columns", level="Airline") # map color of comparison column based on its sign and color of airline codes based on code (streamlit doesn't directly support color text in an index)
-        elif len(selected_airlines) > 1 and compare_yes_no=="No":
-            comparison_display = comparison_display.set_index(["Period", "Airline"])
-            comparison_display = comparison_display.drop(columns=f"vs {base_airline}") # do not display percent difference column if user chooses not to compare
-            comparison_display = comparison_display.unstack(level="Airline")
-            comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
-            comparison_display = comparison_display.sort_index(axis=1, level=0)
-        st.dataframe(comparison_display) 
+            metric_display = metric
 
-    with col2:
-        # Time series line plot (via plotly) for the metric's change over time if more than one time period (quarter or year) is selected.
-        if len(selected_years)>1 or len(selected_quarters)>1:
-            # Generate the plot
-            fig_line = px.line(
-                filtered_data, 
-                x="Period", 
-                y=metric_display, 
-                color="Airline",
-                title=f"{metric} Over Time",
-                color_discrete_map=airline_colors  # Apply custom color mapping
-            )
-            # Update plot layout features
-            fig_line.update_layout(
-                xaxis_title=None,
-                yaxis_title=metric_display,
-                xaxis_tickangle=-45
-            )
-            # Add a more visible line at zero to more easily visually recognize positive and negative
-            fig_line.add_hline(
-                y=0, 
-                line_dash="dot", 
-                line_color="gray",
-                opacity=0.25
-            )
-            # Adjust the hover over display formatting to improve readability
+        # Define function to alter color of the comparison column values based on sign
+        def color_positive_negative_zero(val):
+            if val is None: # allows function to handle columns that have missing data
+                return ""  # no color if the value is None
+            try:
+                numeric_val = float(val[:-1]) if isinstance(val, str) else val # converts value into float if needed
+            except ValueError:
+                return ""  # no color if conversion fails
+            color = "green" if numeric_val > 0 else "red" if numeric_val < 0 else "" # apply color based on value
+            return f"color: {color}"
+
+        # Function to apply color based on the airline code
+        def color_airlines(val):
+            return f"color: {airline_colors.get(val, '')}" if val in airline_colors else ""
+
+        # Set title for the metric display
+        st.header(f"{metric}", divider="gray")
+
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            # Display table for the metric to allow review of the data
+            comparison_display = comparison_df[comparison_df["Metric"] == metric_display] # prepare a copy of the comparison table to be used for display
+            comparison_display = comparison_display.rename(columns={"Value":metric_display}) # rename value column to make it more understandable
+            comparison_display["Percent Difference"] = comparison_display["Percent Difference"].apply(lambda x: f"{x}%") # reformat percent difference column to show % sign
+            #comparison_display = comparison_display.style.set_table_styles([{"subset": ["Percent Difference"], "props": [("text-align", "right")]}])
+            comparison_display = comparison_display.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column to make it more understandable
+            comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
+            # Column reformatting steps
             if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing"]:
-                fig_line.update_traces(
-                    hovertemplate="%{x}<br>$%{y:.0f}"
-                )
+                comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.2f}") # reformat currency columns to show $ sign
             elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
-                fig_line.update_traces(
-                    hovertemplate="%{x}<br>%{y:.2f}\u00A2"
-                )
+                comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.2f}\u00A2") # reformat unit currency columns to show cents sign
             elif metric in ["Net Margin", "Load Factor"]:
-                fig_line.update_traces(
+                comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.2f}%") # reformat percent columns to show % sign
+            else:
+                comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.0f}") # ensure any other metric is displayed as a unitless integer for readability
+            comparison_display = comparison_display.sort_values(by=["Period", "Airline"], ascending=True) # sort dataframe by the period and airline
+            # Column display output
+            if len(selected_airlines) <= 1:
+                comparison_display = comparison_display.set_index(["Period", "Airline"])
+                comparison_display = comparison_display.drop(columns=[f"vs {base_airline}"]) # do not display percent difference column if only 1 airline is selected
+                comparison_display = comparison_display.unstack(level="Airline")
+                comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
+                comparison_display = comparison_display.sort_index(axis=1, level=0)
+            elif len(selected_airlines) > 1 and compare_yes_no=="Yes":
+                comparison_display = comparison_display.set_index(["Period", "Airline"])
+                comparison_display = comparison_display.unstack(level="Airline")
+                comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
+                comparison_display = comparison_display.sort_index(axis=1, level=0)
+                comparison_display = comparison_display.drop(columns=pd.IndexSlice[base_airline, f"vs {base_airline}"])
+                conditional_color_columns = [(col, f"vs {base_airline}") for col in comparison_display.columns.levels[0] if (col, f"vs {base_airline}") in comparison_display.columns] # specify the percent difference columns for which to apply conditional color formatting
+                comparison_display = comparison_display.style.applymap(color_positive_negative_zero, subset=conditional_color_columns).applymap_index(color_airlines, axis="columns", level="Airline") # map color of comparison column based on its sign and color of airline codes based on code (streamlit doesn't directly support color text in an index)
+            elif len(selected_airlines) > 1 and compare_yes_no=="No":
+                comparison_display = comparison_display.set_index(["Period", "Airline"])
+                comparison_display = comparison_display.drop(columns=f"vs {base_airline}") # do not display percent difference column if user chooses not to compare
+                comparison_display = comparison_display.unstack(level="Airline")
+                comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
+                comparison_display = comparison_display.sort_index(axis=1, level=0)
+            st.dataframe(comparison_display) 
+
+        with col2:
+            # Time series line plot (via plotly) for the metric's change over time if more than one time period (quarter or year) is selected.
+            if len(selected_years)>1 or len(selected_quarters)>1:
+                # Generate the plot
+                fig_line = px.line(
+                    filtered_data, 
+                    x="Period", 
+                    y=metric_display,
+                    category_orders={"Period": sorted(data["Period"].unique(), reverse=False)}, # ensure x axis plots in chronological order
+                    color="Airline",
+                    title=f"{metric} Over Time",
+                    color_discrete_map=airline_colors  # Apply custom color mapping
+                )
+                # Update plot layout features
+                fig_line.update_layout(
+                    xaxis_title=None,
+                    yaxis_title=metric_display,
+                    xaxis_tickangle=-45
+                )
+                # Add a more visible line at zero to more easily visually recognize positive and negative
+                fig_line.add_hline(
+                    y=0, 
+                    line_dash="dot", 
+                    line_color="gray",
+                    opacity=0.25
+                )
+                # Adjust the hover over display formatting to improve readability
+                if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing"]:
+                    fig_line.update_traces(
+                        hovertemplate="%{x}<br>$%{y:.0f}"
+                    )
+                elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
+                    fig_line.update_traces(
+                        hovertemplate="%{x}<br>%{y:.2f}\u00A2"
+                    )
+                elif metric in ["Net Margin", "Load Factor"]:
+                    fig_line.update_traces(
+                        hovertemplate="%{x}<br>%{y:.2f}%"
+                    )
+                else:
+                    fig_line.update_traces(
+                        hovertemplate="%{x}<br>%{y:.0f}"
+                    )
+                # Display plot
+                st.plotly_chart(fig_line)
+
+        with col3:
+            # Bar plot (via plotly) for % difference if more than one airline is selected.
+            if len(selected_airlines) > 1 and compare_yes_no=="Yes":
+                # Generate the plot
+                fig_bar = px.bar(
+                    comparison_df[comparison_df["Airline"]!=base_airline][comparison_df["Metric"] == metric_display], 
+                    x="Period", 
+                    y="Percent Difference",
+                    category_orders={"Period": sorted(data["Period"].unique(), reverse=False)}, # ensure x axis plots in chronological order
+                    color="Airline",
+                    barmode="group",
+                    title=f"Percent Difference in {metric} vs {base_airline}",
+                    color_discrete_map=airline_colors  # Apply custom color mapping
+                    )
+                # Update plot layout features
+                fig_bar.update_layout(
+                    xaxis_title=None,
+                    yaxis_title="Percent Difference (%)",
+                    xaxis_tickangle=-45
+                    )
+                # Add a more visible line at zero to more easily visually recognize positive and negative
+                fig_bar.add_hline(
+                    y=0, 
+                    line_dash="dot", 
+                    line_color="gray",
+                    opacity=.75
+                    )
+                # Adjust the hover over display formatting to improve readability
+                fig_bar.update_traces(
                     hovertemplate="%{x}<br>%{y:.2f}%"
                 )
-            else:
-                fig_line.update_traces(
-                    hovertemplate="%{x}<br>%{y:.0f}"
-                )
-            # Display plot
-            st.plotly_chart(fig_line)
+                # Display plot
+                st.plotly_chart(fig_bar)
 
-    with col3:
-        # Bar plot (via plotly) for % difference if more than one airline is selected.
-        if len(selected_airlines) > 1 and compare_yes_no=="Yes":
-            # Generate the plot
-            fig_bar = px.bar(
-                comparison_df[comparison_df["Airline"]!=base_airline][comparison_df["Metric"] == metric_display], 
-                x="Period", 
-                y="Percent Difference", 
-                color="Airline",
-                barmode="group",
-                title=f"Percent Difference in {metric} vs {base_airline}",
-                color_discrete_map=airline_colors  # Apply custom color mapping
-                )
-            # Update plot layout features
-            fig_bar.update_layout(
-                xaxis_title=None,
-                yaxis_title="Percent Difference (%)",
-                xaxis_tickangle=-45
-                )
-            # Add a more visible line at zero to more easily visually recognize positive and negative
-            fig_bar.add_hline(
-                y=0, 
-                line_dash="dot", 
-                line_color="gray",
-                opacity=.75
-                )
-            # Adjust the hover over display formatting to improve readability
-            fig_bar.update_traces(
-                hovertemplate="%{x}<br>%{y:.2f}%"
-            )
-            # Display plot
-            st.plotly_chart(fig_bar)
+# Display a summary of the latest reporting period's metrics
+with tab2:
+    comparison_summary = comparison_df[comparison_df["Period"]==max(data["Period"])]
+    # Column reformatting steps
+    def format_value_based_on_metric(value, metric):
+        if metric in ["Total Revenue (millions)", "Passenger Revenue (millions)", "Total Expenses (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
+            return f"${value:,.0f}" if value.is_integer() else f"${value:,.2f}" # reformat currency columns to show $ sign
+        elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
+            return f"{value:,.2f}\u00A2" # reformat unit currency columns to show cents sign
+        elif metric in ["Net Margin", "Load Factor"]:
+            return f"{value:,.2f}%" # reformat percent columns to show % sign
+        else:
+            return f"{value:,.0f}" # ensure any other metric is displayed as a unitless integer for readability
+    comparison_summary["Value"] = comparison_summary.apply(lambda row: format_value_based_on_metric(row["Value"], row["Metric"]), axis=1)
+    comparison_summary["Percent Difference"] = comparison_summary["Percent Difference"].apply(lambda x: f"{x}%") # reformat percent difference column to show % sign
+    comparison_summary = comparison_summary.set_index(["Metric", "Airline"], drop=True)
+    comparison_summary = comparison_summary.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column
+    comparison_summary = comparison_summary.drop(columns=["Period"]) # drop period column as the summary only covers a single period
+    comparison_summary = comparison_summary.rename(columns={"Value":f"{max(data["Period"])}"})
+    if len(selected_airlines) <= 1:
+        comparison_summary = comparison_summary.drop(columns=f"vs {base_airline}") # do not display percent difference column if user chooses not to compare
+        comparison_summary = comparison_summary.unstack(level="Airline")
+        comparison_summary.columns = comparison_summary.columns.swaplevel(0, 1)
+        comparison_summary = comparison_summary.sort_index(axis=1, level=0)
+    elif compare_yes_no=="Yes":
+        comparison_summary = comparison_summary.unstack(level="Airline")
+        comparison_summary.columns = comparison_summary.columns.swaplevel(0, 1)
+        comparison_summary = comparison_summary.sort_index(axis=1, level=0)
+        comparison_summary = comparison_summary.drop(columns=pd.IndexSlice[base_airline, f"vs {base_airline}"])
+        conditional_color_columns = [(col, f"vs {base_airline}") for col in comparison_display.columns.levels[0] if (col, f"vs {base_airline}") in comparison_display.columns] # specify the percent difference columns for which to apply conditional color formatting
+        comparison_summary = comparison_summary.style.applymap(color_positive_negative_zero, subset=conditional_color_columns).applymap_index(color_airlines, axis="columns", level="Airline") # map color of comparison column based on its sign and color of airline codes based on code (streamlit doesn't directly support color text in an index)
+    elif compare_yes_no=="No":
+        comparison_summary = comparison_summary.drop(columns=f"vs {base_airline}") # do not display percent difference column if user chooses not to compare
+        comparison_summary = comparison_summary.unstack(level="Airline")
+        comparison_summary.columns = comparison_summary.columns.swaplevel(0, 1)
+        comparison_summary = comparison_summary.sort_index(axis=1, level=0)
+    st.dataframe(comparison_summary)
