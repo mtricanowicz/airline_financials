@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import plotly.express as px
+import plotly.graph_objects as go
 
 # Set custom page configuration including the "About" section
 st.set_page_config(
@@ -233,7 +235,7 @@ for metric in selected_metrics:
 
     # Define function to alter color of the comparison column values based on sign
     def color_positive_negative_zero(val):
-        color = "green" if float(val[:-1]) > 0 else "red" if float(val[:-1]) < 0 else "black"
+        color = "green" if float(val[:-1]) > 0 else "red" if float(val[:-1]) < 0 else ""
         return f"color: {color}"
 
     # Function to apply color based on the airline code
@@ -281,25 +283,79 @@ for metric in selected_metrics:
         comparison_display = comparison_display.sort_index(axis=1, level=0)
     st.dataframe(comparison_display) 
 
-    # Time series line plot for the metric's change over time if more than one time period (quarter or year) is selected.
+    # Time series line plot (via plotly) for the metric's change over time if more than one time period (quarter or year) is selected.
     if len(selected_years)>1 or len(selected_quarters)>1:
-        fig, ax = plt.subplots(figsize=(12, 6))
-        sns.lineplot(data=filtered_data, x="Period", y=metric_display, hue="Airline", palette=airline_colors, ax=ax)
-        plt.xticks(rotation=45, ha="right", va="top")
-        ax.set_title(f"{metric} Over Time")
-        ax.set_xlabel(None)
-        ax.set_ylabel(metric_display)
-        ax.legend(title="Airline")
-        ax.axhline(0, color="gray", linestyle="--")
-        st.pyplot(fig)
+        # Generate the plot
+        fig_line = px.line(
+            filtered_data, 
+            x="Period", 
+            y=metric_display, 
+            color="Airline",
+            title=f"{metric} Over Time",
+            color_discrete_map=airline_colors  # Apply custom color mapping
+        )
+        # Update plot layout features
+        fig_line.update_layout(
+            xaxis_title=None,
+            yaxis_title=metric_display,
+            xaxis_tickangle=-45
+        )
+        # Add a more visible line at zero to more easily visually recognize positive and negative
+        fig_line.add_hline(
+            y=0, 
+            line_dash="dot", 
+            line_color="gray",
+            opacity=0.25
+        )
+        # Adjust the hover over display formatting to improve readability
+        if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing"]:
+            fig_line.update_traces(
+                hovertemplate="%{x}<br>$%{y:.0f}"
+            )
+        elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
+            fig_line.update_traces(
+                hovertemplate="%{x}<br>%{y:.2f}\u00A2"
+            )
+        elif metric in ["Net Margin", "Load Factor"]:
+            fig_line.update_traces(
+                hovertemplate="%{x}<br>%{y:.2f}%"
+            )
+        else:
+            fig_line.update_traces(
+                hovertemplate="%{x}<br>%{y:.0f}"
+            )
+        # Display plot
+        st.plotly_chart(fig_line)
 
-    # Bar plot for % difference if more than one airline is selected.
+
+    # Bar plot (via plotly) for % difference if more than one airline is selected.
     if len(selected_airlines) > 1 and compare_yes_no=="Yes":
-        fig, ax = plt.subplots(figsize=(12, 6))
-        sns.barplot(data=comparison_df[comparison_df["Airline"]!=base_airline][comparison_df["Metric"] == metric_display], x="Period", y="Percent Difference", hue="Airline", palette=airline_colors, ax=ax)
-        plt.xticks(rotation=45, ha="right", va="top")
-        ax.set_title(f"Percent Difference in {metric} Compared to {base_airline}")
-        ax.set_xlabel(None)
-        ax.set_ylabel("Percent Difference (%)")
-        ax.axhline(0, color="gray", linestyle="--")
-        st.pyplot(fig)
+        # Generate the plot
+        fig_bar = px.bar(
+            comparison_df[comparison_df["Airline"]!=base_airline][comparison_df["Metric"] == metric_display], 
+            x="Period", 
+            y="Percent Difference", 
+            color="Airline",
+            barmode="group",
+            title=f"Percent Difference in {metric} Compared to {base_airline}",
+            color_discrete_map=airline_colors  # Apply custom color mapping
+            )
+        # Update plot layout features
+        fig_bar.update_layout(
+            xaxis_title=None,
+            yaxis_title="Percent Difference (%)",
+            xaxis_tickangle=-45
+            )
+        # Add a more visible line at zero to more easily visually recognize positive and negative
+        fig_bar.add_hline(
+            y=0, 
+            line_dash="dot", 
+            line_color="gray",
+            opacity=.75
+            )
+        # Adjust the hover over display formatting to improve readability
+        fig_bar.update_traces(
+            hovertemplate="%{x}<br>%{y:.2f}%"
+        )
+        # Display plot
+        st.plotly_chart(fig_bar)
