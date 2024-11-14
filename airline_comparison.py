@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 st.set_page_config(
     page_title="US Airline Financial Metrics Comparison",  # Custom title in the browser tab
     page_icon=":airplane:",  # Custom icon for the browser tab
-    layout="centered",  # Set the defaul layout for the app
+    layout="wide",  # Set the defaul layout for the app
     initial_sidebar_state="auto",  # Sidebar state when app loads
     menu_items={
         "About": """
@@ -225,7 +225,13 @@ comparison_df = comparison_df.reset_index(drop=True)
 #st.dataframe(comparison_df.set_index(["Period", "Airline"]).sort_values(by=["Period", "Metric", "Airline"], ascending=True))
 
 # Display selected data
+
 for metric in selected_metrics:
+
+    # Set title for the metric display
+    st.header(f"{metric}", divider="gray")
+
+    col1, col2, col3 = st.columns(3)
 
     # Reflect the renamed metrics new names
     if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing", "RPM", "ASM"]:
@@ -242,120 +248,121 @@ for metric in selected_metrics:
     def color_airlines(val):
         return f"color: {airline_colors.get(val, '')}" if val in airline_colors else ""
 
-    # Display table for the metric to allow review of the data
-    st.header(f"{metric}", divider="gray")
-    comparison_display = comparison_df[comparison_df["Metric"] == metric_display] # prepare a copy of the comparison table to be used for display
-    comparison_display = comparison_display.rename(columns={"Value":metric_display}) # rename value column to make it more understandable
-    comparison_display["Percent Difference"] = comparison_display["Percent Difference"].apply(lambda x: f"{x}%") # reformat percent difference column to show % sign
-    #comparison_display = comparison_display.style.set_table_styles([{"subset": ["Percent Difference"], "props": [("text-align", "right")]}])
-    comparison_display = comparison_display.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column to make it more understandable
-    comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
-    # Column reformatting steps
-    if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing"]:
-        comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.2f}") # reformat currency columns to show $ sign
-    elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
-        comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.2f}\u00A2") # reformat unit currency columns to show cents sign
-    elif metric in ["Net Margin", "Load Factor"]:
-        comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.2f}%") # reformat percent columns to show % sign
-    else:
-        comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.0f}") # ensure any other metric is displayed as a unitless integer for readability
-    comparison_display = comparison_display.sort_values(by=["Period", "Airline"], ascending=True) # sort dataframe by the period and airline
-    # Column display output
-    if len(selected_airlines) <= 1:
-        comparison_display = comparison_display.set_index(["Period", "Airline"])
-        comparison_display = comparison_display.drop(columns=[f"vs {base_airline}"]) # do not display percent difference column if only 1 airline is selected
-        comparison_display = comparison_display.unstack(level="Airline")
-        comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
-        comparison_display = comparison_display.sort_index(axis=1, level=0)
-    elif len(selected_airlines) > 1 and compare_yes_no=="Yes":
-        comparison_display = comparison_display.set_index(["Period", "Airline"])
-        comparison_display = comparison_display.unstack(level="Airline")
-        comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
-        comparison_display = comparison_display.sort_index(axis=1, level=0)
-        comparison_display = comparison_display.drop(columns=pd.IndexSlice[base_airline, f"vs {base_airline}"])
-        conditional_color_columns = [(col, f"vs {base_airline}") for col in comparison_display.columns.levels[0] if (col, f"vs {base_airline}") in comparison_display.columns] # specify the percent difference columns for which to apply conditional color formatting
-        comparison_display = comparison_display.style.applymap(color_positive_negative_zero, subset=conditional_color_columns).applymap_index(color_airlines, axis="columns", level="Airline") # map color of comparison column based on its sign and color of airline codes based on code (streamlit doesn't directly support color text in an index)
-    elif len(selected_airlines) > 1 and compare_yes_no=="No":
-        comparison_display = comparison_display.set_index(["Period", "Airline"])
-        comparison_display = comparison_display.drop(columns=f"vs {base_airline}") # do not display percent difference column if user chooses not to compare
-        comparison_display = comparison_display.unstack(level="Airline")
-        comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
-        comparison_display = comparison_display.sort_index(axis=1, level=0)
-    st.dataframe(comparison_display) 
-
-    # Time series line plot (via plotly) for the metric's change over time if more than one time period (quarter or year) is selected.
-    if len(selected_years)>1 or len(selected_quarters)>1:
-        # Generate the plot
-        fig_line = px.line(
-            filtered_data, 
-            x="Period", 
-            y=metric_display, 
-            color="Airline",
-            title=f"{metric} Over Time",
-            color_discrete_map=airline_colors  # Apply custom color mapping
-        )
-        # Update plot layout features
-        fig_line.update_layout(
-            xaxis_title=None,
-            yaxis_title=metric_display,
-            xaxis_tickangle=-45
-        )
-        # Add a more visible line at zero to more easily visually recognize positive and negative
-        fig_line.add_hline(
-            y=0, 
-            line_dash="dot", 
-            line_color="gray",
-            opacity=0.25
-        )
-        # Adjust the hover over display formatting to improve readability
+    with col1:
+        # Display table for the metric to allow review of the data
+        comparison_display = comparison_df[comparison_df["Metric"] == metric_display] # prepare a copy of the comparison table to be used for display
+        comparison_display = comparison_display.rename(columns={"Value":metric_display}) # rename value column to make it more understandable
+        comparison_display["Percent Difference"] = comparison_display["Percent Difference"].apply(lambda x: f"{x}%") # reformat percent difference column to show % sign
+        #comparison_display = comparison_display.style.set_table_styles([{"subset": ["Percent Difference"], "props": [("text-align", "right")]}])
+        comparison_display = comparison_display.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column to make it more understandable
+        comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
+        # Column reformatting steps
         if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing"]:
-            fig_line.update_traces(
-                hovertemplate="%{x}<br>$%{y:.0f}"
-            )
+            comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.2f}") # reformat currency columns to show $ sign
         elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
-            fig_line.update_traces(
-                hovertemplate="%{x}<br>%{y:.2f}\u00A2"
-            )
+            comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.2f}\u00A2") # reformat unit currency columns to show cents sign
         elif metric in ["Net Margin", "Load Factor"]:
-            fig_line.update_traces(
+            comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.2f}%") # reformat percent columns to show % sign
+        else:
+            comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.0f}") # ensure any other metric is displayed as a unitless integer for readability
+        comparison_display = comparison_display.sort_values(by=["Period", "Airline"], ascending=True) # sort dataframe by the period and airline
+        # Column display output
+        if len(selected_airlines) <= 1:
+            comparison_display = comparison_display.set_index(["Period", "Airline"])
+            comparison_display = comparison_display.drop(columns=[f"vs {base_airline}"]) # do not display percent difference column if only 1 airline is selected
+            comparison_display = comparison_display.unstack(level="Airline")
+            comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
+            comparison_display = comparison_display.sort_index(axis=1, level=0)
+        elif len(selected_airlines) > 1 and compare_yes_no=="Yes":
+            comparison_display = comparison_display.set_index(["Period", "Airline"])
+            comparison_display = comparison_display.unstack(level="Airline")
+            comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
+            comparison_display = comparison_display.sort_index(axis=1, level=0)
+            comparison_display = comparison_display.drop(columns=pd.IndexSlice[base_airline, f"vs {base_airline}"])
+            conditional_color_columns = [(col, f"vs {base_airline}") for col in comparison_display.columns.levels[0] if (col, f"vs {base_airline}") in comparison_display.columns] # specify the percent difference columns for which to apply conditional color formatting
+            comparison_display = comparison_display.style.applymap(color_positive_negative_zero, subset=conditional_color_columns).applymap_index(color_airlines, axis="columns", level="Airline") # map color of comparison column based on its sign and color of airline codes based on code (streamlit doesn't directly support color text in an index)
+        elif len(selected_airlines) > 1 and compare_yes_no=="No":
+            comparison_display = comparison_display.set_index(["Period", "Airline"])
+            comparison_display = comparison_display.drop(columns=f"vs {base_airline}") # do not display percent difference column if user chooses not to compare
+            comparison_display = comparison_display.unstack(level="Airline")
+            comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
+            comparison_display = comparison_display.sort_index(axis=1, level=0)
+        st.dataframe(comparison_display) 
+
+    with col2:
+        # Time series line plot (via plotly) for the metric's change over time if more than one time period (quarter or year) is selected.
+        if len(selected_years)>1 or len(selected_quarters)>1:
+            # Generate the plot
+            fig_line = px.line(
+                filtered_data, 
+                x="Period", 
+                y=metric_display, 
+                color="Airline",
+                title=f"{metric} Over Time",
+                color_discrete_map=airline_colors  # Apply custom color mapping
+            )
+            # Update plot layout features
+            fig_line.update_layout(
+                xaxis_title=None,
+                yaxis_title=metric_display,
+                xaxis_tickangle=-45
+            )
+            # Add a more visible line at zero to more easily visually recognize positive and negative
+            fig_line.add_hline(
+                y=0, 
+                line_dash="dot", 
+                line_color="gray",
+                opacity=0.25
+            )
+            # Adjust the hover over display formatting to improve readability
+            if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing"]:
+                fig_line.update_traces(
+                    hovertemplate="%{x}<br>$%{y:.0f}"
+                )
+            elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
+                fig_line.update_traces(
+                    hovertemplate="%{x}<br>%{y:.2f}\u00A2"
+                )
+            elif metric in ["Net Margin", "Load Factor"]:
+                fig_line.update_traces(
+                    hovertemplate="%{x}<br>%{y:.2f}%"
+                )
+            else:
+                fig_line.update_traces(
+                    hovertemplate="%{x}<br>%{y:.0f}"
+                )
+            # Display plot
+            st.plotly_chart(fig_line)
+
+    with col3:
+        # Bar plot (via plotly) for % difference if more than one airline is selected.
+        if len(selected_airlines) > 1 and compare_yes_no=="Yes":
+            # Generate the plot
+            fig_bar = px.bar(
+                comparison_df[comparison_df["Airline"]!=base_airline][comparison_df["Metric"] == metric_display], 
+                x="Period", 
+                y="Percent Difference", 
+                color="Airline",
+                barmode="group",
+                title=f"Percent Difference in {metric} vs {base_airline}",
+                color_discrete_map=airline_colors  # Apply custom color mapping
+                )
+            # Update plot layout features
+            fig_bar.update_layout(
+                xaxis_title=None,
+                yaxis_title="Percent Difference (%)",
+                xaxis_tickangle=-45
+                )
+            # Add a more visible line at zero to more easily visually recognize positive and negative
+            fig_bar.add_hline(
+                y=0, 
+                line_dash="dot", 
+                line_color="gray",
+                opacity=.75
+                )
+            # Adjust the hover over display formatting to improve readability
+            fig_bar.update_traces(
                 hovertemplate="%{x}<br>%{y:.2f}%"
             )
-        else:
-            fig_line.update_traces(
-                hovertemplate="%{x}<br>%{y:.0f}"
-            )
-        # Display plot
-        st.plotly_chart(fig_line)
-
-
-    # Bar plot (via plotly) for % difference if more than one airline is selected.
-    if len(selected_airlines) > 1 and compare_yes_no=="Yes":
-        # Generate the plot
-        fig_bar = px.bar(
-            comparison_df[comparison_df["Airline"]!=base_airline][comparison_df["Metric"] == metric_display], 
-            x="Period", 
-            y="Percent Difference", 
-            color="Airline",
-            barmode="group",
-            title=f"Percent Difference in {metric} vs {base_airline}",
-            color_discrete_map=airline_colors  # Apply custom color mapping
-            )
-        # Update plot layout features
-        fig_bar.update_layout(
-            xaxis_title=None,
-            yaxis_title="Percent Difference (%)",
-            xaxis_tickangle=-45
-            )
-        # Add a more visible line at zero to more easily visually recognize positive and negative
-        fig_bar.add_hline(
-            y=0, 
-            line_dash="dot", 
-            line_color="gray",
-            opacity=.75
-            )
-        # Adjust the hover over display formatting to improve readability
-        fig_bar.update_traces(
-            hovertemplate="%{x}<br>%{y:.2f}%"
-        )
-        # Display plot
-        st.plotly_chart(fig_bar)
+            # Display plot
+            st.plotly_chart(fig_bar)
