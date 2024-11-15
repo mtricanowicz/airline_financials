@@ -25,6 +25,9 @@ st.set_page_config(
     }
 )
 
+# Streamlit app title
+st.title("Airline Financial Metrics Comparison")
+
 #CUSTOM CSS ADDITIONS
 # Custom CSS to style radio buttons horizontally
 st.markdown("""
@@ -44,7 +47,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-
 # Load the CSV data
 file_path = "airline_financial_data.csv"
 airline_financials = pd.read_csv(file_path)
@@ -62,10 +64,9 @@ airline_financials["Quarter"] = airline_financials["Quarter"].apply(lambda x: f"
 airline_financials["Period"] = airline_financials["Year"].astype(str) + airline_financials["Quarter"].astype(str)
 
 # Split data into full-year and quarterly DataFrames
-airline_financials_fy = airline_financials[airline_financials["Quarter"] == "FY"].copy()
+airline_financials_fy = airline_financials[airline_financials["Quarter"] == "FY"].copy() # full year data
 #airline_financials_fy["Date"] = pd.to_datetime(airline_financials_fy["Year"].astype(str) + "-12-31") # date ended up not being needed, keeping for future use if necessary
-
-airline_financials_q = airline_financials[airline_financials["Quarter"] != "FY"].copy()
+airline_financials_q = airline_financials[airline_financials["Quarter"] != "FY"].copy() # quarterly data
 #airline_financials_q["Date"] = pd.to_datetime(airline_financials_q["Year"].astype(str) + "-" + (airline_financials_q["Quarter"]*3).astype(str) + "-01") + pd.offsets.MonthEnd(0) # date ended up not being needed, keeping for future use if necessary
 
 # Color palette to use for visualizaitons
@@ -76,9 +77,6 @@ airline_colors = {
     "ALK": "#00385f",
     "LUV": "#f9b612"
 }
-
-# Streamlit app title
-st.title("Airline Financial Metrics Comparison")
 
 # Allow users to select full-year or quarterly data
 data_type = st.selectbox("View Full Year or Quarterly Data?", ["Full Year", "Quarterly"])
@@ -107,9 +105,6 @@ if len(selected_airlines) > 1:
         base_airline = selected_airlines[0]
 else:
     base_airline = selected_airlines[0]
-
-# Tie base airline selection to a theme color (to be used to dynamically change app interface element colors in future)
-#base_color = airline_colors[base_airline]
 
 # Allow user to select years for comparison
 years = data["Year"].unique()
@@ -140,7 +135,7 @@ elif metric_group_select=="All":
 elif metric_group_select=="Custom":
     selected_metrics = st.multiselect("Add or Remove Metrics to Compare", available_metrics, default=available_metrics[0])
     if not selected_metrics:
-        selected_metrics = [available_metrics[0]] # prevents empty set from triggering an error, displays earnings metrics if none are selected
+        selected_metrics = [available_metrics[0]] # prevents empty set from triggering an error, displays first metric in available metrics if none are selected
 
 # Add a toggle to display metric definitions for users who need them
 with st.expander("Show definitions of the available metrics."):
@@ -225,6 +220,7 @@ comparison_df = comparison_df.reset_index(drop=True)
 #st.write("Airline Comparison")
 #st.dataframe(comparison_df.set_index(["Period", "Airline"]).sort_values(by=["Period", "Metric", "Airline"], ascending=True))
 
+# Create tabs
 tab1, tab2 = st.tabs(["Comparison", "Most Recent Period Summary"])
 
 # Display selected comparison data
@@ -254,6 +250,7 @@ with tab1:
         # Set title for the metric display
         st.header(f"{metric}", divider="gray")
 
+        # Create display columns
         col1, col2, col3 = st.columns(3)
 
         with col1:
