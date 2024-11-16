@@ -152,9 +152,9 @@ with st.expander("Show definitions of the available metrics."):
     st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     st.write("Available Seat Mile (ASM) - A basic measure of production. One ASM represents one seat flown one mile.")
     st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-    st.write("Long-Term Debt - Total long-term debt net of current maturities.")
+    st.write("Long-Term Debt - Total long-term debt net of current maturities.<br>NOTE: Due to inconsistent reporting in quarterly filings between airilnes, this metric is only shown for full year data.", unsafe_allow_html=True)
     st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-    st.write("Profit Sharing - Amount of income set aside to fund employee profit sharing programs.<br>NOTE: AAL's reporting of this metric was inconsistent pre-COVID and has not been reported at all post-COVID. Data provided may have been obtained from internal sources. Additionally, zero profit sharing shown can either indicate no profit sharing or lack of reported data.", unsafe_allow_html=True)
+    st.write("Profit Sharing - Amount of income set aside to fund employee profit sharing programs.<br>NOTE: AAL's quarterly reporting of this metric is inconsistent. Data provided may also have been obtained from internal sources. Additionally, zero profit sharing shown can either indicate no profit sharing or lack of reported data.", unsafe_allow_html=True)
     st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     st.write("Net Margin - Percentage of profit earned for each dollar in revenue. Net Income divided by Total Revenue.")
     st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
@@ -376,42 +376,44 @@ with tab1:
 
 # Display a summary of the latest reporting period's metrics
 with tab2:
-    comparison_summary = comparison_df[comparison_df["Period"]==max(data["Period"])]
-    # Column reformatting steps
-    def format_value_based_on_metric(value, metric):
-        if metric in ["Total Revenue (millions)", "Passenger Revenue (millions)", "Total Expenses (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
-            return f"${value:,.0f}" if value.is_integer() else f"${value:,.2f}" # reformat currency columns to show $ sign
-        elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
-            return f"{value:,.2f}\u00A2" # reformat unit currency columns to show cents sign
-        elif metric in ["Net Margin", "Load Factor"]:
-            return f"{value:,.2f}%" # reformat percent columns to show % sign
-        else:
-            return f"{value:,.0f}" # ensure any other metric is displayed as a unitless integer for readability
-    comparison_summary["Value"] = comparison_summary.apply(lambda row: format_value_based_on_metric(row["Value"], row["Metric"]), axis=1)
-    comparison_summary["Percent Difference"] = comparison_summary["Percent Difference"].apply(lambda x: f"{x}%") # reformat percent difference column to show % sign
-    comparison_summary = comparison_summary.set_index(["Metric", "Airline"], drop=True)
-    comparison_summary = comparison_summary.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column
-    comparison_summary = comparison_summary.drop(columns=["Period"]) # drop period column as the summary only covers a single period
-    comparison_summary = comparison_summary.rename(columns={"Value":f"{max(data["Period"])}"})
-    ordered_metrics = [item + " (millions)" if i < 8 else item for i, item in enumerate(available_metrics)]
-    if len(selected_airlines) <= 1:
-        comparison_summary = comparison_summary.drop(columns=f"vs {base_airline}") # do not display percent difference column if user chooses not to compare
-        comparison_summary = comparison_summary.unstack(level="Airline")
-        comparison_summary.columns = comparison_summary.columns.swaplevel(0, 1)
-        comparison_summary = comparison_summary.sort_index(axis=1, level=0)
-        comparison_summary = comparison_summary.reindex([item for item in ordered_metrics if item in comparison_summary.index])
-    elif compare_yes_no=="Yes":
-        comparison_summary = comparison_summary.unstack(level="Airline")
-        comparison_summary.columns = comparison_summary.columns.swaplevel(0, 1)
-        comparison_summary = comparison_summary.sort_index(axis=1, level=0)
-        comparison_summary = comparison_summary.drop(columns=pd.IndexSlice[base_airline, f"vs {base_airline}"])
-        comparison_summary = comparison_summary.reindex([item for item in ordered_metrics if item in comparison_summary.index])
-        conditional_color_columns = [(col, f"vs {base_airline}") for col in comparison_display.columns.levels[0] if (col, f"vs {base_airline}") in comparison_display.columns] # specify the percent difference columns for which to apply conditional color formatting
-        comparison_summary = comparison_summary.style.applymap(color_positive_negative_zero, subset=conditional_color_columns).applymap_index(color_airlines, axis="columns", level="Airline") # map color of comparison column based on its sign and color of airline codes based on code (streamlit doesn't directly support color text in an index)
-    elif compare_yes_no=="No":
-        comparison_summary = comparison_summary.drop(columns=f"vs {base_airline}") # do not display percent difference column if user chooses not to compare
-        comparison_summary = comparison_summary.unstack(level="Airline")
-        comparison_summary.columns = comparison_summary.columns.swaplevel(0, 1)
-        comparison_summary = comparison_summary.sort_index(axis=1, level=0)
-        comparison_summary = comparison_summary.reindex([item for item in ordered_metrics if item in comparison_summary.index])
-    st.dataframe(comparison_summary)
+    col4, col5 = st.columns(2)
+    with col4:
+        comparison_summary = comparison_df[comparison_df["Period"]==max(data["Period"])]
+        # Column reformatting steps
+        def format_value_based_on_metric(value, metric):
+            if metric in ["Total Revenue (millions)", "Passenger Revenue (millions)", "Total Expenses (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
+                return f"${value:,.0f}" if value.is_integer() else f"${value:,.2f}" # reformat currency columns to show $ sign
+            elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
+                return f"{value:,.2f}\u00A2" # reformat unit currency columns to show cents sign
+            elif metric in ["Net Margin", "Load Factor"]:
+                return f"{value:,.2f}%" # reformat percent columns to show % sign
+            else:
+                return f"{value:,.0f}" # ensure any other metric is displayed as a unitless integer for readability
+        comparison_summary["Value"] = comparison_summary.apply(lambda row: format_value_based_on_metric(row["Value"], row["Metric"]), axis=1)
+        comparison_summary["Percent Difference"] = comparison_summary["Percent Difference"].apply(lambda x: f"{x}%") # reformat percent difference column to show % sign
+        comparison_summary = comparison_summary.set_index(["Metric", "Airline"], drop=True)
+        comparison_summary = comparison_summary.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column
+        comparison_summary = comparison_summary.drop(columns=["Period"]) # drop period column as the summary only covers a single period
+        comparison_summary = comparison_summary.rename(columns={"Value":f"{max(data["Period"])}"})
+        ordered_metrics = [item + " (millions)" if i < 8 else item for i, item in enumerate(available_metrics)]
+        if len(selected_airlines) <= 1:
+            comparison_summary = comparison_summary.drop(columns=f"vs {base_airline}") # do not display percent difference column if user chooses not to compare
+            comparison_summary = comparison_summary.unstack(level="Airline")
+            comparison_summary.columns = comparison_summary.columns.swaplevel(0, 1)
+            comparison_summary = comparison_summary.sort_index(axis=1, level=0)
+            comparison_summary = comparison_summary.reindex([item for item in ordered_metrics if item in comparison_summary.index])
+        elif compare_yes_no=="Yes":
+            comparison_summary = comparison_summary.unstack(level="Airline")
+            comparison_summary.columns = comparison_summary.columns.swaplevel(0, 1)
+            comparison_summary = comparison_summary.sort_index(axis=1, level=0)
+            comparison_summary = comparison_summary.drop(columns=pd.IndexSlice[base_airline, f"vs {base_airline}"])
+            comparison_summary = comparison_summary.reindex([item for item in ordered_metrics if item in comparison_summary.index])
+            conditional_color_columns = [(col, f"vs {base_airline}") for col in comparison_display.columns.levels[0] if (col, f"vs {base_airline}") in comparison_display.columns] # specify the percent difference columns for which to apply conditional color formatting
+            comparison_summary = comparison_summary.style.applymap(color_positive_negative_zero, subset=conditional_color_columns).applymap_index(color_airlines, axis="columns", level="Airline") # map color of comparison column based on its sign and color of airline codes based on code (streamlit doesn't directly support color text in an index)
+        elif compare_yes_no=="No":
+            comparison_summary = comparison_summary.drop(columns=f"vs {base_airline}") # do not display percent difference column if user chooses not to compare
+            comparison_summary = comparison_summary.unstack(level="Airline")
+            comparison_summary.columns = comparison_summary.columns.swaplevel(0, 1)
+            comparison_summary = comparison_summary.sort_index(axis=1, level=0)
+            comparison_summary = comparison_summary.reindex([item for item in ordered_metrics if item in comparison_summary.index])
+        st.dataframe(comparison_summary)
