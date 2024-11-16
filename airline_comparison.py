@@ -78,102 +78,105 @@ airline_colors = {
     "LUV": "#f9b612"
 }
 
-# Allow users to select full-year or quarterly data
-with st.container(border=True):
-    data_type = st.selectbox("View Full Year or Quarterly Data?", ["Full Year", "Quarterly"])
-if data_type == "Full Year":
-    data = airline_financials_fy
-else:
-    data = airline_financials_q
+with st.expander("Make Selections"):
+    # Allow users to select full-year or quarterly data
+    with st.container(border=True):
+        data_type = st.selectbox("View Full Year or Quarterly Data?", ["Full Year", "Quarterly"])
+    if data_type == "Full Year":
+        data = airline_financials_fy
+    else:
+        data = airline_financials_q
 
-# Remove metrics from the data that do not have data for the chosen reporting period
-data = data.dropna(axis=1, how="all") # drop columns (metrics)
-# data = data.dropna(axis=0, how="all") # drop rows (individual airline reporting periods), not applied
+    # Remove metrics from the data that do not have data for the chosen reporting period
+    data = data.dropna(axis=1, how="all") # drop columns (metrics)
+    # data = data.dropna(axis=0, how="all") # drop rows (individual airline reporting periods), not applied
 
-# Allow user to select airlines to compare
-airlines = data["Airline"].unique()
-with st.container(border=True):
-    selected_airlines = st.multiselect("Select Airline(s) for Comparison", airlines, default=["AAL"])
-if not selected_airlines:
-    selected_airlines=["AAL"] # prevents empty set from triggering an error, displays AAL if none are selected
+    # Allow user to select airlines to compare
+    airlines = data["Airline"].unique()
+    with st.container(border=True):
+        selected_airlines = st.multiselect("Select Airline(s) for Comparison", airlines, default=["AAL"])
+    if not selected_airlines:
+        selected_airlines=["AAL"] # prevents empty set from triggering an error, displays AAL if none are selected
 
-# Allow user to select a base airline to compare others against
-with st.container(border=True):
-    if len(selected_airlines) > 1:
-        options_yes_no = ["Yes", "No"]
-        compare_yes_no = st.radio("Would you like to compare selected airlines' metrics against one of the airlines?", options_yes_no, index=options_yes_no.index("Yes"))
-        if(compare_yes_no=="Yes"):
-            base_airline = st.selectbox("Select Airline to Compare Against", selected_airlines)
+    # Allow user to select a base airline to compare others against
+    with st.container(border=True):
+        if len(selected_airlines) > 1:
+            options_yes_no = ["Yes", "No"]
+            compare_yes_no = st.radio("Would you like to compare selected airlines' metrics against one of the airlines?", options_yes_no, index=options_yes_no.index("Yes"))
+            if(compare_yes_no=="Yes"):
+                base_airline = st.selectbox("Select Airline to Compare Against", selected_airlines)
+            else:
+                base_airline = selected_airlines[0]
         else:
             base_airline = selected_airlines[0]
-    else:
-        base_airline = selected_airlines[0]
 
-# Allow user to select years for comparison
-years = data["Year"].unique()
-with st.container(border=True):
-    selected_years = st.multiselect("Select Year(s) for Comparison", years, default=years)
-if not selected_years:
-    selected_years=years # prevents empty set from triggering an error, displays all years if none are selected
+    # Allow user to select years for comparison
+    years = data["Year"].unique()
+    with st.container(border=True):
+        selected_years = st.multiselect("Select Year(s) for Comparison", years, default=years)
+    if not selected_years:
+        selected_years=years # prevents empty set from triggering an error, displays all years if none are selected
 
-# Allow user to select quarters for comparison
-quarters = data["Quarter"].unique()
-with st.container(border=True):
-    if data_type == "Quarterly":
-        selected_quarters = st.multiselect("Select Quarter(s) for Comparison", quarters, default=quarters)
-        if not selected_quarters: # prevents empty set from triggering an error, displays all quarters if none are selected
+    # Allow user to select quarters for comparison
+    quarters = data["Quarter"].unique()
+    with st.container(border=True):
+        if data_type == "Quarterly":
+            selected_quarters = st.multiselect("Select Quarter(s) for Comparison", quarters, default=quarters)
+            if not selected_quarters: # prevents empty set from triggering an error, displays all quarters if none are selected
+                selected_quarters=quarters
+        elif data_type == "Full Year":
             selected_quarters=quarters
-    elif data_type == "Full Year":
-        selected_quarters=quarters
 
-# Allow user to select metrics to compare with a "Select All" option
-available_metrics = data.columns.drop(["Year", "Quarter", "Airline", "Period"])
-metric_groups = ["Earnings", "Unit Performance", "All", "Custom"]
-with st.container(border=True):
-    metric_group_select = st.radio("Select Metrics for Comparison:", metric_groups, index=metric_groups.index("Earnings"))
-    # Provide preselected groups of metrics and allow user to customize selection
-    if metric_group_select=="Earnings":
-        selected_metrics = ["Total Revenue", "Net Income", "Net Margin"]
-    elif metric_group_select=="Unit Performance":
-        selected_metrics = ["Yield", "TRASM", "PRASM", "CASM"]
-    elif metric_group_select=="All":
-        selected_metrics = available_metrics
-    elif metric_group_select=="Custom":
-        selected_metrics = st.multiselect("Add or Remove Metrics to Compare", available_metrics, default=available_metrics[0])
-        if not selected_metrics:
-            selected_metrics = [available_metrics[0]] # prevents empty set from triggering an error, displays first metric in available metrics if none are selected
+    # Allow user to select metrics to compare with a "Select All" option
+    available_metrics = data.columns.drop(["Year", "Quarter", "Airline", "Period"])
+    metric_groups = ["Earnings", "Unit Performance", "All", "Custom"]
+    with st.container(border=True):
+        metric_group_select = st.radio("Select Metrics for Comparison:", metric_groups, index=metric_groups.index("Earnings"))
+        # Provide preselected groups of metrics and allow user to customize selection
+        if metric_group_select=="Earnings":
+            selected_metrics = ["Total Revenue", "Net Income", "Net Margin"]
+        elif metric_group_select=="Unit Performance":
+            selected_metrics = ["Yield", "TRASM", "PRASM", "CASM"]
+        elif metric_group_select=="All":
+            selected_metrics = available_metrics
+        elif metric_group_select=="Custom":
+            selected_metrics = st.multiselect("Add or Remove Metrics to Compare", available_metrics, default=available_metrics[0])
+            if not selected_metrics:
+                selected_metrics = [available_metrics[0]] # prevents empty set from triggering an error, displays first metric in available metrics if none are selected
 
-    # Add a toggle to display metric definitions for users who need them
-    with st.expander("Show definitions of the available metrics."):
-        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        st.write("Total Revenue - Total amount earned from sales.")
-        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        st.write("Passenger Revenue - Revenue primarily composed of passenger ticket sales, loyalty travel awards, and travel-related services performed in conjunction with a passenger's flight.")
-        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        st.write("Total Expenses - Total amount of costs incurred.")
-        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        st.write("Net Income - Profit.")
-        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        st.write("Revenue Passenger Mile (RPM) - A basic measure of sales volume. One RPM represents one passenger flown one mile.")
-        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        st.write("Available Seat Mile (ASM) - A basic measure of production. One ASM represents one seat flown one mile.")
-        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        st.write("Long-Term Debt - Total long-term debt net of current maturities.<br>NOTE: Due to inconsistent reporting in quarterly filings between airilnes, this metric is only shown for full year data.", unsafe_allow_html=True)
-        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        st.write("Profit Sharing - Amount of income set aside to fund employee profit sharing programs.<br>NOTE: AAL's quarterly reporting of this metric is inconsistent. Data provided may also have been obtained from internal sources. Additionally, zero profit sharing shown can either indicate no profit sharing or lack of reported data.", unsafe_allow_html=True)
-        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        st.write("Net Margin - Percentage of profit earned for each dollar in revenue. Net Income divided by Total Revenue.")
-        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        st.write("Load Factor - The percentage of available seats that are filled with revenue passengers. RPMs divided by ASMs.")
-        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        st.write("Yield - A measure of airline revenue derived by dividing Passenger Revenue by RPMs.")
-        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        st.write("Total Revenue per Available Seat Mile (TRASM) - Total Revenue divided by ASMs.")
-        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        st.write("Passenger Revenue per Available Seat Mile (PRASM) - Passenger Revenue divided by ASMs.")
-        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-        st.write("Cost per Available Seat Mile (CASM) - Total Expenses divided by ASMs.")
-        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+        # Add a toggle to display metric definitions for users who need them
+        with st.container(border=False):
+            definitions = st.checkbox("Show definitions of the available metrics.")
+            if definitions:
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                st.write("Total Revenue - Total amount earned from sales.")
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                st.write("Passenger Revenue - Revenue primarily composed of passenger ticket sales, loyalty travel awards, and travel-related services performed in conjunction with a passenger's flight.")
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                st.write("Total Expenses - Total amount of costs incurred.")
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                st.write("Net Income - Profit.")
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                st.write("Revenue Passenger Mile (RPM) - A basic measure of sales volume. One RPM represents one passenger flown one mile.")
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                st.write("Available Seat Mile (ASM) - A basic measure of production. One ASM represents one seat flown one mile.")
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                st.write("Long-Term Debt - Total long-term debt net of current maturities.<br>NOTE: Due to inconsistent reporting in quarterly filings between airilnes, this metric is only shown for full year data.", unsafe_allow_html=True)
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                st.write("Profit Sharing - Amount of income set aside to fund employee profit sharing programs.<br>NOTE: AAL's quarterly reporting of this metric is inconsistent. Data provided may also have been obtained from internal sources. Additionally, zero profit sharing shown can either indicate no profit sharing or lack of reported data.", unsafe_allow_html=True)
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                st.write("Net Margin - Percentage of profit earned for each dollar in revenue. Net Income divided by Total Revenue.")
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                st.write("Load Factor - The percentage of available seats that are filled with revenue passengers. RPMs divided by ASMs.")
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                st.write("Yield - A measure of airline revenue derived by dividing Passenger Revenue by RPMs.")
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                st.write("Total Revenue per Available Seat Mile (TRASM) - Total Revenue divided by ASMs.")
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                st.write("Passenger Revenue per Available Seat Mile (PRASM) - Passenger Revenue divided by ASMs.")
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                st.write("Cost per Available Seat Mile (CASM) - Total Expenses divided by ASMs.")
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
 
 # Filter data for selected airlines and metrics
 filtered_data = data[data["Airline"].isin(selected_airlines)][data["Year"].isin(selected_years)][data["Quarter"].isin(selected_quarters)].copy()
