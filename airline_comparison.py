@@ -78,7 +78,7 @@ airline_colors = {
     "LUV": "#f9b612"
 }
 
-with st.expander("Make Selections"):
+with st.expander("Make Selections", expanded=True):
     # Allow users to select full-year or quarterly data
     with st.container(border=True):
         data_type = st.selectbox("View Full Year or Quarterly Data?", ["Full Year", "Quarterly"])
