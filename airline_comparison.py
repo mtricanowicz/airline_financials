@@ -403,7 +403,7 @@ with tab2:
     comparison_summary = comparison_summary.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column
     comparison_summary = comparison_summary.drop(columns=["Period"]) # drop period column as the summary only covers a single period
     comparison_summary = comparison_summary.rename(columns={"Value":f"{max(data["Period"])}"})
-    ordered_metrics = [item + " (millions)" if i < 8 else item for i, item in enumerate(available_metrics)]
+    ordered_metrics = [item + " (millions)" if i < len(available_metrics)-6 else item for i, item in enumerate(available_metrics)]
     if len(selected_airlines) <= 1:
         comparison_summary = comparison_summary.drop(columns=f"vs {base_airline}") # do not display percent difference column if user chooses not to compare
         comparison_summary = comparison_summary.unstack(level="Airline")
