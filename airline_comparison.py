@@ -233,7 +233,7 @@ comparison_df = comparison_df.reset_index(drop=True)
 
 # Display comparison table and sort by "Period" and "Metric". Overall view of the data. Not used because separate tables are shown for each selected metric to improve readability of the data.
 #st.write("Airline Comparison")
-st.dataframe(comparison_df.set_index(["Period", "Airline"]).sort_values(by=["Period", "Metric", "Airline"], ascending=True))
+#st.dataframe(comparison_df.set_index(["Period", "Airline"]).sort_values(by=["Period", "Metric", "Airline"], ascending=True))
 
 # Define function to alter color of the comparison column values based on sign
 def color_positive_negative_zero(val):
