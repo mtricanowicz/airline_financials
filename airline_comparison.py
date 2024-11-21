@@ -118,7 +118,7 @@ with st.expander("Make Selections", expanded=True):
         selected_years=years # prevents empty set from triggering an error, displays all years if none are selected
 
     # Allow user to select quarters for comparison
-    quarters = data["Quarter"].unique()
+    quarters = sorted(data["Quarter"].unique())
     with st.container(border=True):
         if data_type == "Quarterly":
             selected_quarters = st.multiselect("Select Quarter(s) for Comparison", quarters, default=quarters)
