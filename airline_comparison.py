@@ -71,8 +71,8 @@ airline_financials_q = airline_financials[airline_financials["Quarter"] != "FY"]
 
 # Color palette to use for visualizaitons
 airline_colors = {
-    "AAL": "#A5B5BE",
-    "DAL": "#9B1631",
+    "AAL": "#9DA6AB", # AA Gray/Silver
+    "DAL": "#C01933", # Delta Red
     "UAL": "#005daa",
     "ALK": "#00385f",
     "LUV": "#f9b612"
@@ -111,7 +111,7 @@ with st.expander("Make Selections", expanded=True):
             base_airline = selected_airlines[0]
 
     # Allow user to select years for comparison
-    years = data["Year"].unique()
+    years = sorted(data["Year"].unique())
     with st.container(border=True):
         selected_years = st.multiselect("Select Year(s) for Comparison", years, default=years)
     if not selected_years:
@@ -179,7 +179,7 @@ with st.expander("Make Selections", expanded=True):
                 st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
 
 # Filter data for selected airlines and metrics
-filtered_data = data[data["Airline"].isin(selected_airlines)][data["Year"].isin(selected_years)][data["Quarter"].isin(selected_quarters)].copy()
+filtered_data = (data[data["Airline"].isin(selected_airlines)][data["Year"].isin(selected_years)][data["Quarter"].isin(selected_quarters)].copy()).sort_values(by="Period")
 
 # Define a function to compare values between airlines and output the percent difference
 def pct_diff(base, comparison):
