@@ -186,12 +186,12 @@ def pct_diff(base, comparison):
     # Handle cases where base is zero to avoid division by zero
     if base == 0:
         return float(np.inf) if comparison != 0 else 0
+    if pd.isna(base) or base==None or pd.isna(comparison) or comparison==None:
+        return None
     # Calculate the percentage difference using absolute values
     percent_change = round(abs((comparison - base) / (base)) * 100, 2)
     # Determine if the change should be considered positive or negative
-    if pd.isna(base) or base==None:
-        return None
-    elif base < 0 < comparison:
+    if base < 0 < comparison:
         return percent_change
     elif base > 0 > comparison:
         return -percent_change
@@ -213,10 +213,12 @@ for metric in selected_metrics:
     # Initiate base airline data
     base_values = filtered_data[filtered_data["Airline"] == base_airline].set_index(["Period"])[metric]
     base_values = base_values.reindex(filtered_data["Period"].unique())
+    base_values = base_values.replace({np.nan: None})
     # Initiate all selected airline data and compare to the base airline
     for airline in selected_airlines:
         airline_values = filtered_data[filtered_data["Airline"] == airline].set_index(["Period"])[metric]
         airline_values = airline_values.reindex(filtered_data["Period"].unique())
+        airline_values = airline_values.replace({np.nan: None})
         percent_difference = pd.Series([pct_diff(base, comp) for base, comp in zip(base_values, airline_values)]) # calculate percent difference between each airline and base airline
         comparison_data.append(pd.DataFrame({
             "Period": airline_values.index,
@@ -231,7 +233,7 @@ comparison_df = comparison_df.reset_index(drop=True)
 
 # Display comparison table and sort by "Period" and "Metric". Overall view of the data. Not used because separate tables are shown for each selected metric to improve readability of the data.
 #st.write("Airline Comparison")
-#st.dataframe(comparison_df.set_index(["Period", "Airline"]).sort_values(by=["Period", "Metric", "Airline"], ascending=True))
+st.dataframe(comparison_df.set_index(["Period", "Airline"]).sort_values(by=["Period", "Metric", "Airline"], ascending=True))
 
 # Define function to alter color of the comparison column values based on sign
 def color_positive_negative_zero(val):
@@ -271,19 +273,19 @@ with tab1:
             # Display table for the metric to allow review of the data
             comparison_display = comparison_df[comparison_df["Metric"] == metric_display] # prepare a copy of the comparison table to be used for display
             comparison_display = comparison_display.rename(columns={"Value":metric_display}) # rename value column to make it more understandable
-            comparison_display["Percent Difference"] = comparison_display["Percent Difference"].apply(lambda x: f"{x}%") # reformat percent difference column to show % sign
+            comparison_display["Percent Difference"] = comparison_display["Percent Difference"].apply(lambda x: None if x is None or pd.isna(x) else f"{x}%") # reformat percent difference column to show % sign
             #comparison_display = comparison_display.style.set_table_styles([{"subset": ["Percent Difference"], "props": [("text-align", "right")]}])
             comparison_display = comparison_display.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column to make it more understandable
             comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
             # Column reformatting steps
             if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing"]:
-                comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"${x:,.0f}" if x.is_integer() else f"${x:,.2f}") # reformat currency columns to show $ sign
+                comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"${x:,.0f}" if x.is_integer() else f"${x:,.2f}") # reformat currency columns to show $ sign
             elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
-                comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.2f}\u00A2") # reformat unit currency columns to show cents sign
+                comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"{x:,.2f}\u00A2") # reformat unit currency columns to show cents sign
             elif metric in ["Net Margin", "Load Factor"]:
-                comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.2f}%") # reformat percent columns to show % sign
+                comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"{x:,.2f}%") # reformat percent columns to show % sign
             else:
-                comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: f"{x:,.0f}") # ensure any other metric is displayed as a unitless integer for readability
+                comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"{x:,.0f}") # ensure any other metric is displayed as a unitless integer for readability
             comparison_display = comparison_display.sort_values(by=["Period", "Airline"], ascending=True) # sort dataframe by the period and airline
             # Column display output
             if len(selected_airlines) <= 1:
