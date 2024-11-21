@@ -189,7 +189,9 @@ def pct_diff(base, comparison):
     # Calculate the percentage difference using absolute values
     percent_change = round(abs((comparison - base) / (base)) * 100, 2)
     # Determine if the change should be considered positive or negative
-    if base < 0 < comparison:
+    if pd.isna(base) or base==None:
+        return None
+    elif base < 0 < comparison:
         return percent_change
     elif base > 0 > comparison:
         return -percent_change
@@ -210,10 +212,11 @@ for metric in selected_metrics:
         filtered_data[metric] = filtered_data[metric] * 100
     # Initiate base airline data
     base_values = filtered_data[filtered_data["Airline"] == base_airline].set_index(["Period"])[metric]
+    base_values = base_values.reindex(filtered_data["Period"].unique())
     # Initiate all selected airline data and compare to the base airline
     for airline in selected_airlines:
         airline_values = filtered_data[filtered_data["Airline"] == airline].set_index(["Period"])[metric]
-        percent_difference = pd.Series([pct_diff(base, comp) for base, comp in zip(base_values, airline_values)])
+        percent_difference = pd.Series([pct_diff(base, comp) for base, comp in zip(base_values, airline_values)]) # calculate percent difference between each airline and base airline
         comparison_data.append(pd.DataFrame({
             "Period": airline_values.index,
             "Airline": airline,
