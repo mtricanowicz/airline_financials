@@ -216,6 +216,7 @@ for metric in selected_metrics:
     # Initiate all selected airline data and compare to the base airline
     for airline in selected_airlines:
         airline_values = filtered_data[filtered_data["Airline"] == airline].set_index(["Period"])[metric]
+        airline_values = airline_values.reindex(filtered_data["Period"].unique())
         percent_difference = pd.Series([pct_diff(base, comp) for base, comp in zip(base_values, airline_values)]) # calculate percent difference between each airline and base airline
         comparison_data.append(pd.DataFrame({
             "Period": airline_values.index,
