@@ -16,7 +16,7 @@ st.set_page_config(
         "About": """
         ## US Airline Financial Metrics Comparison App
         This app enables quick and intuitive comparisons of the financial performance of major US commercial airlines. Several selected metrics can be evaluated over chosen reporting periods. Unless otherwise noted, all metrics are either sourced or calculated from data given in the 10-Q/8-K (quarterly filings) and 10-K (annual filing) forms reported to the SEC and available on the airlines' investor relations sites linked below.\n
-        [AAL](https://americanairlines.gcs-web.com/) | [DAL](https://ir.delta.com/) | [UAL](https://ir.united.com/)
+        [AAL](https://americanairlines.gcs-web.com/) | [DAL](https://ir.delta.com/) | [UAL](https://ir.united.com/) | [LUV](https://www.southwestairlinesinvestorrelations.com/)
         - **Version:** 1.0.0
         - **Author:** Michael Tricanowicz
         - **License:** MIT
