@@ -318,7 +318,7 @@ with tab1:
                     filtered_data, 
                     x="Period", 
                     y=metric_display,
-                    category_orders={"Period": sorted(data["Period"].unique(), reverse=False), "Airline": sorted(data["Airline"].unique(), reverse=False)}, # ensure x axis plots in chronological order
+                    category_orders={"Period": sorted(filtered_data["Period"].unique(), reverse=False), "Airline": sorted(filtered_data["Airline"].unique(), reverse=False)}, # ensure x axis plots in chronological order
                     color="Airline",
                     title=f"{metric} Over Time",
                     color_discrete_map=airline_colors  # Apply custom color mapping
@@ -364,7 +364,7 @@ with tab1:
                     comparison_df[comparison_df["Airline"]!=base_airline][comparison_df["Metric"] == metric_display], 
                     x="Period", 
                     y="Percent Difference",
-                    category_orders={"Period": sorted(data["Period"].unique(), reverse=False), "Airline": sorted(data["Airline"].unique(), reverse=False)}, # ensure x axis plots in chronological order
+                    category_orders={"Period": sorted(filtered_data["Period"].unique(), reverse=False), "Airline": sorted(filtered_data["Airline"].unique(), reverse=False)}, # ensure x axis plots in chronological order
                     color="Airline",
                     barmode="group",
                     title=f"Percent Difference in {metric} vs {base_airline}",
