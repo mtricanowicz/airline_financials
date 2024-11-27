@@ -474,7 +474,7 @@ with tab3:
                         , unsafe_allow_html=True)
             repurchase_net = ((last_close[airline].values[0]-total_average_share_cost[airline])/1000)*total_shares_repurchase[airline]
             repurchase_net_color = "green" if repurchase_net > 0 else "black" if repurchase_net==0 else "red"
-            st.markdown(f"<p style='margin-bottom:0;'><h3 style='color:{repurchase_net_color};'>{f"{'-$' if repurchase_net < 0 else '$'}{abs(repurchase_net):,.1f} billion"}</h3></p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='margin-bottom:0;'><h3 style='color:{repurchase_net_color};'>{f"{'-$' if repurchase_net < 0 else '$'}{abs(repurchase_net):,.1f} billion {"&nbsp;"*10} {"🔥💰🔥" if repurchase_net<0 else "🤷" if repurchase_net==0 else "💸💸💸"}"}</h3></p>", unsafe_allow_html=True)
     # Historical repurchase data for viewing
     with col2:
         # Prepare data for display
