@@ -8,7 +8,6 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import pytz
 import yfinance as yf
-import pandas_datareader.data as web
 
 # Set custom page configuration including the "About" section
 st.set_page_config(
