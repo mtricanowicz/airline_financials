@@ -472,13 +472,8 @@ with tab3:
         total_shares_repurchase = share_repurchases.groupby("Airline")["Shares (millions)"].sum()
         total_cost_repurchase = share_repurchases.groupby("Airline")["Cost (millions)"].sum()
         total_average_share_cost = total_cost_repurchase/total_shares_repurchase
-        ticker_date = (datetime.now()-timedelta(days=1)) if datetime.now(pytz.timezone("America/New_York")).hour<=16 else datetime.now() # set date for closing price (yesterday if market is still open else today) since yfinance's Close data is the latest price when the market is open
-        last_close = yf.Tickers(share_repurchases["Airline"].unique().tolist()).history(period="1d", start=ticker_date, end=ticker_date)["Close"]
-        st.write(last_close)
         for airline in share_repurchases["Airline"].unique():
             st.markdown(f"<h4>{airline}</h4>", unsafe_allow_html=True)
-            st.dataframe(last_close[airline])
-            #st.write(last_close[airline][0])
             st.markdown(f"{airline} repurchased **{total_shares_repurchase[airline]:.1f} million** shares at a total cost of **\${(total_cost_repurchase[airline]/1000):.1f} billion**.<br>"
                         f"The average share price of repurchase was **\${total_average_share_cost[airline]:.2f}**. {airline} last closed at **\${last_close[airline].values[0]:.2f}**.<br>"
                         f"Based on the current share price, the repurchase campaign netted {airline}:"
