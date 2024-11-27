@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
+import yfinance as yf
 
 # Set custom page configuration including the "About" section
 st.set_page_config(
@@ -47,28 +48,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Load the CSV data
-file_path = "airline_financial_data.csv"
-airline_financials = pd.read_csv(file_path)
-
-# Add calculated metrics
-airline_financials["Net Margin"] = round((airline_financials["Net Income"] / airline_financials["Total Revenue"]) * 100, 2)
-airline_financials["Load Factor"] = round((airline_financials["RPM"] / airline_financials["ASM"]) * 100, 2)
-airline_financials["Yield"] = airline_financials["Passenger Revenue"] / airline_financials["RPM"]
-airline_financials["TRASM"] = airline_financials["Total Revenue"] / airline_financials["ASM"]
-airline_financials["PRASM"] = airline_financials["Passenger Revenue"] / airline_financials["ASM"]
-airline_financials["CASM"] = airline_financials["Total Expenses"] / airline_financials["ASM"]
-
-# Create a Period column to represent the fiscal period and to use for data display
-airline_financials["Quarter"] = airline_financials["Quarter"].apply(lambda x: f"Q{x}" if x != "FY" else x)
-airline_financials["Period"] = airline_financials["Year"].astype(str) + airline_financials["Quarter"].astype(str)
-
-# Split data into full-year and quarterly DataFrames
-airline_financials_fy = airline_financials[airline_financials["Quarter"] == "FY"].copy() # full year data
-#airline_financials_fy["Date"] = pd.to_datetime(airline_financials_fy["Year"].astype(str) + "-12-31") # date ended up not being needed, keeping for future use if necessary
-airline_financials_q = airline_financials[airline_financials["Quarter"] != "FY"].copy() # quarterly data
-#airline_financials_q["Date"] = pd.to_datetime(airline_financials_q["Year"].astype(str) + "-" + (airline_financials_q["Quarter"]*3).astype(str) + "-01") + pd.offsets.MonthEnd(0) # date ended up not being needed, keeping for future use if necessary
-
 # Color palette to use for visualizaitons
 airline_colors = {
     "AAL": "#9DA6AB", # AA Gray/Silver
@@ -78,6 +57,43 @@ airline_colors = {
     "LUV": "#f9b612"
 }
 
+#####################################################################################
+
+## DATA IMPORT AND PREP ##
+# Load the CSV data
+airline_financials = pd.read_csv("airline_financial_data.csv")
+share_repurchases = pd.read_csv("share_repurchases.csv")
+
+# Airline financial data
+# Add calculated metrics
+airline_financials["Net Margin"] = round((airline_financials["Net Income"] / airline_financials["Total Revenue"]) * 100, 2)
+airline_financials["Load Factor"] = round((airline_financials["RPM"] / airline_financials["ASM"]) * 100, 2)
+airline_financials["Yield"] = airline_financials["Passenger Revenue"] / airline_financials["RPM"]
+airline_financials["TRASM"] = airline_financials["Total Revenue"] / airline_financials["ASM"]
+airline_financials["PRASM"] = airline_financials["Passenger Revenue"] / airline_financials["ASM"]
+airline_financials["CASM"] = airline_financials["Total Expenses"] / airline_financials["ASM"]
+# Create a Period column to represent the fiscal period and to use for data display
+airline_financials["Quarter"] = airline_financials["Quarter"].apply(lambda x: f"Q{x}" if x != "FY" else x)
+airline_financials["Period"] = airline_financials["Year"].astype(str) + airline_financials["Quarter"].astype(str)
+# Split data into full-year and quarterly DataFrames
+airline_financials_fy = airline_financials[airline_financials["Quarter"] == "FY"].copy() # full year data
+#airline_financials_fy["Date"] = pd.to_datetime(airline_financials_fy["Year"].astype(str) + "-12-31") # date ended up not being needed, keeping for future use if necessary
+airline_financials_q = airline_financials[airline_financials["Quarter"] != "FY"].copy() # quarterly data
+#airline_financials_q["Date"] = pd.to_datetime(airline_financials_q["Year"].astype(str) + "-" + (airline_financials_q["Quarter"]*3).astype(str) + "-01") + pd.offsets.MonthEnd(0) # date ended up not being needed, keeping for future use if necessary
+
+# Share repurchase data
+# Add calculated and transformed columns
+share_repurchases["Shares (millions)"] = share_repurchases["Shares Repurchased"]/1000000
+share_repurchases["Cost (millions)"] = share_repurchases["Cost"]/1000000
+share_repurchases["Average Share Cost"] = share_repurchases["Cost"]/share_repurchases["Shares Repurchased"]
+share_repurchases["Average Share Cost"] = share_repurchases["Average Share Cost"].replace(np.nan, 0)
+share_repurchases["Period"] = share_repurchases["Year"].astype(str) + share_repurchases["Quarter"].astype(str)
+# Fetch latest closing price of the airlines' stock
+last_close = yf.Tickers(share_repurchases["Airline"].unique().tolist()).history(period="1d")["Close"]
+
+#####################################################################################
+
+## USER INTERACTION ##
 with st.expander("Make Selections", expanded=True):
     # Allow users to select full-year or quarterly data
     with st.container(border=True):
@@ -178,6 +194,9 @@ with st.expander("Make Selections", expanded=True):
                 st.write("Cost per Available Seat Mile (CASM) - Total Expenses divided by ASMs.")
                 st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
 
+#####################################################################################
+
+## FILTERING, CALCULATIONS, AND FUNCTIONS ##
 # Filter data for selected airlines and metrics
 filtered_data = (data[data["Airline"].isin(selected_airlines)][data["Year"].isin(selected_years)][data["Quarter"].isin(selected_quarters)].copy()).sort_values(by="Period")
 
@@ -250,8 +269,12 @@ def color_positive_negative_zero(val):
 def color_airlines(val):
     return f"color: {airline_colors.get(val, '')}" if val in airline_colors else ""
 
+#####################################################################################
+
+## OUTPUT/DISPLAY ##
 # Create tabs
-tab1, tab2 = st.tabs(["Comparison", "Most Recent Period Summary"])
+#tab1, tab2 = st.tabs(["Comparison", "Most Recent Period Summary"])
+tab1, tab2, tab3 = st.tabs(["Comparison", "Most Recent Period Summary", "Share Repurchases"]) # tab 3 in progress
 
 # Display selected comparison data
 with tab1:
@@ -430,4 +453,42 @@ with tab2:
         comparison_summary.columns = comparison_summary.columns.swaplevel(0, 1)
         comparison_summary = comparison_summary.sort_index(axis=1, level=0)
         comparison_summary = comparison_summary.reindex([item for item in ordered_metrics if item in comparison_summary.index])
-    st.dataframe(comparison_summary)
+    st.dataframe(comparison_summary, height=(len(selected_metrics)+2)*35+3)
+
+# Display share repurchase history of the Big 3 airlines (AAL, DAL, UAL)
+with tab3:
+    st.header("2010s Big 3 Share Buyback Campaign", divider='gray')
+    # Create display columns
+    col1, col2 = st.columns(2)
+    # Information about the repurchases
+    with col1:
+        total_shares_repurchase = share_repurchases.groupby("Airline")["Shares (millions)"].sum()
+        total_cost_repurchase = share_repurchases.groupby("Airline")["Cost (millions)"].sum()
+        total_average_share_cost = total_cost_repurchase/total_shares_repurchase
+        for airline in share_repurchases["Airline"].unique():
+            st.markdown(f"<h4>{airline}</h4>", unsafe_allow_html=True)
+            st.markdown(f"**{airline}** repurchased {total_shares_repurchase[airline]:.1f} million shares at a total cost of **\${(total_cost_repurchase[airline]/1000):.1f} billion**.<br>"
+                        f"The average share price of repurchase was **\${total_average_share_cost[airline]:.2f}**. **{airline}** last closed at **\${last_close[airline].values[0]:.2f}**.<br>"
+                        f"Based on the current share price, the repurchase campaign netted **{airline}**:"
+                        , unsafe_allow_html=True)
+            repurchase_net = ((last_close[airline].values[0]-total_average_share_cost[airline])/1000)*total_shares_repurchase[airline]
+            repurchase_net_color = "green" if repurchase_net > 0 else "black" if repurchase_net==0 else "red"
+            st.markdown(f"<p style='margin-bottom:0;'><h3 style='color:{repurchase_net_color};'>{f"{'-$' if repurchase_net < 0 else '$'}{abs(repurchase_net):,.1f} billion"}</h3></p>", unsafe_allow_html=True)
+    # Historical repurchase data for viewing
+    with col2:
+        # Prepare data for display
+        shares_display = share_repurchases.copy()
+        shares_display = shares_display.drop(columns=["Year", "Quarter", "Shares Repurchased", "Cost"])
+        shares_display["Shares (millions)"] = shares_display["Shares (millions)"].apply(lambda x: f"{x:,.1f}")
+        shares_display["Cost (millions)"] = shares_display["Cost (millions)"].apply(lambda x: f"${x:,.0f}")
+        shares_display["Average Share Cost"] = shares_display["Average Share Cost"].apply(lambda x: f"${x:,.2f}")
+        shares_display = shares_display.set_index(["Period", "Airline"])
+        shares_display = shares_display.unstack(level="Airline")
+        shares_display.columns = shares_display.columns.swaplevel(0, 1)
+        shares_display.columns = pd.MultiIndex.from_tuples(
+            sorted(shares_display.columns, key=lambda x: ["Shares (millions)", "Cost (millions)", "Average Share Cost"].index(x[1]))
+        )
+        shares_display = shares_display.sort_index(axis=1, level=0, sort_remaining=False)
+        # Display in collapsible element
+        with st.expander("Share Repurchase History", expanded=False):
+            st.dataframe(shares_display)
