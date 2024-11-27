@@ -459,7 +459,7 @@ with tab2:
 with tab3:
     st.header("2010s Big 3 Share Buyback Campaign", divider='gray')
     # Create display columns
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([1, 2])
     # Information about the repurchases
     with col1:
         total_shares_repurchase = share_repurchases.groupby("Airline")["Shares (millions)"].sum()
@@ -489,6 +489,5 @@ with tab3:
             sorted(shares_display.columns, key=lambda x: ["Shares (millions)", "Cost (millions)", "Average Share Cost"].index(x[1]))
         )
         shares_display = shares_display.sort_index(axis=1, level=0, sort_remaining=False)
-        # Display in collapsible element
-        with st.expander("Share Repurchase History", expanded=False):
-            st.dataframe(shares_display)
+        st.markdown(f"<h4>Share Repurchase History</h4>", unsafe_allow_html=True)
+        st.dataframe(shares_display)
