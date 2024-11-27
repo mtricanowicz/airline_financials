@@ -472,6 +472,8 @@ with tab3:
         total_shares_repurchase = share_repurchases.groupby("Airline")["Shares (millions)"].sum()
         total_cost_repurchase = share_repurchases.groupby("Airline")["Cost (millions)"].sum()
         total_average_share_cost = total_cost_repurchase/total_shares_repurchase
+        ticker_date = (datetime.now()-timedelta(days=1)) if datetime.now(pytz.timezone("America/New_York")).hour<=16 else datetime.now() # set date for closing price (yesterday if market is still open else today) since yfinance's Close data is the latest price when the market is open
+        last_close = yf.Tickers(share_repurchases["Airline"].unique().tolist()).history(period="1d", start=ticker_date, end=ticker_date)["Close"]
         for airline in share_repurchases["Airline"].unique():
             st.markdown(f"<h4>{airline}</h4>", unsafe_allow_html=True)
             st.dataframe(last_close[airline])
