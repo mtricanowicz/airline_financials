@@ -466,10 +466,6 @@ with tab2:
 with tab3:
     st.header("2010s Big 3 Share Buyback Campaign", divider='gray')
     # Create display columns
-    
-    st.write(ticker_date.date())
-    st.write(last_close)
-    
     col1, col2 = st.columns([1, 2])
     # Information about the repurchases
     with col1:
