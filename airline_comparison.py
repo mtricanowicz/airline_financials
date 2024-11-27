@@ -415,8 +415,8 @@ with tab1:
 
 # Display a summary of the latest reporting period's metrics
 with tab2:
-    st.header(f"Summary of {max(data["Period"])} Metrics", divider='gray')
-    comparison_summary = comparison_df[comparison_df["Period"]==max(data["Period"])]
+    st.header(f"Summary of {max(filtered_data["Period"])} Metrics", divider='gray')
+    comparison_summary = comparison_df[comparison_df["Period"]==max(filtered_data["Period"])]
     # Column reformatting steps
     def format_value_based_on_metric(value, metric):
         if metric in ["Total Revenue (millions)", "Passenger Revenue (millions)", "Total Expenses (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
@@ -432,7 +432,7 @@ with tab2:
     comparison_summary = comparison_summary.set_index(["Metric", "Airline"], drop=True)
     comparison_summary = comparison_summary.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column
     comparison_summary = comparison_summary.drop(columns=["Period"]) # drop period column as the summary only covers a single period
-    comparison_summary = comparison_summary.rename(columns={"Value":f"{max(data["Period"])}"})
+    comparison_summary = comparison_summary.rename(columns={"Value":f"{max(filtered_data["Period"])}"})
     ordered_metrics = [item + " (millions)" if i < len(available_metrics)-6 else item for i, item in enumerate(available_metrics)]
     if len(selected_airlines) <= 1:
         comparison_summary = comparison_summary.drop(columns=f"vs {base_airline}") # do not display percent difference column if user chooses not to compare
