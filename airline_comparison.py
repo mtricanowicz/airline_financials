@@ -415,6 +415,7 @@ with tab1:
 
 # Display a summary of the latest reporting period's metrics
 with tab2:
+    st.header(f"Summary of {max(data["Period"])} Metrics", divider='gray')
     comparison_summary = comparison_df[comparison_df["Period"]==max(data["Period"])]
     # Column reformatting steps
     def format_value_based_on_metric(value, metric):
@@ -489,5 +490,5 @@ with tab3:
             sorted(shares_display.columns, key=lambda x: ["Shares (millions)", "Cost (millions)", "Average Share Cost"].index(x[1]))
         )
         shares_display = shares_display.sort_index(axis=1, level=0, sort_remaining=False)
-        st.markdown(f"<h4>Share Repurchase History</h4>", unsafe_allow_html=True)
+        st.markdown("<h4>Share Repurchase History</h4>", unsafe_allow_html=True)
         st.dataframe(shares_display)
