@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
+from datetime import datetime, timedelta
+import pytz
 import yfinance as yf
 
 # Set custom page configuration including the "About" section
@@ -64,8 +66,8 @@ airline_colors = {
 #airline_financials = pd.read_csv("airline_financial_data.csv")
 #share_repurchases = pd.read_csv("share_repurchases.csv")
 # Load the data from XLSX
-airline_financials = pd.read_excel("airline_financial_data.xlsx", sheet_name="airline_financials")
-share_repurchases = pd.read_excel("airline_financial_data.xlsx", sheet_name="share_repurchases")
+airline_financials = pd.read_excel("airline_financial_data.xlsx", sheet_name="airline_financials") # primary financial data and metrics
+share_repurchases = pd.read_excel("airline_financial_data.xlsx", sheet_name="share_repurchases") # share repurchase data
 
 # Airline financial data
 # Add calculated metrics
@@ -89,10 +91,11 @@ airline_financials_q = airline_financials[airline_financials["Quarter"] != "FY"]
 share_repurchases["Shares (millions)"] = share_repurchases["Shares Repurchased"]/1000000
 share_repurchases["Cost (millions)"] = share_repurchases["Cost"]/1000000
 share_repurchases["Average Share Cost"] = share_repurchases["Cost"]/share_repurchases["Shares Repurchased"]
-share_repurchases["Average Share Cost"] = share_repurchases["Average Share Cost"].replace(np.nan, 0)
+share_repurchases["Average Share Cost"] = share_repurchases["Average Share Cost"].replace(np.nan, 0) # for years with zero shares purchased, address the NaN
 share_repurchases["Period"] = share_repurchases["Year"].astype(str) + share_repurchases["Quarter"].astype(str)
 # Fetch latest closing price of the airlines' stock
-last_close = yf.Tickers(share_repurchases["Airline"].unique().tolist()).history(period="1d")["Close"]
+ticker_date = (datetime.now()-timedelta(days=1)) if datetime.now(pytz.timezone("America/New_York")).hour<=16 else datetime.now() # set date for closing price (yesterday if market is still open else today) since yfinance's Close data is the latest price when the market is open
+last_close = yf.Tickers(share_repurchases["Airline"].unique().tolist()).history(period="1d", start=ticker_date, end=ticker_date)["Close"]
 
 #####################################################################################
 
