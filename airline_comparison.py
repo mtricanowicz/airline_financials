@@ -368,7 +368,7 @@ with tab1:
                 # Adjust the hover over display formatting to improve readability
                 if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing"]:
                     fig_line.update_traces(
-                        hovertemplate="%{x}<br>$%{y:.0f}"
+                        hovertemplate="%{x}<br>$%{y:,.0f}"
                     )
                 elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
                     fig_line.update_traces(
@@ -380,7 +380,7 @@ with tab1:
                     )
                 else:
                     fig_line.update_traces(
-                        hovertemplate="%{x}<br>%{y:.0f}"
+                        hovertemplate="%{x}<br>%{y:,.0f}"
                     )
                 # Display plot
                 st.plotly_chart(fig_line)
@@ -498,3 +498,39 @@ with tab3:
         shares_display = shares_display.sort_index(axis=1, level=0, sort_remaining=False)
         st.markdown("<h4>Share Repurchase History</h4>", unsafe_allow_html=True)
         st.dataframe(shares_display)
+        # Prepare data to plot gain/loss from repurchases over time since Covid onset
+        # Fetch daily closing price since start of 2020Q2
+        ticker_since_covid = yf.Tickers(share_repurchases["Airline"].unique().tolist()).history(period="1d", start="2020-04-01", end=datetime.now())["Close"]
+        # Calculate the daily gain/loss in billions based on average repurchase price minus closing price multiplied by number of shares repurchased
+        gain = pd.DataFrame()
+        for airline in share_repurchases["Airline"].unique():
+            gain[airline] = ticker_since_covid[airline].apply(lambda x: (x - total_average_share_cost[airline])*total_shares_repurchase[airline]/1000)
+        gain_melt = pd.melt(gain.reset_index(), id_vars="Date", var_name="Airline", value_name="Gain")
+        # Generate a line plot for each airline's gain/loss over time
+        fig_line2 = px.line(
+            gain_melt, 
+            x="Date", 
+            y="Gain",
+            color="Airline",
+            title="Gain/Loss of the Share Repurchase Program Since the Onset of Covid-19",
+            color_discrete_map=airline_colors  # Apply custom color mapping
+        )
+        # Update plot layout features
+        fig_line2.update_layout(
+            xaxis_title=None,
+            yaxis_title="Gain/Loss (billions)",
+            xaxis_tickangle=-45
+        )
+        # Add a more visible line at zero to more easily visually recognize positive and negative
+        fig_line2.add_hline(
+            y=0, 
+            line_dash="dot", 
+            line_color="black",
+            opacity=0.5
+        )
+        # Adjust the hover over display formatting to improve readability
+        fig_line2.update_traces(
+            hovertemplate="%{x}<br>%{y:.1f} billion", #"%{x}<br>$%{y:.1f}"
+            hoverinfo="text"
+        )
+        st.plotly_chart(fig_line2)
