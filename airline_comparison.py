@@ -475,7 +475,7 @@ with tab3:
         for airline in share_repurchases["Airline"].unique():
             st.markdown(f"<h4>{airline}</h4>", unsafe_allow_html=True)
             st.markdown(f"{airline} repurchased **{total_shares_repurchase[airline]:.1f} million** shares at a total cost of **\${(total_cost_repurchase[airline]/1000):.1f} billion**.<br>"
-                        f"The average share price of repurchase was **\${total_average_share_cost[airline]:.2f}**. {airline} last closed at **\${last_close[airline][0]:.2f}**.<br>"
+                        f"The average share price of repurchase was **\${total_average_share_cost[airline]:.2f}**. {airline} last closed at **\${last_close[airline].values[0]:.2f}**.<br>"
                         f"Based on the current share price, the repurchase campaign netted {airline}:"
                         , unsafe_allow_html=True)
             repurchase_net = ((last_close[airline].values[0]-total_average_share_cost[airline])/1000)*total_shares_repurchase[airline]
