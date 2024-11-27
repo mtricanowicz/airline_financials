@@ -8,6 +8,7 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import pytz
 import yfinance as yf
+import pandas_datareader.data as web
 
 # Set custom page configuration including the "About" section
 st.set_page_config(
@@ -94,7 +95,7 @@ share_repurchases["Average Share Cost"] = share_repurchases["Cost"]/share_repurc
 share_repurchases["Average Share Cost"] = share_repurchases["Average Share Cost"].replace(np.nan, 0) # for years with zero shares purchased, address the NaN
 share_repurchases["Period"] = share_repurchases["Year"].astype(str) + share_repurchases["Quarter"].astype(str)
 # Fetch latest closing price of the airlines' stock
-ticker_date = (datetime.now()-timedelta(days=1)) if datetime.now(pytz.timezone("America/New_York")).hour<=16 else datetime.now() # set date for closing price (yesterday if market is still open else today) since yfinance's Close data is the latest price when the market is open
+ticker_date = (datetime.now(pytz.timezone("America/New_York"))-timedelta(days=1)) if datetime.now(pytz.timezone("America/New_York")).hour<16 else datetime.now(pytz.timezone("America/New_York")) # set date for closing price (yesterday if market is still open else today) since yfinance's Close data is the latest price when the market is open
 last_close = yf.Tickers(share_repurchases["Airline"].unique().tolist()).history(period="1d", start=ticker_date, end=ticker_date)["Close"]
 
 #####################################################################################
@@ -466,6 +467,10 @@ with tab2:
 with tab3:
     st.header("2010s Big 3 Share Buyback Campaign", divider='gray')
     # Create display columns
+    
+    st.write(ticker_date.date())
+    st.write(last_close)
+    
     col1, col2 = st.columns([1, 2])
     # Information about the repurchases
     with col1:
