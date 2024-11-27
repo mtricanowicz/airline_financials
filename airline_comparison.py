@@ -60,9 +60,12 @@ airline_colors = {
 #####################################################################################
 
 ## DATA IMPORT AND PREP ##
-# Load the CSV data
-airline_financials = pd.read_csv("airline_financial_data.csv")
-share_repurchases = pd.read_csv("share_repurchases.csv")
+# Load the data from CSV
+#airline_financials = pd.read_csv("airline_financial_data.csv")
+#share_repurchases = pd.read_csv("share_repurchases.csv")
+# Load the data from XLSX
+airline_financials = pd.read_excel("airline_financial_data.xlsx", sheet_name="airline_financials")
+share_repurchases = pd.read_excel("airline_financial_data.xlsx", sheet_name="share_repurchases")
 
 # Airline financial data
 # Add calculated metrics
