@@ -293,8 +293,7 @@ def fetch_last_close_prices(tickers, ticker_date, max_retries=31):
 
 ## OUTPUT/DISPLAY ##
 # Create tabs
-#tab1, tab2 = st.tabs(["Comparison", "Most Recent Period Summary"])
-tab1, tab2, tab3 = st.tabs(["Comparison", "Most Recent Period Summary", "Share Repurchases"]) # tab 3 in progress
+tab1, tab2, tab3 = st.tabs(["Comparison", "Most Recent Period Summary", "Share Repurchases"])
 
 # Display selected comparison data
 with tab1:
@@ -440,7 +439,7 @@ with tab2:
     # Column reformatting steps
     def format_value_based_on_metric(value, metric):
         if metric in ["Total Revenue (millions)", "Passenger Revenue (millions)", "Total Expenses (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
-            return f"${value:,.0f}" if value.is_integer() else f"${value:,.2f}" # reformat currency columns to show $ sign
+            return f"{"-$" if value < 0 else "$"}{abs(value):,.0f}" if value.is_integer() else f"{"-$" if value < 0 else "$"}{abs(value):,.2f}" # reformat currency columns to show $ sign
         elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
             return f"{value:,.2f}\u00A2" # reformat unit currency columns to show cents sign
         elif metric in ["Net Margin", "Load Factor"]:
