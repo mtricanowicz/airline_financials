@@ -277,13 +277,14 @@ def color_airlines(val):
 ticker_date = (datetime.now(pytz.timezone("America/New_York"))-timedelta(days=1)) if datetime.now(pytz.timezone("America/New_York")).hour<16 else datetime.now(pytz.timezone("America/New_York")) # set date for closing price (yesterday if market is still open else today) since yfinance's Close data is the latest price when the market is open
 # Function
 def fetch_last_close_prices(tickers, ticker_date):
-    try:
-        close_prices = yf.Tickers(tickers).history(period="1d", start=ticker_date, end=ticker_date)["Close"]
-        if close_prices.empty:  # Check if no data was returned
-            return "Error fetching stock price: No data returned"
-        return close_prices
-    except Exception as e: # Handle exceptions and return an error message
-        return f"Error fetching stock price: {e}"
+    while True:
+        try:
+            close_prices = yf.Tickers(tickers).history(period="1d", start=ticker_date, end=ticker_date)["Close"]
+            if not close_prices.empty:  # Check if no data was returned
+                return close_prices
+            ticker_date -= timedelta(days=1)
+        except Exception as e: # Handle exceptions and return an error message
+            return f"Error fetching stock price: {e}"
 
 #####################################################################################
 
