@@ -272,19 +272,22 @@ def color_positive_negative_zero(val):
 def color_airlines(val):
     return f"color: {airline_colors.get(val, '')}" if val in airline_colors else ""
 
-# Define functions to fetch most recent close prices of a set of tickers
+# Define function to fetch most recent close prices of a set of tickers
 # Date variable to ensure most recent close date is used to fetch latest closing price of the airlines' stock
 ticker_date = (datetime.now(pytz.timezone("America/New_York"))-timedelta(days=1)) if datetime.now(pytz.timezone("America/New_York")).hour<16 else datetime.now(pytz.timezone("America/New_York")) # set date for closing price (yesterday if market is still open else today) since yfinance's Close data is the latest price when the market is open
 # Function
-def fetch_last_close_prices(tickers, ticker_date):
-    while True:
+def fetch_last_close_prices(tickers, ticker_date, max_retries=31):
+    retries = 0
+    while retries < max_retries: # continuing trying to pull close price for 31 days prior to current day if request doesn't return price data
         try:
             close_prices = yf.Tickers(tickers).history(period="1d", start=ticker_date, end=ticker_date)["Close"]
             if not close_prices.empty:  # Check if no data was returned
-                return close_prices
-            ticker_date -= timedelta(days=1)
+                return close_prices # if data fetched return the close prices
+            ticker_date -= timedelta(days=1) # otherwise go back one day and try again (intended to deal with days the market isn't open when yfinance seems to have no price data)
         except Exception as e: # Handle exceptions and return an error message
             return f"Error fetching stock price: {e}"
+        retries += 1
+    return "Max attempts reached. No stock price data available for the preceding month."
 
 #####################################################################################
 
@@ -319,7 +322,7 @@ with tab1:
             comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
             # Column reformatting steps
             if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing"]:
-                comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"${x:,.0f}" if x.is_integer() else f"${x:,.2f}") # reformat currency columns to show $ sign
+                comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"{"-$" if x < 0 else "$"}{abs(x):,.0f}" if x.is_integer() else f"{"-$" if x < 0 else "$"}{abs(x):,.2f}") # reformat currency columns to show $ sign
             elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
                 comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"{x:,.2f}\u00A2") # reformat unit currency columns to show cents sign
             elif metric in ["Net Margin", "Load Factor"]:
