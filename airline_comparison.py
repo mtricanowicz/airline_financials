@@ -108,14 +108,13 @@ with st.expander("Make Selections", expanded=True):
 
     # Remove metrics from the data that do not have data for the chosen reporting period
     data = data.dropna(axis=1, how="all") # drop columns (metrics)
-    # data = data.dropna(axis=0, how="all") # drop rows (individual airline reporting periods), not applied
-
+    
     # Allow user to select airlines to compare
     airlines = data["Airline"].unique()
     with st.container(border=True):
-        selected_airlines = st.multiselect("Select Airline(s) for Comparison", airlines, default=["AAL"])
+        selected_airlines = st.multiselect("Select Airline(s) for Comparison", airlines, default=["AAL", "DAL", "UAL"])
     if not selected_airlines:
-        selected_airlines=["AAL"] # prevents empty set from triggering an error, displays AAL if none are selected
+        selected_airlines=[airlines[0]] # prevents empty set from triggering an error, displays AAL if none are selected
 
     # Allow user to select a base airline to compare others against
     with st.container(border=True):
@@ -148,16 +147,16 @@ with st.expander("Make Selections", expanded=True):
 
     # Allow user to select metrics to compare with a "Select All" option
     available_metrics = data.columns.drop(["Year", "Quarter", "Airline", "Period"])
-    metric_groups = ["Earnings", "Unit Performance", "All", "Custom"]
+    metric_groups = ["All", "Earnings", "Unit Performance", "Custom"]
     with st.container(border=True):
-        metric_group_select = st.radio("Select Metrics for Comparison:", metric_groups, index=metric_groups.index("Earnings"))
+        metric_group_select = st.radio("Select Metrics for Comparison:", metric_groups, index=metric_groups.index("All"))
         # Provide preselected groups of metrics and allow user to customize selection
-        if metric_group_select=="Earnings":
+        if metric_group_select=="All":
+            selected_metrics = available_metrics
+        elif metric_group_select=="Earnings":
             selected_metrics = ["Total Revenue", "Net Income", "Net Margin"]
         elif metric_group_select=="Unit Performance":
             selected_metrics = ["Yield", "TRASM", "PRASM", "CASM"]
-        elif metric_group_select=="All":
-            selected_metrics = available_metrics
         elif metric_group_select=="Custom":
             selected_metrics = st.multiselect("Add or Remove Metrics to Compare", available_metrics, default=available_metrics[0])
             if not selected_metrics:
@@ -498,8 +497,8 @@ with tab3:
                 close_value = last_close
                 close_display = close_value
             else:
-                close_value = last_close[airline][0]
-                close_display = f"${last_close[airline][0]:.2f}" 
+                close_value = last_close[airline].iloc[0]
+                close_display = f"${close_value:.2f}" 
             # Display information about the airline's repurchase program
             st.markdown(f"{airline} repurchased **{total_shares_repurchase[airline]:.1f} million** shares at a total cost of **\${(total_cost_repurchase[airline]/1000):.1f} billion**.<br>"
                         f"The average share price of repurchase was **\${total_average_share_cost[airline]:.2f}**. {airline} last closed at **{close_display}**.<br>"
