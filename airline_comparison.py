@@ -328,7 +328,7 @@ with tab1:
                     comparison_display = comparison_display.sort_index(axis=1, level=0)
                     comparison_display = comparison_display.drop(columns=pd.IndexSlice[base_airline, f"vs {base_airline}"])
                     conditional_color_columns = [(col, f"vs {base_airline}") for col in comparison_display.columns.levels[0] if (col, f"vs {base_airline}") in comparison_display.columns] # specify the percent difference columns for which to apply conditional color formatting
-                    comparison_display = comparison_display.style.applymap(color_positive_negative_zero, subset=conditional_color_columns).applymap_index(color_airlines, axis="columns", level="Airline") # map color of comparison column based on its sign and color of airline codes based on code (streamlit doesn't directly support color text in an index)
+                    comparison_display = comparison_display.style.map(color_positive_negative_zero, subset=conditional_color_columns) # map color of comparison column based on its sign and color of airline codes based on code ([.map_index(color_airlines, axis="columns", level="Airline")] streamlit doesn't directly support color text in an index)
                 elif len(selected_airlines) > 1 and compare_yes_no=="No":
                     comparison_display = comparison_display.set_index(["Period", "Airline"])
                     comparison_display = comparison_display.drop(columns=f"vs {base_airline}") # do not display percent difference column if user chooses not to compare
@@ -450,7 +450,7 @@ with tab1:
             comparison_summary = comparison_summary.drop(columns=pd.IndexSlice[base_airline, f"vs {base_airline}"])
             comparison_summary = comparison_summary.reindex([item for item in ordered_metrics if item in comparison_summary.index])
             conditional_color_columns = [(col, f"vs {base_airline}") for col in comparison_display.columns.levels[0] if (col, f"vs {base_airline}") in comparison_display.columns] # specify the percent difference columns for which to apply conditional color formatting
-            comparison_summary = comparison_summary.style.applymap(color_positive_negative_zero, subset=conditional_color_columns).applymap_index(color_airlines, axis="columns", level="Airline") # map color of comparison column based on its sign and color of airline codes based on code (streamlit doesn't directly support color text in an index)
+            comparison_summary = comparison_summary.style.map(color_positive_negative_zero, subset=conditional_color_columns) # map color of comparison column based on its sign and color of airline codes based on code ([.map_index(color_airlines, axis="columns", level="Airline")] streamlit doesn't directly support color text in an index)
         elif compare_yes_no=="No":
             comparison_summary = comparison_summary.drop(columns=f"vs {base_airline}") # do not display percent difference column if user chooses not to compare
             comparison_summary = comparison_summary.unstack(level="Airline")
@@ -567,7 +567,7 @@ with tab2:
             data_transformed_df = data_transformed_df.drop(columns=pd.IndexSlice[base_airline_2, f"vs {base_airline_2}"])
             data_transformed_df = data_transformed_df.reindex([item for item in ordered_metrics])# if item in data_transformed_df.index], axis=0)
             conditional_color_columns_2 = [(col, f"vs {base_airline_2}") for col in data_transformed_df.columns.levels[0] if (col, f"vs {base_airline_2}") in data_transformed_df.columns] # specify the percent difference columns for which to apply conditional color formatting
-            data_transformed_df = data_transformed_df.style.applymap(color_positive_negative_zero, subset=conditional_color_columns_2).applymap_index(color_airlines, axis="columns", level="Airline") # map color of comparison column based on its sign and color of airline codes based on code (streamlit doesn't directly support color text in an index)
+            data_transformed_df = data_transformed_df.style.map(color_positive_negative_zero, subset=conditional_color_columns_2) # map color of comparison column based on its sign and color of airline codes based on code ([.map_index(color_airlines, axis="columns", level="Airline")] streamlit doesn't directly support color text in an index)
         elif compare_yes_no_2=="No":
             data_transformed_df = data_transformed_df.drop(columns=f"vs {base_airline_2}") # do not display percent difference column if user chooses not to compare
             data_transformed_df = data_transformed_df.unstack(level="Airline")
