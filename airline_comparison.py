@@ -122,63 +122,72 @@ with tab1:
 #####################################################################################
     ## USER INTERACTION ##
     with st.expander("Expand to Set Filters", expanded=False):
-        # Allow users to select full-year or quarterly data
+        # Allow user to select time periods for comparison
         with st.container(border=True):
-            data_type = st.selectbox("View Full Year or Quarterly Data?", ["Full Year", "Quarterly"])
-        if data_type == "Full Year":
-            data = airline_financials_fy
-        else:
-            data = airline_financials_q
+            filter_col1, filter_col2, filter_col3 = st.columns(3)
+            # Allow users to select full-year or quarterly data
+            with filter_col1:
+                data_type = st.pills("View Full Year or Quarterly Data?", ["Full Year", "Quarterly"], default="Full Year")
+            if data_type == "Full Year":
+                data = airline_financials_fy
+            else:
+                data = airline_financials_q
+            # Allow user to select years for comparison
+            years = sorted(data["Year"].unique())
+            with filter_col2:
+                selected_years = st.pills("Select Year(s) for Comparison", years, default=years, selection_mode="multi")
+            if not selected_years:
+                selected_years=years # prevents empty set from triggering an error, displays all years if none are selected        
+            # Allow user to select quarters for comparison
+            quarters = sorted(data["Quarter"].unique())
+            with filter_col3:
+                if data_type == "Quarterly":
+                    selected_quarters = st.pills("Select Quarter(s) for Comparison", quarters, default=quarters, selection_mode="multi")
+                    if not selected_quarters: # prevents empty set from triggering an error, displays all quarters if none are selected
+                        selected_quarters=quarters
+                elif data_type == "Full Year":
+                    selected_quarters=quarters
         # Remove metrics from the data that do not have data for the chosen reporting period
         data = data.dropna(axis=1, how="all") # drop columns (metrics)        
         # Allow user to select airlines to compare
         airlines = data["Airline"].unique()
         with st.container(border=True):
-            selected_airlines = st.multiselect("Select Airline(s) for Comparison", airlines, default=["AAL", "DAL", "UAL"])
-        if not selected_airlines:
-            selected_airlines=[airlines[0]] # prevents empty set from triggering an error, displays AAL if none are selected        
-        # Allow user to select a base airline to compare others against
-        with st.container(border=True):
-            if len(selected_airlines) > 1:
-                options_yes_no = ["Yes", "No"]
-                compare_yes_no = st.radio("Would you like to compare selected airlines' metrics against one of the airlines?", options_yes_no, index=options_yes_no.index("Yes"))
-                if(compare_yes_no=="Yes"):
-                    base_airline = st.selectbox("Select Airline to Compare Against", selected_airlines)
+            filter_col4, filter_col5, filter_col6 = st.columns(3)
+            with filter_col4:
+                selected_airlines = st.pills("Select Airline(s) for Comparison", airlines, default=["AAL", "DAL", "UAL"], selection_mode="multi")
+                if not selected_airlines:
+                    selected_airlines=[airlines[0]] # prevents empty set from triggering an error, displays AAL if none are selected        
+            # Allow user to select a base airline to compare others against
+            with filter_col5:
+                if len(selected_airlines) > 1:
+                    options_yes_no = ["Yes", "No"]
+                    compare_yes_no = st.pills("Would you like to compare selected airlines' metrics against one of the airlines?", options_yes_no, default="Yes")
+                    with filter_col6:
+                        if(compare_yes_no=="Yes"):
+                            base_airline = st.pills("Select Airline to Compare Against", selected_airlines, default=selected_airlines[0])
+                        else:
+                            base_airline = selected_airlines[0]
                 else:
-                    base_airline = selected_airlines[0]
-            else:
-                base_airline = selected_airlines[0]        
-        # Allow user to select years for comparison
-        years = sorted(data["Year"].unique())
-        with st.container(border=True):
-            selected_years = st.multiselect("Select Year(s) for Comparison", years, default=years)
-        if not selected_years:
-            selected_years=years # prevents empty set from triggering an error, displays all years if none are selected        
-        # Allow user to select quarters for comparison
-        quarters = sorted(data["Quarter"].unique())
-        with st.container(border=True):
-            if data_type == "Quarterly":
-                selected_quarters = st.multiselect("Select Quarter(s) for Comparison", quarters, default=quarters)
-                if not selected_quarters: # prevents empty set from triggering an error, displays all quarters if none are selected
-                    selected_quarters=quarters
-            elif data_type == "Full Year":
-                selected_quarters=quarters
+                    base_airline = selected_airlines[0]        
         # Allow user to select metrics to compare with a "Select All" option
         available_metrics = data.columns.drop(["Year", "Quarter", "Airline", "Period"])
         metric_groups = ["All", "Earnings", "Unit Performance", "Custom"]
         with st.container(border=True):
-            metric_group_select = st.radio("Select Metrics for Comparison:", metric_groups, index=metric_groups.index("All"))
+            filter_col7, filter_col8 = st.columns([1, 2])
             # Provide preselected groups of metrics and allow user to customize selection
-            if metric_group_select=="All":
-                selected_metrics = available_metrics
-            elif metric_group_select=="Earnings":
-                selected_metrics = ["Total Revenue", "Net Income", "Net Margin"]
-            elif metric_group_select=="Unit Performance":
-                selected_metrics = ["Yield", "TRASM", "PRASM", "CASM"]
-            elif metric_group_select=="Custom":
-                selected_metrics = st.multiselect("Add or Remove Metrics to Compare", available_metrics, default=available_metrics[0])
-                if not selected_metrics:
-                    selected_metrics = [available_metrics[0]] # prevents empty set from triggering an error, displays first metric in available metrics if none are selected
+            with filter_col7:
+                metric_group_select = st.pills("Select Metrics for Comparison:", metric_groups, default="All")
+                if metric_group_select=="All":
+                    selected_metrics = available_metrics
+                elif metric_group_select=="Earnings":
+                    selected_metrics = ["Total Revenue", "Net Income", "Net Margin"]
+                elif metric_group_select=="Unit Performance":
+                    selected_metrics = ["Yield", "TRASM", "PRASM", "CASM"]
+                elif metric_group_select=="Custom":
+                    with filter_col8:
+                        selected_metrics = st.pills("Add or Remove Metrics to Compare", available_metrics, default=available_metrics[0], selection_mode="multi")
+                        if not selected_metrics:
+                            selected_metrics = [available_metrics[0]] # prevents empty set from triggering an error, displays first metric in available metrics if none are selected
             # Add a toggle to display metric definitions for users who need them
             with st.container(border=False):
                 definitions = st.checkbox("Show definitions of the available metrics.")
@@ -471,9 +480,9 @@ with tab2:
     with summary_col3:
         # Allow user to select a base airline to compare others against
         with st.container(border=True):
-            compare_yes_no_2 = st.radio("Would you like to compare against one of the airlines?", options_yes_no, index=options_yes_no.index("No"), key="radio_tab2")
+            compare_yes_no_2 = st.pills("Would you like to compare against one of the airlines?", options_yes_no, default="No")
             if(compare_yes_no_2=="Yes"):
-                base_airline_2 = st.selectbox("Select Airline to Compare Against", airlines, key="select_tab2")
+                base_airline_2 = st.pills("Select Airline to Compare Against", airlines, default=airlines[0], key="base_tab2")
             else:
                 base_airline_2 = airlines[0]
         # Add a toggle to display metric definitions for users who need them
