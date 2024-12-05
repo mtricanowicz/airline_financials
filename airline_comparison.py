@@ -52,6 +52,18 @@ st.markdown("""
     }
     </style>
     """, unsafe_allow_html=True)
+# Custom CSS for styling pills inside containers
+st.markdown(
+    """
+    <style>
+    /* Target the pills inside a container*/
+    div[data-testid="stExpanderDetails"] div[data-testid="stVerticalBlock"] div[data-testid="stColumn"] div[data-testid="stElementContainer"] div[data-testid="stButtonGroup"] div[data-testid="stPills"] > div {
+        font-size: 10px !important;  /* Change font size */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 # Custom CSS to style radio buttons horizontally
 st.markdown("""
     <style>
@@ -107,6 +119,26 @@ share_repurchases["Cost (millions)"] = share_repurchases["Cost"]/1000000
 share_repurchases["Average Share Cost"] = share_repurchases["Cost"]/share_repurchases["Shares Repurchased"]
 share_repurchases["Average Share Cost"] = share_repurchases["Average Share Cost"].replace(np.nan, 0) # for years with zero shares purchased, address the NaN
 share_repurchases["Period"] = share_repurchases["Year"].astype(str) + share_repurchases["Quarter"].astype(str)
+#####################################################################################
+# Definitions of the metrics
+metric_definitions = [
+    ("Total Revenue", "Total amount earned from sales."),
+    ("Passenger Revenue", "Revenue primarily composed of passenger ticket sales, loyalty travel awards, and travel-related services performed in conjunction with a passenger's flight."),
+    ("Total Expenses", "Total amount of costs incurred."),
+    ("Net Income", "Profit."),
+    ("Revenue Passenger Mile (RPM)", "A basic measure of sales volume. One RPM represents one passenger flown one mile."),
+    ("Available Seat Mile (ASM)", "A basic measure of production. One ASM represents one seat flown one mile."),
+    ("Long-Term Debt", "Total long-term debt net of current maturities.<br>NOTE: Due to inconsistent reporting in quarterly filings between airilnes, this metric is only shown for full year data."),
+    ("Profit Sharing", "Amount of income set aside to fund employee profit sharing programs.<br>NOTE: AAL's quarterly reporting of this metric is inconsistent. Data provided may also have been obtained from internal sources. Additionally, zero profit sharing shown can either indicate no profit sharing or lack of reported data."),
+    ("Net Margin", "Percentage of profit earned for each dollar in revenue. Net Income divided by Total Revenue."),
+    ("Load Factor", "The percentage of available seats that are filled with revenue passengers. RPMs divided by ASMs."),
+    ("Yield", "A measure of airline revenue derived by dividing Passenger Revenue by RPMs."),
+    ("Total Revenue per Available Seat Mile (TRASM)", "Total Revenue divided by ASMs."),
+    ("Passenger Revenue per Available Seat Mile (PRASM)", "Passenger Revenue divided by ASMs."),
+    ("Cost per Available Seat Mile (CASM)", "Total Expenses divided by ASMs.")
+]
+
+#####################################################################################
 #####################################################################################
 
 # Create tabs
@@ -192,34 +224,9 @@ with tab1:
             with st.container(border=False):
                 definitions = st.checkbox("Show definitions of the available metrics.")
                 if definitions:
-                    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-                    st.write("Total Revenue - Total amount earned from sales.")
-                    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-                    st.write("Passenger Revenue - Revenue primarily composed of passenger ticket sales, loyalty travel awards, and travel-related services performed in conjunction with a passenger's flight.")
-                    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-                    st.write("Total Expenses - Total amount of costs incurred.")
-                    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-                    st.write("Net Income - Profit.")
-                    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-                    st.write("Revenue Passenger Mile (RPM) - A basic measure of sales volume. One RPM represents one passenger flown one mile.")
-                    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-                    st.write("Available Seat Mile (ASM) - A basic measure of production. One ASM represents one seat flown one mile.")
-                    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-                    st.write("Long-Term Debt - Total long-term debt net of current maturities.<br>NOTE: Due to inconsistent reporting in quarterly filings between airilnes, this metric is only shown for full year data.", unsafe_allow_html=True)
-                    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-                    st.write("Profit Sharing - Amount of income set aside to fund employee profit sharing programs.<br>NOTE: AAL's quarterly reporting of this metric is inconsistent. Data provided may also have been obtained from internal sources. Additionally, zero profit sharing shown can either indicate no profit sharing or lack of reported data.", unsafe_allow_html=True)
-                    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-                    st.write("Net Margin - Percentage of profit earned for each dollar in revenue. Net Income divided by Total Revenue.")
-                    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-                    st.write("Load Factor - The percentage of available seats that are filled with revenue passengers. RPMs divided by ASMs.")
-                    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-                    st.write("Yield - A measure of airline revenue derived by dividing Passenger Revenue by RPMs.")
-                    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-                    st.write("Total Revenue per Available Seat Mile (TRASM) - Total Revenue divided by ASMs.")
-                    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-                    st.write("Passenger Revenue per Available Seat Mile (PRASM) - Passenger Revenue divided by ASMs.")
-                    st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-                    st.write("Cost per Available Seat Mile (CASM) - Total Expenses divided by ASMs.")
+                    for metric, definition in metric_definitions:
+                        st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                        st.write(f"{metric} - {definition}", unsafe_allow_html=True)
                     st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
 #####################################################################################
     ## FILTERING, CALCULATIONS, AND FUNCTIONS ##
@@ -487,34 +494,9 @@ with tab2:
                 base_airline_2 = airlines[0]
         # Add a toggle to display metric definitions for users who need them
         with st.expander("Show definitions of the metrics.", expanded=False):
-            st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-            st.write("Total Revenue - Total amount earned from sales.")
-            st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-            st.write("Passenger Revenue - Revenue primarily composed of passenger ticket sales, loyalty travel awards, and travel-related services performed in conjunction with a passenger's flight.")
-            st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-            st.write("Total Expenses - Total amount of costs incurred.")
-            st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-            st.write("Net Income - Profit.")
-            st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-            st.write("Revenue Passenger Mile (RPM) - A basic measure of sales volume. One RPM represents one passenger flown one mile.")
-            st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-            st.write("Available Seat Mile (ASM) - A basic measure of production. One ASM represents one seat flown one mile.")
-            st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-            st.write("Long-Term Debt - Total long-term debt net of current maturities.<br>NOTE: Due to inconsistent reporting in quarterly filings between airilnes, this metric is only shown for full year data.", unsafe_allow_html=True)
-            st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-            st.write("Profit Sharing - Amount of income set aside to fund employee profit sharing programs.<br>NOTE: AAL's quarterly reporting of this metric is inconsistent. Data provided may also have been obtained from internal sources. Additionally, zero profit sharing shown can either indicate no profit sharing or lack of reported data.", unsafe_allow_html=True)
-            st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-            st.write("Net Margin - Percentage of profit earned for each dollar in revenue. Net Income divided by Total Revenue.")
-            st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-            st.write("Load Factor - The percentage of available seats that are filled with revenue passengers. RPMs divided by ASMs.")
-            st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-            st.write("Yield - A measure of airline revenue derived by dividing Passenger Revenue by RPMs.")
-            st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-            st.write("Total Revenue per Available Seat Mile (TRASM) - Total Revenue divided by ASMs.")
-            st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-            st.write("Passenger Revenue per Available Seat Mile (PRASM) - Passenger Revenue divided by ASMs.")
-            st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-            st.write("Cost per Available Seat Mile (CASM) - Total Expenses divided by ASMs.")
+            for metric, definition in metric_definitions:
+                st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+                st.write(f"{metric} - {definition}", unsafe_allow_html=True)
             st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
 #####################################################################################
     ## FILTERING, CALCULATIONS, AND FUNCTIONS ##
@@ -619,6 +601,18 @@ with tab3:
                 return f"Error fetching stock price: {e}"
             retries += 1
         return "Max attempts reached. Stock price could not be retrieved."
+    # Define function to fetch daily close prices since the start of 2020Q2 (first quarter after share buybacks were ceased due to Covid-19)
+    def fetch_daily_close(tickers, start_date, end_date, max_retries=10):
+        retries = 0
+        while retries < max_retries:
+            try:
+                close_history = yf.Tickers(tickers).history(period="1d", start=start_date, end=end_date)["Close"]
+                if not close_history.empty:  # Check if no data was returned
+                    return close_history # if data fetched return the close prices
+            except Exception as e: # Handle exceptions and return an error message
+                return f"Error fetching stock price: {e}"
+            retries += 1
+        return "Max attempts reached. Stock price could not be retrieved."
 #####################################################################################
     ## OUTPUT/DISPLAY ##
     st.header("2010s Big 3 Share Buyback Campaign", divider='gray')
@@ -678,7 +672,7 @@ with tab3:
         st.dataframe(shares_display)
         # Prepare data to plot gain/loss from repurchases over time since Covid onset
         # Fetch daily closing price since start of 2020Q2
-        ticker_since_covid = yf.Tickers(share_repurchases["Airline"].unique().tolist()).history(period="1d", start="2020-04-01", end=datetime.now())["Close"]
+        ticker_since_covid = fetch_daily_close(tickers, "2020-04-01", datetime.now())
         # Calculate the daily gain/loss in billions based on average repurchase price minus closing price multiplied by number of shares repurchased
         gain = pd.DataFrame()
         for airline in share_repurchases["Airline"].unique():
