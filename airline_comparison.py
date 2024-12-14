@@ -18,7 +18,7 @@ st.set_page_config(
     menu_items={
         "About": """
         ## US Airline Financial Performance Dashboard
-        This app enables quick and intuitive comparisons of the financial performance of major US commercial airlines. Data is provided from 2014. This starting point was chosen because it was the first year after all of the major airlines had completed mergers and represents the start of the present industry landscape.\n
+        This app enables quick and intuitive comparisons of the financial performance of major US commercial airlines. Data is provided from 2014. This starting point was chosen because it was the first year after all of the major airlines had completed mergers, marking the completion of a cycle of consolidation and the start of the present industry landscape.\n
         The airlines covered (and their stock tickers) are American Airlines (AAL), Delta Air Lines (DAL), United Airlines (UAL), and Southwest Airlines (LUV). LUV quarterly data is provided from 2024.\n
         The Filtered Comparisons tab provides customizable views of airline financials. Several metrics can be selected for evaluation over chosen reporting periods.\n
         The Most Recent Year and Quarter Summaries tab gives a summary of the most recent annual and quarterly results for easy viewing.\n
