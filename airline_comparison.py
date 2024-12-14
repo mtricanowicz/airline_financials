@@ -18,7 +18,8 @@ st.set_page_config(
     menu_items={
         "About": """
         ## US Airline Financial Performance Dashboard
-        This app enables quick and intuitive comparisons of the financial performance of major US commercial airlines.\n
+        This app enables quick and intuitive comparisons of the financial performance of major US commercial airlines. Data is provided from 2014. This starting point was chosen because it was the first year after all of the major airlines had completed mergers and represents the start of the present industry landscape.\n
+        The airlines covered (and their stock tickers) are American Airlines (AAL), Delta Air Lines (DAL), United Airlines (UAL), and Southwest Airlines (LUV). LUV quarterly data is provided from 2024.\n
         The Filtered Comparisons tab provides customizable views of airline financials. Several metrics can be selected for evaluation over chosen reporting periods.\n
         The Most Recent Year and Quarter Summaries tab gives a summary of the most recent annual and quarterly results for easy viewing.\n
         The Share Repurchases tab contains a high level overview of the share buyback programs by the Big 3 airilnes (AAL, DAL, UAL) that were carried out in the 2010s and ended with the onset of the Covid-19 pandemic.\n
@@ -129,7 +130,7 @@ metric_definitions = [
     ("Revenue Passenger Mile (RPM)", "A basic measure of sales volume. One RPM represents one passenger flown one mile."),
     ("Available Seat Mile (ASM)", "A basic measure of production. One ASM represents one seat flown one mile."),
     ("Long-Term Debt", "Total long-term debt net of current maturities.<br>NOTE: Due to inconsistent reporting in quarterly filings between airilnes, this metric is only shown for full year data."),
-    ("Profit Sharing", "Amount of income set aside to fund employee profit sharing programs.<br>NOTE: AAL's quarterly reporting of this metric is inconsistent. Data provided may also have been obtained from internal sources. Additionally, zero profit sharing shown can either indicate no profit sharing or lack of reported data."),
+    ("Profit Sharing", "Amount of income set aside to fund employee profit sharing programs.<br>NOTE: Quarterly reporting by AAL and UAL of this metric is inconsistent. Data provided may also have been obtained from internal sources or estimated by proportioning the annual value by the quarterly operating income. Additionally, zero profit sharing shown can either indicate no profit sharing or lack of reported or estimated data."),
     ("Net Margin", "Percentage of profit earned for each dollar in revenue. Net Income divided by Total Revenue."),
     ("Load Factor", "The percentage of available seats that are filled with revenue passengers. RPMs divided by ASMs."),
     ("Yield", "A measure of airline revenue derived by dividing Passenger Revenue by RPMs."),
