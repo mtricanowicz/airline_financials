@@ -137,6 +137,9 @@ metric_definitions = [
     ("Passenger Revenue per Available Seat Mile (PRASM)", "Passenger Revenue divided by ASMs."),
     ("Cost per Available Seat Mile (CASM)", "Total Expenses divided by ASMs.")
 ]
+#####################################################################################
+# Create global yes/no options variable
+options_yes_no = ["Yes", "No"]
 
 #####################################################################################
 #####################################################################################
@@ -192,7 +195,6 @@ with tab1:
             # Allow user to select a base airline to compare others against
             with filter_col5:
                 if len(selected_airlines) > 1:
-                    options_yes_no = ["Yes", "No"]
                     compare_yes_no = st.pills("Would you like to compare selected airlines' metrics against one of the airlines?", options_yes_no, default="Yes")
                     with filter_col6:
                         if(compare_yes_no=="Yes"):
@@ -311,13 +313,25 @@ with tab1:
             # Set title for the metric display
             st.header(f"{metric}", divider="gray")
             # Create display columns
-            compare_col1, compare_col2, compare_col3 = st.columns(3)
+            # Check if the time comparison conditions are active
+            show_compare_col2 = len(selected_years)>1 or len(selected_quarters)>1
+            # Check if the airline comparison conditions are active
+            show_compare_col3 = len(selected_airlines) > 1 and compare_yes_no == "Yes"
+            # Create display columns conditionally depending on user selected filters
+            if not show_compare_col2 and not show_compare_col3:
+                compare_col1, = st.columns(1)
+            elif show_compare_col2 and not show_compare_col3:
+                compare_col1, compare_col2 = st.columns(2)
+            elif not show_compare_col2 and show_compare_col3:
+                compare_col1, compare_col3 = st.columns(2)
+            else:
+                compare_col1, compare_col2, compare_col3 = st.columns(3)
+            # Conditionally display the appropriate columns
             with compare_col1:
                 # Display table for the metric to allow review of the data
                 comparison_display = comparison_df[comparison_df["Metric"] == metric_display] # prepare a copy of the comparison table to be used for display
                 comparison_display = comparison_display.rename(columns={"Value":metric_display}) # rename value column to make it more understandable
                 comparison_display["Percent Difference"] = comparison_display["Percent Difference"].apply(lambda x: None if x is None or pd.isna(x) else f"{x}%") # reformat percent difference column to show % sign
-                #comparison_display = comparison_display.style.set_table_styles([{"subset": ["Percent Difference"], "props": [("text-align", "right")]}])
                 comparison_display = comparison_display.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column to make it more understandable
                 comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
                 # Column reformatting steps
@@ -352,9 +366,9 @@ with tab1:
                     comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
                     comparison_display = comparison_display.sort_index(axis=1, level=0)
                 st.dataframe(comparison_display, width=750) 
-            with compare_col2:
-                # Time series line plot (via plotly) for the metric's change over time if more than one time period (quarter or year) is selected.
-                if len(selected_years)>1 or len(selected_quarters)>1:
+            if show_compare_col2:
+                with compare_col2:
+                    # Time series line plot (via plotly) for the metric's change over time if more than one time period (quarter or year) is selected.
                     # Generate the plot
                     fig_line = px.line(
                         filtered_data, 
@@ -397,9 +411,9 @@ with tab1:
                         )
                     # Display plot
                     st.plotly_chart(fig_line)
-            with compare_col3:
-                # Bar plot (via plotly) for % difference if more than one airline is selected.
-                if len(selected_airlines) > 1 and compare_yes_no=="Yes":
+            if show_compare_col3:
+                with compare_col3:
+                    # Bar plot (via plotly) for % difference if more than one airline is selected.
                     # Generate the plot
                     fig_bar = px.bar(
                         comparison_df[comparison_df["Airline"]!=base_airline][comparison_df["Metric"] == metric_display], 
