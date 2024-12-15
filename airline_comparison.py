@@ -222,7 +222,7 @@ with tab1:
                         if not selected_metrics:
                             selected_metrics = [available_metrics[0]] # prevents empty set from triggering an error, displays first metric in available metrics if none are selected
                 # Add a popover to display metric definitions for users who need them
-                with st.popover(icon=":material/menu_book:", label="Show definitions of the available metrics.", use_container_width=True):
+                with st.popover(icon=":material/dictionary:", label="Show definitions of the available metrics.", use_container_width=True):
                     for metric, definition in metric_definitions:
                         st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
                         st.write(f"{metric} - {definition}", unsafe_allow_html=True)
@@ -504,7 +504,7 @@ with tab2:
             else:
                 base_airline_2 = airlines[0]
         # Add a toggle to display metric definitions for users who need them
-        with st.popover(icon=":material/menu_book:", label="Show definitions of the metrics.", use_container_width=True):
+        with st.popover(icon=":material/dictionary:", label="Show definitions of the metrics.", use_container_width=True):
             for metric, definition in metric_definitions:
                 st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
                 st.write(f"{metric} - {definition}", unsafe_allow_html=True)
