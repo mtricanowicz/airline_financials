@@ -26,7 +26,6 @@ st.set_page_config(
         Unless otherwise noted, all metrics are either sourced or calculated from data given in the 10-Q/8-K (quarterly filings) and 10-K (annual filing) forms reported to the SEC and available on the airlines' investor relations sites linked below.\n
         [AAL](https://americanairlines.gcs-web.com/) | [DAL](https://ir.delta.com/) | [UAL](https://ir.united.com/) | [LUV](https://www.southwestairlinesinvestorrelations.com/)\n
         - **Author:** Michael Tricanowicz
-        - **License:** MIT
         - **GitHub:** [airline_financials](https://github.com/mtricanowicz/airline_financials)
         """
     }
@@ -82,7 +81,6 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
-
 
 # Color palette to use for visualizaitons
 airline_colors = {
@@ -223,10 +221,8 @@ with tab1:
                         selected_metrics = st.pills("Add or Remove Metrics to Compare", available_metrics, default=available_metrics[0], selection_mode="multi")
                         if not selected_metrics:
                             selected_metrics = [available_metrics[0]] # prevents empty set from triggering an error, displays first metric in available metrics if none are selected
-            # Add a toggle to display metric definitions for users who need them
-            with st.container(border=False):
-                definitions = st.checkbox("Show definitions of the available metrics.")
-                if definitions:
+                # Add a popover to display metric definitions for users who need them
+                with st.popover(icon=":material/menu_book:", label="Show definitions of the available metrics.", use_container_width=True):
                     for metric, definition in metric_definitions:
                         st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
                         st.write(f"{metric} - {definition}", unsafe_allow_html=True)
@@ -322,7 +318,7 @@ with tab1:
             if not show_compare_col2 and not show_compare_col3:
                 compare_col1, = st.columns(1)
             elif show_compare_col2 and not show_compare_col3:
-                compare_col1, compare_col2 = st.columns(2)
+                compare_col1, compare_col2 = st.columns([2,3])
             elif not show_compare_col2 and show_compare_col3:
                 compare_col1, compare_col3 = st.columns(2)
             else:
@@ -366,7 +362,7 @@ with tab1:
                     comparison_display = comparison_display.unstack(level="Airline")
                     comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
                     comparison_display = comparison_display.sort_index(axis=1, level=0)
-                st.dataframe(comparison_display, width=750) 
+                st.dataframe(comparison_display, width=1000) 
             if show_compare_col2:
                 with compare_col2:
                     # Time series line plot (via plotly) for the metric's change over time if more than one time period (quarter or year) is selected.
@@ -508,7 +504,7 @@ with tab2:
             else:
                 base_airline_2 = airlines[0]
         # Add a toggle to display metric definitions for users who need them
-        with st.expander("Show definitions of the metrics.", expanded=False):
+        with st.popover(icon=":material/menu_book:", label="Show definitions of the metrics.", use_container_width=True):
             for metric, definition in metric_definitions:
                 st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
                 st.write(f"{metric} - {definition}", unsafe_allow_html=True)
