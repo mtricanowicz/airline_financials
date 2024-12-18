@@ -136,7 +136,7 @@ metric_definitions = [
     ("Revenue Passenger Mile (RPM)", "A basic measure of sales volume. One RPM represents one passenger flown one mile."),
     ("Available Seat Mile (ASM)", "A basic measure of production. One ASM represents one seat flown one mile."),
     ("Long-Term Debt", "Total long-term debt net of current maturities.<br>NOTE: Due to inconsistent reporting in quarterly filings between airilnes, this metric is only shown for full year data."),
-    ("Profit Sharing", "Amount of income set aside to fund employee profit sharing programs.<br>NOTE: Quarterly reporting by AAL and UAL of this metric is inconsistent. Data provided may also have been obtained from internal sources or estimated by proportioning the annual value by the quarterly operating income. Additionally, zero profit sharing shown can either indicate no profit sharing or lack of reported or estimated data."),
+    ("Profit Sharing", "Amount of income set aside to fund employee profit sharing programs.<br>NOTE: Quarterly reporting by AAL and UAL of this metric is inconsistent. Data provided may have been obtained from internal sources or estimated by proportioning the annual profit sharing reported by the quarterly operating income reported."),
     ("Net Margin", "Percentage of profit earned for each dollar in revenue. Net Income divided by Total Revenue."),
     ("Load Factor", "The percentage of available seats that are filled with revenue passengers. RPMs divided by ASMs."),
     ("Yield", "A measure of airline revenue derived by dividing Passenger Revenue by RPMs."),
