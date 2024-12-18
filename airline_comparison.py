@@ -739,7 +739,7 @@ with tab3:
         )
         share_repurchase_display = share_repurchase_display.sort_index(axis=1, level=0, sort_remaining=False)
         st.markdown("<h4>Share Repurchase History</h4>", unsafe_allow_html=True)
-        st.dataframe(share_repurchase_display)
+        st.dataframe(share_repurchase_display, width=1300)
         # Prepare sale data for display
         share_sales_display = share_sales.copy()
         share_sales_display = share_sales_display.drop(columns=["Year", "Quarter", "Shares Sold", "Proceeds"])
@@ -754,5 +754,5 @@ with tab3:
         )
         share_sales_display = share_sales_display.sort_index(axis=1, level=0, sort_remaining=False)
         st.markdown("<h4>Share Sale History</h4>", unsafe_allow_html=True)
-        st.dataframe(share_sales_display)
+        st.dataframe(share_sales_display, width=1300)
 #####################################################################################
