@@ -674,7 +674,7 @@ with tab3:
             else:
                 repurchase_net_value = (((total_average_share_sale[airline]-total_average_share_cost[airline])*(total_shares_sale[airline]))+((close_value-total_average_share_cost[airline])*(total_shares_repurchase[airline]-total_shares_sale[airline])))/1000
                 repurchase_net_color = "green" if repurchase_net_value > 0 else "black" if repurchase_net_value==0 else "red"
-                repurchase_net_display = f"<p style='margin-bottom:0;'><h3 style='color:{repurchase_net_color};'>{f"{'-$' if repurchase_net_value < 0 else '$'}{abs(repurchase_net_value):,.1f} billion {"&nbsp;"*10} {"🔥💰🔥" if repurchase_net_value<0 else "🤷" if repurchase_net_value==0 else "💸💸💸"}"}</h3></p>"
+                repurchase_net_display = f"<p style='margin-bottom:0;'><h3 style='color:{repurchase_net_color};'>{f"{'-$' if repurchase_net_value < 0 else '$'}{abs(repurchase_net_value):,.1f} billion {"&nbsp;"*10} {"🔥💰🔥" if repurchase_net_value<-0.1 else "🤷" if repurchase_net_value<0.1 else "💸💸💸"}"}</h3></p>"
             st.markdown(repurchase_net_display, unsafe_allow_html=True)
     # Historical repurchase data for viewing
     with col2:
