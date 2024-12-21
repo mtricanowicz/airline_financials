@@ -65,7 +65,11 @@ jobs:
           name: python-app
 
       - name: Unzip artifact for deployment
-        run: unzip release.zip
+        run: |
+          mkdir -p /home/site/wwwroot  # Create directory if it doesn't exist
+          tar -xzvf release.zip -C /home/site/wwwroot/
+          # Extract .streamlit folder and ensure it's at the root of the app
+          # unzip release.zip (original unzip command)
 
       
       - name: Login to Azure
