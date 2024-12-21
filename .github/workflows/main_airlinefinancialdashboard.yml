@@ -67,7 +67,7 @@ jobs:
       - name: Unzip artifact for deployment
         run: |
           # Unzip the release.zip file
-          unzip release.zip -d /home/site/wwwroot/
+          unzip release.zip
           # Navigate into the directory where the .tar.gz file is located (if necessary)
           cd /home/site/wwwroot/
           # Extract the .tar.gz file
