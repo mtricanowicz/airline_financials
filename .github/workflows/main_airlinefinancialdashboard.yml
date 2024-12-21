@@ -66,9 +66,10 @@ jobs:
 
       - name: Unzip artifact for deployment
         run: |
-          mkdir -p /home/site/wwwroot  # Create directory if it doesn't exist
+          # Extract the content of the release.zip directly into /home/site/wwwroot/
           tar -xzvf release.zip -C /home/site/wwwroot/
-          # Extract .streamlit folder and ensure it's at the root of the app
+          # If needed, also make sure the .streamlit folder is placed inside the right location
+          # For example, if .streamlit folder is nested inside the tarball, ensure it's extracted correctly.
           # unzip release.zip (original unzip command)
 
       
