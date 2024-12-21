@@ -82,5 +82,5 @@ jobs:
           slot-name: 'Production'
         
           env:
-          STREAMLIT_CONFIG_DIR: /home/site/wwwroot/.streamlit
+            STREAMLIT_CONFIG_DIR: /home/site/wwwroot/.streamlit
           
