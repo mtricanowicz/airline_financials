@@ -65,11 +65,7 @@ jobs:
           name: python-app
 
       - name: Unzip artifact for deployment
-        run: |
-          # Unzip the release.zip file
-          unzip release.zip
-          # Extract the .tar.gz file
-          tar -xzvf yourfile.tar.gz
+        run: unzip release.zip
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -84,4 +80,7 @@ jobs:
         with:
           app-name: 'AirlineFinancialDashboard'
           slot-name: 'Production'
+        
+          env:
+          STREAMLIT_CONFIG_DIR: /home/site/wwwroot/.streamlit
           
