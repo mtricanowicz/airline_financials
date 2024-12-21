@@ -80,7 +80,6 @@ jobs:
         with:
           app-name: 'AirlineFinancialDashboard'
           slot-name: 'Production'
-        
-          env:
-            STREAMLIT_CONFIG_DIR: /home/site/wwwroot/.streamlit
+        env:
+          STREAMLIT_CONFIG_DIR: /home/site/wwwroot/.streamlit
           
