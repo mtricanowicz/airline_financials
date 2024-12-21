@@ -68,10 +68,8 @@ jobs:
         run: |
           # Unzip the release.zip file
           unzip release.zip
-          # Navigate into the directory where the .tar.gz file is located (if necessary)
-          cd /home/site/wwwroot/
           # Extract the .tar.gz file
-          tar -xzvf yourfile.tar.gz -C /home/site/wwwroot/
+          tar -xzvf yourfile.tar.gz
       
       - name: Login to Azure
         uses: azure/login@v2
