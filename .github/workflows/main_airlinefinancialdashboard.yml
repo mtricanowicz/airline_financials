@@ -66,12 +66,12 @@ jobs:
 
       - name: Unzip artifact for deployment
         run: |
-          # Extract the content of the release.zip directly into /home/site/wwwroot/
-          tar -xzvf release.zip -C /home/site/wwwroot/
-          # If needed, also make sure the .streamlit folder is placed inside the right location
-          # For example, if .streamlit folder is nested inside the tarball, ensure it's extracted correctly.
-          # unzip release.zip (original unzip command)
-
+          # Unzip the release.zip file
+          unzip release.zip -d /home/site/wwwroot/
+          # Navigate into the directory where the .tar.gz file is located (if necessary)
+          cd /home/site/wwwroot/
+          # Extract the .tar.gz file
+          tar -xzvf yourfile.tar.gz -C /home/site/wwwroot/
       
       - name: Login to Azure
         uses: azure/login@v2
