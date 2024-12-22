@@ -619,7 +619,7 @@ with tab3:
             except Exception as e: # Handle exceptions and return an error message
                 return f"Error fetching stock price: {e}"
             retries += 1
-        return "Max attempts reached. Stock price could not be retrieved."
+        return "Max attempts reached. Stock price could not be retrieved"
     # Define function to fetch daily close prices since the start of 2020Q2 (first quarter after share buybacks were ceased due to Covid-19)
     def fetch_daily_close(tickers, start_date, end_date, max_retries=10):
         retries = 0
@@ -631,7 +631,7 @@ with tab3:
             except Exception as e: # Handle exceptions and return an error message
                 return f"Error fetching stock price: {e}"
             retries += 1
-        return "Max attempts reached. Stock price could not be retrieved."
+        return "Max attempts reached. Stock price could not be retrieved"
 #####################################################################################
     ## OUTPUT/DISPLAY ##
     st.header("2010s Big 3 Share Buyback Campaign", divider='gray')
