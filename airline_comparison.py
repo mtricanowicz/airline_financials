@@ -135,7 +135,7 @@ metric_definitions = [
     ("Net Income", "Profit."),
     ("Revenue Passenger Mile (RPM)", "A basic measure of sales volume. One RPM represents one passenger flown one mile."),
     ("Available Seat Mile (ASM)", "A basic measure of production. One ASM represents one seat flown one mile."),
-    ("Long-Term Debt", "Total long-term debt net of current maturities.<br>NOTE: Due to inconsistent reporting in quarterly filings between airilnes, this metric is only shown for full year data."),
+    ("Long-Term Debt", "Total long-term debt net of current maturities.<br>NOTE: Due to inconsistent reporting in quarterly filings between airilnes, this metric is only shown for full year data and sourced 10K filings."),
     ("Profit Sharing", "Amount of income set aside to fund employee profit sharing programs.<br>NOTE: Quarterly reporting by AAL and UAL of this metric is inconsistent. Data provided may have been obtained from internal sources or estimated by proportioning the annual profit sharing reported by the quarterly operating income reported."),
     ("Net Margin", "Percentage of profit earned for each dollar in revenue. Net Income divided by Total Revenue."),
     ("Load Factor", "The percentage of available seats that are filled with revenue passengers. RPMs divided by ASMs."),
@@ -241,11 +241,12 @@ with tab1:
     filtered_data = (data[data["Airline"].isin(selected_airlines)][data["Year"].isin(selected_years)][data["Quarter"].isin(selected_quarters)].copy()).sort_values(by="Period")
     # Define a function to compare values between airlines and output the percent difference
     def pct_diff(base, comparison):
+        # Handle cases where one or both of the comparison values don't exist
+        if pd.isna(base) or base==None or base==np.nan or pd.isna(comparison) or comparison==None or comparison==np.nan:
+            return None
         # Handle cases where base is zero to avoid division by zero
         if base == 0:
             return float(np.inf) if comparison != 0 else 0
-        if pd.isna(base) or base==None or pd.isna(comparison) or comparison==None:
-            return None
         # Calculate the percentage difference using absolute values
         percent_change = round(abs((comparison - base) / (base)) * 100, 2)
         # Determine if the change should be considered positive or negative
@@ -458,15 +459,15 @@ with tab1:
         # Column reformatting steps
         def format_value_based_on_metric(value, metric):
             if metric in ["Total Revenue (millions)", "Passenger Revenue (millions)", "Total Expenses (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
-                return f"{"-$" if value < 0 else "$"}{abs(value):,.0f}" if value.is_integer() else f"{"-$" if value < 0 else "$"}{abs(value):,.2f}" # reformat currency columns to show $ sign
+                return None if value==None else None if pd.isna(value) else f"{"-$" if value < 0 else "$"}{abs(value):,.0f}" if value.is_integer() else f"{"-$" if value < 0 else "$"}{abs(value):,.2f}" # reformat currency columns to show $ sign
             elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
-                return f"{value:,.2f}\u00A2" # reformat unit currency columns to show cents sign
+                return None if value==None else None if pd.isna(value) else f"{value:,.2f}\u00A2" # reformat unit currency columns to show cents sign
             elif metric in ["Net Margin", "Load Factor"]:
-                return f"{value:,.2f}%" # reformat percent columns to show % sign
+                return None if value==None else None if pd.isna(value) else f"{value:,.2f}%" # reformat percent columns to show % sign
             else:
-                return f"{value:,.0f}" # ensure any other metric is displayed as a unitless integer for readability
+                return None if value==None else None if pd.isna(value) else f"{value:,.0f}" # ensure any other metric is displayed as a unitless integer for readability
         comparison_summary["Value"] = comparison_summary.apply(lambda row: format_value_based_on_metric(row["Value"], row["Metric"]), axis=1)
-        comparison_summary["Percent Difference"] = comparison_summary["Percent Difference"].apply(lambda x: f"{x}%") # reformat percent difference column to show % sign
+        comparison_summary["Percent Difference"] = comparison_summary["Percent Difference"].apply(lambda x: None if x is None or pd.isna(x) else f"{x}%") # reformat percent difference column to show % sign
         comparison_summary = comparison_summary.set_index(["Metric", "Airline"], drop=True)
         comparison_summary = comparison_summary.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column
         comparison_summary = comparison_summary.drop(columns=["Period"]) # drop period column as the summary only covers a single period
@@ -520,18 +521,18 @@ with tab2:
 #####################################################################################
     ## FILTERING, CALCULATIONS, AND FUNCTIONS ##
     # Filter data for most recent year and quarter
-    summary_data_fy = airline_financials_fy[airline_financials_fy["Period"]==max(airline_financials_fy["Period"].unique())].dropna(axis=1, how="all")
+    summary_data_fy = airline_financials_fy[airline_financials_fy["Period"]==max(airline_financials_fy["Period"].unique())]#.dropna(axis=1, how="all")
     summary_data_q = airline_financials_q[airline_financials_q["Period"]==max(airline_financials_q["Period"].unique())].dropna(axis=1, how="all")
     # Column reformatting steps
     def format_value_based_on_metric(value, metric):
         if metric in ["Total Revenue (millions)", "Passenger Revenue (millions)", "Total Expenses (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
-            return f"{"-$" if value < 0 else "$"}{abs(value):,.0f}" if value.is_integer() else f"{"-$" if value < 0 else "$"}{abs(value):,.2f}" # reformat currency columns to show $ sign
+            return "TBA" if value==None else "TBA" if pd.isna(value) else f"{"-$" if value < 0 else "$"}{abs(value):,.0f}" if value.is_integer() else f"{"-$" if value < 0 else "$"}{abs(value):,.2f}" # reformat currency columns to show $ sign
         elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
-            return f"{value:,.2f}\u00A2" # reformat unit currency columns to show cents sign
+            return "TBA" if value==None else "TBA" if pd.isna(value) else f"{value:,.2f}\u00A2" # reformat unit currency columns to show cents sign
         elif metric in ["Net Margin", "Load Factor"]:
-            return f"{value:,.2f}%" # reformat percent columns to show % sign
+            return "TBA" if value==None else "TBA" if pd.isna(value) else f"{value:,.2f}%" # reformat percent columns to show % sign
         else:
-            return f"{value:,.0f}" # ensure any other metric is displayed as a unitless integer for readability
+            return "TBA" if value==None else "TBA" if pd.isna(value) else f"{value:,.0f}" # ensure any other metric is displayed as a unitless integer for readability
     # Define function to transform data for display
     def data_transform(data):
         ordered_metrics = [item + " (millions)" if i < len((data.columns).intersection(data.columns.drop(["Year", "Quarter", "Airline", "Period"])))-6 else item for i, item in enumerate((data.columns).intersection(data.columns.drop(["Year", "Quarter", "Airline", "Period"])))]
@@ -565,7 +566,7 @@ with tab2:
         data_transformed_df = pd.concat(data_transformed) # output the comparison dataframe
         data_transformed_df = data_transformed_df.reset_index(drop=True)
         data_transformed_df["Value"] = data_transformed_df.apply(lambda row: format_value_based_on_metric(row["Value"], row["Metric"]), axis=1)
-        data_transformed_df["Percent Difference"] = data_transformed_df["Percent Difference"].apply(lambda x: f"{x}%") # reformat percent difference column to show % sign
+        data_transformed_df["Percent Difference"] = data_transformed_df["Percent Difference"].apply(lambda x: None if x is None or pd.isna(x) else f"{x}%") # reformat percent difference column to show % sign
         data_transformed_df = data_transformed_df.set_index(["Metric", "Airline"], drop=True)
         data_transformed_df = data_transformed_df.rename(columns={"Percent Difference":f"vs {base_airline_2}"}) # rename percent difference column
         data_transformed_df = data_transformed_df.drop(columns=["Period"]) # drop period column as the summary only covers a single period
