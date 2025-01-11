@@ -99,6 +99,8 @@ share_repurchases = pd.read_excel("airline_financial_data.xlsx", sheet_name="sha
 share_sales = pd.read_excel("airline_financial_data.xlsx", sheet_name="share_sales") # share sale data during Covid-19
 # Airline financial data
 # Add calculated metrics
+airline_financials["Operating Income"] = airline_financials["Total Revenue"] - airline_financials["Total Expenses"]
+airline_financials["Operating Margin"] = round((airline_financials["Operating Income"] / airline_financials["Total Revenue"]) * 100, 2)
 airline_financials["Net Margin"] = round((airline_financials["Net Income"] / airline_financials["Total Revenue"]) * 100, 2)
 airline_financials["Load Factor"] = round((airline_financials["RPM"] / airline_financials["ASM"]) * 100, 2)
 airline_financials["Yield"] = airline_financials["Passenger Revenue"] / airline_financials["RPM"]
@@ -108,6 +110,11 @@ airline_financials["CASM"] = airline_financials["Total Expenses"] / airline_fina
 # Create a Period column to represent the fiscal period and to use for data display
 airline_financials["Quarter"] = airline_financials["Quarter"].apply(lambda x: f"Q{x}" if x != "FY" else x)
 airline_financials["Period"] = airline_financials["Year"].astype(str) + airline_financials["Quarter"].astype(str)
+# Reorder columns to have calculated Operating Income with other reported income/expense columns
+reordered_columns = list(airline_financials.columns)
+reordered_columns.remove("Operating Income")
+reordered_columns.insert(6, ("Operating Income"))
+airline_financials = airline_financials[reordered_columns]
 # Split data into full-year and quarterly DataFrames
 airline_financials_fy = airline_financials[airline_financials["Quarter"] == "FY"].copy() # full year data
 #airline_financials_fy["Date"] = pd.to_datetime(airline_financials_fy["Year"].astype(str) + "-12-31") # date ended up not being needed, keeping for future use if necessary
@@ -129,14 +136,16 @@ share_sales["Period"] = share_sales["Year"].astype(str) + share_sales["Quarter"]
 #####################################################################################
 # Definitions of the metrics
 metric_definitions = [
-    ("Total Revenue", "Total amount earned from sales."),
+    ("Total Revenue", "Total amount earned from operations."),
     ("Passenger Revenue", "Revenue primarily composed of passenger ticket sales, loyalty travel awards, and travel-related services performed in conjunction with a passenger's flight."),
-    ("Total Expenses", "Total amount of costs incurred."),
+    ("Total Expenses", "Total amount of costs incurred from operations."),
+    ("Operating Income", "Income from operations. Total Revenue minues Total Expenses."),
     ("Net Income", "Profit."),
     ("Revenue Passenger Mile (RPM)", "A basic measure of sales volume. One RPM represents one passenger flown one mile."),
     ("Available Seat Mile (ASM)", "A basic measure of production. One ASM represents one seat flown one mile."),
     ("Long-Term Debt", "Total long-term debt net of current maturities.<br>NOTE: Due to inconsistent reporting in quarterly filings between airilnes, this metric is only shown for full year data and sourced from 10K filings."),
     ("Profit Sharing", "Amount of income set aside to fund employee profit sharing programs.<br>NOTE: Quarterly reporting by AAL and UAL of this metric is inconsistent. Data provided may have been obtained from internal sources or estimated by proportioning the annual profit sharing reported by the quarterly operating income reported."),
+    ("Operating Margin", "Operating Income divided by Total Revenue"),
     ("Net Margin", "Percentage of profit earned for each dollar in revenue. Net Income divided by Total Revenue."),
     ("Load Factor", "The percentage of available seats that are filled with revenue passengers. RPMs divided by ASMs."),
     ("Yield", "A measure of airline revenue derived by dividing Passenger Revenue by RPMs."),
@@ -221,7 +230,7 @@ with tab1:
                 if metric_group_select=="All":
                     selected_metrics = available_metrics
                 elif metric_group_select=="Earnings":
-                    selected_metrics = ["Total Revenue", "Net Income", "Net Margin"]
+                    selected_metrics = ["Total Revenue", "Operating Income", "Net Income", "Operating Margin", "Net Margin"]
                 elif metric_group_select=="Unit Performance":
                     selected_metrics = ["Yield", "TRASM", "PRASM", "CASM"]
                 elif metric_group_select=="Custom":
@@ -262,7 +271,7 @@ with tab1:
     comparison_data = []
     for metric in selected_metrics:
         # Adjust some of the metrics to scale better for display
-        if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing", "RPM", "ASM"]:
+        if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing", "RPM", "ASM"]:
             filtered_data[metric] = filtered_data[metric] / 1000000
             filtered_data.rename(columns={metric:f"{metric} (millions)"}, inplace=True)
             metric = metric + " (millions)" 
@@ -312,7 +321,7 @@ with tab1:
     with compare_tab1:
         for metric in selected_metrics:
             # Reflect the renamed metrics new names
-            if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing", "RPM", "ASM"]:
+            if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing", "RPM", "ASM"]:
                 metric_display = metric + " (millions)"
             else:
                 metric_display = metric
@@ -341,11 +350,11 @@ with tab1:
                 comparison_display = comparison_display.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column to make it more understandable
                 comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
                 # Column reformatting steps
-                if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing"]:
+                if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing"]:
                     comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"{"-$" if x < 0 else "$"}{abs(x):,.0f}" if x.is_integer() else f"{"-$" if x < 0 else "$"}{abs(x):,.2f}") # reformat currency columns to show $ sign
                 elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
                     comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"{x:,.2f}\u00A2") # reformat unit currency columns to show cents sign
-                elif metric in ["Net Margin", "Load Factor"]:
+                elif metric in ["Operating Margin", "Net Margin", "Load Factor"]:
                     comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"{x:,.2f}%") # reformat percent columns to show % sign
                 else:
                     comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"{x:,.0f}") # ensure any other metric is displayed as a unitless integer for readability
@@ -399,7 +408,7 @@ with tab1:
                         opacity=0.25
                     )
                     # Adjust the hover over display formatting to improve readability
-                    if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing"]:
+                    if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing"]:
                         fig_line.update_traces(
                             hovertemplate="%{x}<br>$%{y:,.0f}"
                         )
@@ -407,7 +416,7 @@ with tab1:
                         fig_line.update_traces(
                             hovertemplate="%{x}<br>%{y:.2f}\u00A2"
                         )
-                    elif metric in ["Net Margin", "Load Factor"]:
+                    elif metric in ["Operating Margin", "Net Margin", "Load Factor"]:
                         fig_line.update_traces(
                             hovertemplate="%{x}<br>%{y:.2f}%"
                         )
@@ -458,11 +467,11 @@ with tab1:
         comparison_summary = comparison_df[comparison_df["Period"]==max(filtered_data["Period"])]
         # Column reformatting steps
         def format_value_based_on_metric(value, metric):
-            if metric in ["Total Revenue (millions)", "Passenger Revenue (millions)", "Total Expenses (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
+            if metric in ["Total Revenue (millions)", "Passenger Revenue (millions)", "Total Expenses (millions)", "Operating Income (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
                 return None if value==None else None if pd.isna(value) else f"{"-$" if value < 0 else "$"}{abs(value):,.0f}" if value.is_integer() else f"{"-$" if value < 0 else "$"}{abs(value):,.2f}" # reformat currency columns to show $ sign
             elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
                 return None if value==None else None if pd.isna(value) else f"{value:,.2f}\u00A2" # reformat unit currency columns to show cents sign
-            elif metric in ["Net Margin", "Load Factor"]:
+            elif metric in ["Operating Margin", "Net Margin", "Load Factor"]:
                 return None if value==None else None if pd.isna(value) else f"{value:,.2f}%" # reformat percent columns to show % sign
             else:
                 return None if value==None else None if pd.isna(value) else f"{value:,.0f}" # ensure any other metric is displayed as a unitless integer for readability
@@ -472,7 +481,7 @@ with tab1:
         comparison_summary = comparison_summary.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column
         comparison_summary = comparison_summary.drop(columns=["Period"]) # drop period column as the summary only covers a single period
         comparison_summary = comparison_summary.rename(columns={"Value":f"{max(filtered_data["Period"])}"})
-        ordered_metrics = [item + " (millions)" if i < len(available_metrics)-6 else item for i, item in enumerate(available_metrics)]
+        ordered_metrics = [item + " (millions)" if i < len(available_metrics)-7 else item for i, item in enumerate(available_metrics)]
         if len(selected_airlines) <= 1:
             comparison_summary = comparison_summary.drop(columns=f"vs {base_airline}") # do not display percent difference column if user chooses not to compare
             comparison_summary = comparison_summary.unstack(level="Airline")
@@ -525,21 +534,21 @@ with tab2:
     summary_data_q = airline_financials_q[airline_financials_q["Period"]==max(airline_financials_q["Period"].unique())].dropna(axis=1, how="all")
     # Column reformatting steps
     def format_value_based_on_metric(value, metric):
-        if metric in ["Total Revenue (millions)", "Passenger Revenue (millions)", "Total Expenses (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
+        if metric in ["Total Revenue (millions)", "Passenger Revenue (millions)", "Total Expenses (millions)", "Operating Income (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
             return "TBA" if value==None else "TBA" if pd.isna(value) else f"{"-$" if value < 0 else "$"}{abs(value):,.0f}" if value.is_integer() else f"{"-$" if value < 0 else "$"}{abs(value):,.2f}" # reformat currency columns to show $ sign
         elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
             return "TBA" if value==None else "TBA" if pd.isna(value) else f"{value:,.2f}\u00A2" # reformat unit currency columns to show cents sign
-        elif metric in ["Net Margin", "Load Factor"]:
+        elif metric in ["Operating Margin", "Net Margin", "Load Factor"]:
             return "TBA" if value==None else "TBA" if pd.isna(value) else f"{value:,.2f}%" # reformat percent columns to show % sign
         else:
             return "TBA" if value==None else "TBA" if pd.isna(value) else f"{value:,.0f}" # ensure any other metric is displayed as a unitless integer for readability
     # Define function to transform data for display
     def data_transform(data):
-        ordered_metrics = [item + " (millions)" if i < len((data.columns).intersection(data.columns.drop(["Year", "Quarter", "Airline", "Period"])))-6 else item for i, item in enumerate((data.columns).intersection(data.columns.drop(["Year", "Quarter", "Airline", "Period"])))]
+        ordered_metrics = [item + " (millions)" if i < len((data.columns).intersection(data.columns.drop(["Year", "Quarter", "Airline", "Period"])))-7 else item for i, item in enumerate((data.columns).intersection(data.columns.drop(["Year", "Quarter", "Airline", "Period"])))]
         data_transformed = []
         for metric in (data.columns).intersection(data.columns.drop(["Year", "Quarter", "Airline", "Period"])):
             # Adjust some of the metrics to scale better for display
-            if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Net Income", "Long-Term Debt", "Profit Sharing", "RPM", "ASM"]:
+            if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing", "RPM", "ASM"]:
                 data[metric] = data[metric] / 1000000
                 data.rename(columns={metric:f"{metric} (millions)"}, inplace=True)
                 metric = metric + " (millions)"
