@@ -25,8 +25,7 @@ st.set_page_config(
         The Share Repurchases tab contains a high level overview of the share buyback programs by the Big 3 airilnes (AAL, DAL, UAL) that were carried out in the 2010s and ended with the onset of the Covid-19 pandemic.\n
         Unless otherwise noted, all metrics are either sourced or calculated from data given in the 10-Q (quarterly filing), 8-K (current report), and 10-K (annual filing) forms reported to the SEC and available on the airlines' investor relations sites linked below.\n
         [AAL](https://americanairlines.gcs-web.com/) | [DAL](https://ir.delta.com/) | [UAL](https://ir.united.com/) | [LUV](https://www.southwestairlinesinvestorrelations.com/)\n
-        - **Author:** Michael Tricanowicz
-        - **GitHub:** [airline_financials](https://github.com/mtricanowicz/airline_financials)
+        **Created by:** Michael Tricanowicz
         """
     }
 )
@@ -34,7 +33,7 @@ st.set_page_config(
 # Streamlit app title
 st.title("Explore US Airline Financial Performance")
 
-#CUSTOM CSS ADDITIONS
+# CUSTOM CSS ADDITIONS
 # Custom CSS to change tab header size
 st.markdown("""
     <style>
@@ -117,7 +116,6 @@ reordered_columns.insert(6, ("Operating Income"))
 airline_financials = airline_financials[reordered_columns]
 # Split data into full-year and quarterly DataFrames
 airline_financials_fy = airline_financials[airline_financials["Quarter"] == "FY"].copy() # full year data
-#airline_financials_fy["Date"] = pd.to_datetime(airline_financials_fy["Year"].astype(str) + "-12-31") # date ended up not being needed, keeping for future use if necessary
 airline_financials_q = airline_financials[airline_financials["Quarter"] != "FY"].copy() # quarterly data
 # Share repurchase data
 # Add calculated and transformed columns
@@ -410,7 +408,7 @@ with tab1:
                     # Adjust the hover over display formatting to improve readability
                     if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing"]:
                         fig_line.update_traces(
-                            hovertemplate="%{x}<br>$%{y:,.0f}"
+                            hovertemplate="%{x}<br>%{y:$,.0f}"
                         )
                     elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
                         fig_line.update_traces(
@@ -731,7 +729,7 @@ with tab3:
         )
         # Adjust the hover over display formatting to improve readability
         fig_line2.update_traces(
-            hovertemplate="%{x}<br>%{y:.1f} billion", #"%{x}<br>$%{y:.1f}"
+            hovertemplate="%{x}<br>%{y:$.1f} billion",
             hoverinfo="text"
         )
         st.plotly_chart(fig_line2)
