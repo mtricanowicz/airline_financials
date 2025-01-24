@@ -137,7 +137,7 @@ metric_definitions = [
     ("Total Revenue", "Total amount earned from operations."),
     ("Passenger Revenue", "Revenue primarily composed of passenger ticket sales, loyalty travel awards, and travel-related services performed in conjunction with a passenger's flight."),
     ("Total Expenses", "Total amount of costs incurred from operations."),
-    ("Operating Income", "Income from operations. Total Revenue minues Total Expenses."),
+    ("Operating Income", "Income from operations. Total Revenue minus Total Expenses."),
     ("Net Income", "Profit."),
     ("Revenue Passenger Mile (RPM)", "A basic measure of sales volume. One RPM represents one passenger flown one mile."),
     ("Available Seat Mile (ASM)", "A basic measure of production. One ASM represents one seat flown one mile."),
