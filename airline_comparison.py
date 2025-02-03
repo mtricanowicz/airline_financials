@@ -24,8 +24,8 @@ st.set_page_config(
         The airlines covered (and their stock tickers) are American Airlines (AAL), Delta Air Lines (DAL), United Airlines (UAL), and Southwest Airlines (LUV). LUV quarterly data is provided from 2024.\n
         The Filtered Comparisons tab provides customizable views of airline financials. Several metrics can be selected for evaluation over chosen reporting periods.\n
         The Latest Results tab gives a summary of the most recent annual and quarterly results for easy viewing.\n
-        The LLM Insights tab allows the user to select one airline and year at a time and prompts ChatGPT to generate financial performance insights based on the airilne's SEC filings during the period.\n
         The Share Repurchases tab contains a high level overview of the share buyback programs by the Big 3 airilnes (AAL, DAL, UAL) that were carried out in the 2010s and ended with the onset of the Covid-19 pandemic.\n
+        The LLM Insights tab allows the user to select one airline and year at a time and prompts ChatGPT to generate financial performance insights based on the airilne's SEC filings during the period. The accuracy of the content provided cannot be guaranteed.\n
         Unless otherwise noted, all metrics are either sourced or calculated from data given in the 10-Q (quarterly filing), 8-K (current report), and 10-K (annual filing) forms reported to the SEC and available on the airlines' investor relations sites linked below.\n
         [AAL](https://americanairlines.gcs-web.com/) | [DAL](https://ir.delta.com/) | [UAL](https://ir.united.com/) | [LUV](https://www.southwestairlinesinvestorrelations.com/)\n
         **Created by:** Michael Tricanowicz
@@ -790,7 +790,7 @@ with tab4:
                 {"role": "system", "content": "You are an expert financial analyst summarizing SEC filings and presenting them for public consumption."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.3
+            temperature=0.2
         )
         return response.choices[0].message.content
 #####################################################################################
