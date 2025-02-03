@@ -672,8 +672,8 @@ with tab3:
                 close_value = last_close[airline].iloc[0]
                 close_display = f"${close_value:.2f}" 
             # Display information about the airline's repurchase program
-            st.markdown(f"{airline} repurchased **{total_shares_repurchase[airline]:.1f} million** shares at a total cost of **\${(total_cost_repurchase[airline]/1000):.1f} billion**. The average share price of repurchase was **\${total_average_share_cost[airline]:.2f}**. "
-                        f"To raise cash during the Covid-19 pandemic, {airline} offered and sold **{total_shares_sale[airline]:.1f} million** shares generating proceeds of **\${(total_proceeds_sale[airline]/1000):.1f} billion**. The average share price of sale was **\${total_average_share_sale[airline]:.2f}**. "
+            st.markdown(f"{airline} repurchased **{total_shares_repurchase[airline]:.1f} million** shares at a total cost of **\\${(total_cost_repurchase[airline]/1000):.1f} billion**. The average share price of repurchase was **\\${total_average_share_cost[airline]:.2f}**. "
+                        f"To raise cash during the Covid-19 pandemic, {airline} offered and sold **{total_shares_sale[airline]:.1f} million** shares generating proceeds of **\\${(total_proceeds_sale[airline]/1000):.1f} billion**. The average share price of sale was **\\${total_average_share_sale[airline]:.2f}**. "
                         f"{airline} last closed at **{close_display}**.<br>"
                         f"Based on the current share price and sales made during the pandemic, the repurchase campaign netted {airline}:"
                         , unsafe_allow_html=True)
@@ -780,14 +780,14 @@ with tab4:
     def get_sec_filings_summary(airline, year):
         prompt = f"""
         Summarize all SEC filings for {airline} from {year}, including all 10-Q, 10-K, 8-K filings, annual reports, and other filings. 
-        Provide the top 10 insights for the year, highlighting key financial, operational, executive personnel, and strategic developments. If available, include reports of profit sharing paid to employees as one of the insights. 
+        Provide the top 10 insights for the year related to key developments in the following areas: financial, operational, commercial stratgy, labor, executive personnel, and employee profit sharing program. Highlight any major events and their impacts. 
         Format the response in a structured list format. Present insights in chronological order as best as possible. Length of each item should fully detail the insight while being easy to read and digest.
         End the response with a single paragraph "Wrap Up" of the year.
         """
         response = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are an expert financial analyst summarizing SEC filings and presenting them for public consumption."},
+                {"role": "system", "content": "You are an expert financial analyst summarizing SEC filings and presenting them for public consumption. Accuracy is paramount, but you should provide interesting and revelatory insights."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.2
@@ -809,8 +809,7 @@ with tab4:
     # Generate the summary by passing the call to ChatGPT
     if llm_year>2023:
         summary = f"""
-        Cannot provide summary for {llm_year}.\n
-        ChatGPT's training data cuts off in October 2023.\n
+        Cannot provide summary for {llm_year}. ChatGPT's training data cuts off in October 2023.\n
         Please select a different year."""
     else:
         summary = get_sec_filings_summary(llm_airline, llm_year)
