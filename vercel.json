@@ -1,14 +1,15 @@
 {
     "builds": [
       {
-        "src": "airline_comparison.py",
-        "use": "@vercel/python"
+        "src": "run.sh",
+        "use": "@vercel/static-build",
+        "config": { "zeroConfig": true }
       }
     ],
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "airline_comparison.py"
+        "dest": "run.sh"
       }
     ]
   }
