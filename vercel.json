@@ -1,0 +1,14 @@
+{
+    "builds": [
+      {
+        "src": "airline_comparison.py",
+        "use": "@vercel/python"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "airline_comparison.py"
+      }
+    ]
+  }
