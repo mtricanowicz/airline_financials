@@ -1,15 +1,15 @@
 {
     "builds": [
       {
-        "src": "run.sh",
-        "use": "@vercel/static-build",
-        "config": { "zeroConfig": true }
+        "src": "Dockerfile",
+        "use": "@vercel/docker"
       }
     ],
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "run.sh"
+        "dest": "/"
       }
     ]
   }
+  
