@@ -775,7 +775,8 @@ with tab4:
 #####################################################################################
     ## LLM SETUP ##
     # Set OpenAI API key
-    openai.api_key = os.getenv("openai_key")
+    openai.api_key = os.getenv("openai_key") # OpenAI API key call when deployed via Azure or other hosted platform
+    #openai.api_key = st.secrets["API_Keys"]["openai_key"] # OpenAI API key call when deployed via Streamlit Community Cloud
     # Define the API call and prompt
     def get_sec_filings_summary(airline, year, period):
         prompt = f"""
