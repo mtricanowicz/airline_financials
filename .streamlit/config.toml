@@ -1,3 +1,8 @@
 [theme]
 base = "light"
 primaryColor = "#003E8A"
+
+[server]
+port = 8080
+enableCORS = false
+enableXsrfProtection = false
