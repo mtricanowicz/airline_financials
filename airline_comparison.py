@@ -630,7 +630,7 @@ with tab3:
             except Exception as e: # Handle exceptions and return an error message
                 return f"Error fetching stock price: {e}"
             retries += 1
-        return "Max attempts reached. Stock price could not be retrieved"
+        return "Error: Max attempts reached. Stock price could not be retrieved."
     # Define function to fetch daily close prices since the start of 2020Q2 (first quarter after share buybacks were ceased due to Covid-19)
     def fetch_daily_close(tickers, start_date, end_date, max_retries=10):
         retries = 0
@@ -642,7 +642,7 @@ with tab3:
             except Exception as e: # Handle exceptions and return an error message
                 return f"Error fetching stock price: {e}"
             retries += 1
-        return "Max attempts reached. Stock price could not be retrieved"
+        return "Error: Max attempts reached. Stock price history could not be retrieved"
 #####################################################################################
     ## OUTPUT/DISPLAY ##
     st.header("2010s Big 3 Share Buyback Campaign", divider='gray')
@@ -682,32 +682,40 @@ with tab3:
             if isinstance(close_value, str):
                 repurchase_net_value = close_value
                 repurchase_net_display = repurchase_net_value
+                st.warning(repurchase_net_display, icon="⚠️")
             else:
                 repurchase_net_value = (((total_average_share_sale[airline]-total_average_share_cost[airline])*(total_shares_sale[airline]))+((close_value-total_average_share_cost[airline])*(total_shares_repurchase[airline]-total_shares_sale[airline])))/1000
                 repurchase_net_color = "green" if round(repurchase_net_value, 1)>0 else "red" if round(repurchase_net_value, 1)<0 else "black"
                 repurchase_net_display = f"<p style='margin-bottom:0;'><h3 style='color:{repurchase_net_color};'>{f"{'-$' if round(repurchase_net_value, 1)<0 else '$'}{abs(repurchase_net_value):,.1f} billion {"&nbsp;"*10} {"🔥💰🔥" if round(repurchase_net_value, 1)<0 else "🤷" if round(repurchase_net_value, 1)==0 else "💸" if (repurchase_net_value/total_cost_repurchase[airline]/1000)<0.5 else "💸💸" if (repurchase_net_value/total_cost_repurchase[airline]/1000)<=1 else "💸💸💸"}"}</h3></p>"
-            st.markdown(repurchase_net_display, unsafe_allow_html=True)
+                st.markdown(repurchase_net_display, unsafe_allow_html=True)
     # Historical repurchase data for viewing
     with col2:
         # Prepare data to plot gain/loss from repurchases over time since Covid onset
         # Fetch daily closing price since start of 2020Q2
         ticker_since_covid = fetch_daily_close(tickers, "2020-04-01", datetime.now())
-        # Calculate the daily gain/loss in billions based on average repurchase price minus closing price multiplied by number of shares repurchased
+        # Calculate the daily gain/loss in billions based on average repurchase price minus closing price multiplied by number of shares repurchased. Adjust shares outstanding to account for share sales in 2020 and 2021.
         gain = pd.DataFrame()
         for airline in share_repurchases["Airline"].unique():        
-            gain[airline] = pd.Series(
-                ( 
-                    ((x - total_average_share_cost[airline]) * total_shares_repurchase[airline]) / 1000
-                    if date <= pd.Timestamp('2020-12-31')
-                    else ((((share_sales[(share_sales["Airline"]==airline) & (share_sales["Year"]==2020)]["Average Share Price"]-total_average_share_cost[airline])*(share_sales[(share_sales["Airline"]==airline) & (share_sales["Year"]==2020)]["Shares (millions)"]))+((x-total_average_share_cost[airline])*(total_shares_repurchase[airline]-share_sales[(share_sales["Airline"]==airline) & (share_sales["Year"]==2020)]["Shares (millions)"])))/1000).values[0]
-                    if pd.Timestamp("2021-01-01") <= date <= pd.Timestamp("2021-12-31")
-                    else (((total_average_share_sale[airline]-total_average_share_cost[airline])*(total_shares_sale[airline]))+((x-total_average_share_cost[airline])*(total_shares_repurchase[airline]-total_shares_sale[airline])))/1000
+            if isinstance(ticker_since_covid, pd.DataFrame): # Ensure stock prices were successfully fetched
+                gain[airline] = pd.Series(
+                    ( 
+                        ((x - total_average_share_cost[airline]) * total_shares_repurchase[airline]) / 1000
+                        if date <= pd.Timestamp('2020-12-31')
+                        else ((((share_sales[(share_sales["Airline"]==airline) & (share_sales["Year"]==2020)]["Average Share Price"]-total_average_share_cost[airline])*(share_sales[(share_sales["Airline"]==airline) & (share_sales["Year"]==2020)]["Shares (millions)"]))+((x-total_average_share_cost[airline])*(total_shares_repurchase[airline]-share_sales[(share_sales["Airline"]==airline) & (share_sales["Year"]==2020)]["Shares (millions)"])))/1000).values[0]
+                        if pd.Timestamp("2021-01-01") <= date <= pd.Timestamp("2021-12-31")
+                        else (((total_average_share_sale[airline]-total_average_share_cost[airline])*(total_shares_sale[airline]))+((x-total_average_share_cost[airline])*(total_shares_repurchase[airline]-total_shares_sale[airline])))/1000
+                    )
+                    for date, x in zip(ticker_since_covid.index, ticker_since_covid[airline])
                 )
-                for date, x in zip(ticker_since_covid.index, ticker_since_covid[airline])
-            )
-        gain.index = ticker_since_covid.index
-        # Melt the DataFrame into a format usable for plotting
-        gain_melt = pd.melt(gain.reset_index(), id_vars="Date", var_name="Airline", value_name="Gain")
+            else:
+                gain[airline] = pd.Series()  # Assign an empty series to avoid breaking code
+                st.warning(ticker_since_covid + f" for {airline}.", icon="⚠️") # Display error message
+        if gain.empty:
+            gain_melt = pd.DataFrame(columns=["Date", "Airline", "Gain"]) # Assign empty plotting dataframe to avoid breaking code
+        else:
+            gain.index = ticker_since_covid.index
+            # Melt the DataFrame into a format usable for plotting
+            gain_melt = pd.melt(gain.reset_index(), id_vars="Date", var_name="Airline", value_name="Gain")
         # Generate a line plot for each airline's gain/loss over time
         fig_line2 = px.line(
             gain_melt, 
