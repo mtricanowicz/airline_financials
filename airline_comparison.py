@@ -352,7 +352,7 @@ with tab1:
                 comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
                 # Column reformatting steps
                 if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing"]:
-                    comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"{"-$" if x < 0 else "$"}{abs(x):,.0f}" if x.is_integer() else f"{"-$" if x < 0 else "$"}{abs(x):,.2f}") # reformat currency columns to show $ sign
+                    comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"{"-$" if x < 0 else "$"}{abs(x):,.0f}") # reformat currency columns to show $ sign
                 elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
                     comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"{x:,.2f}\u00A2") # reformat unit currency columns to show cents sign
                 elif metric in ["Operating Margin", "Net Margin", "Load Factor"]:
@@ -536,7 +536,7 @@ with tab2:
     # Column reformatting steps
     def format_value_based_on_metric(value, metric):
         if metric in ["Total Revenue (millions)", "Passenger Revenue (millions)", "Total Expenses (millions)", "Operating Income (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
-            return "TBA" if value==None else "TBA" if pd.isna(value) else f"{"-$" if value < 0 else "$"}{abs(value):,.0f}" if value.is_integer() else f"{"-$" if value < 0 else "$"}{abs(value):,.2f}" # reformat currency columns to show $ sign
+            return "TBA" if value==None else "TBA" if pd.isna(value) else f"{"-$" if value < 0 else "$"}{abs(value):,.0f}" # reformat currency columns to show $ sign
         elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
             return "TBA" if value==None else "TBA" if pd.isna(value) else f"{value:,.2f}\u00A2" # reformat unit currency columns to show cents sign
         elif metric in ["Operating Margin", "Net Margin", "Load Factor"]:
