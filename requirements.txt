@@ -9,7 +9,6 @@ plotly
 datetime
 pytz
 openai
-import requests
 from bs4 import BeautifulSoup
 import calendar
 from dateutil.relativedelta import relativedelta
