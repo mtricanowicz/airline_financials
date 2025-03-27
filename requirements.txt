@@ -11,6 +11,5 @@ pytz
 openai
 requests
 beautifulsoup4
-calendar
-dateutil
+python-dateutil
 re
