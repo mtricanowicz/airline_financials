@@ -9,7 +9,8 @@ plotly
 datetime
 pytz
 openai
-from bs4 import BeautifulSoup
-import calendar
-from dateutil.relativedelta import relativedelta
-import re
+requests
+beautifulsoup4
+calendar
+dateutil
+re
