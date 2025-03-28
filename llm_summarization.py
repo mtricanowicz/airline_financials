@@ -244,7 +244,7 @@ import tempfile
 logging.getLogger("chromadb").setLevel(logging.WARNING)
 
 # Load PDFs and Extract Metadata
-@st.cache_data
+@st.cache_resource
 def process_filings(pdfs):
     # Set up ChromaDB elements with a temporary directory
     with tempfile.TemporaryDirectory() as temp_dir:
