@@ -157,7 +157,7 @@ def extract_filing_links(url, doc_base_url, container, container_class, filing_g
 # Define function to extract and scrape pages with date filtering
 def scrape_filing_pages(airline, year, period, sec_filings_url, doc_base_url, container, container_class, filing_group_class):
     if airline not in ["AAL", "UAL"]:
-        print(f"Cannot scrape filings for {airline}.")
+        st.write(f"Cannot scrape filings for {airline}.")
         return
     
     else:
@@ -223,7 +223,7 @@ def token_counter(corpus):
 def token_count(corpus):
     sum_tokens = 0
     for i in range(len(corpus)):
-        sum_tokens = sum_tokens + token_counter(corpus[i])
+        sum_tokens += token_counter(corpus[i])
     return sum_tokens
 #####################################################################################
 # Define a function to load documents, generate embeddings, and store for retrieval
@@ -258,14 +258,17 @@ def process_filings(pdfs):
             collection.delete(ids=existing_ids) 
     with st.spinner(text="Loading documents...", show_time=True):
         #Load the PDF documents
-        #load_status = st.empty() # initiate status message while loading
+        load_status = st.empty() # initiate status message while loading
         for pdf in pdfs:
-            #load_status.write(f"Processing {pdf}...") # updated status message
+            # Print messages when testing function operation
+            status_text = st.empty()
+            status_text.write(f"Loading document: {pdf}")
+            load_status.write(f"Processing {pdf}...") # updated status message
             loader = PyPDFLoader(pdf)
             documents = loader.load()
             # Extract document text and metadata
             for doc in documents:
-                #load_status.write(f"Processing {doc.metadata['title']}-page-{doc.metadata['page_label']} from {pdf}")
+                load_status.write(f"Processing {doc.metadata['title']}-page-{doc.metadata['page_label']} from {pdf}")
                 text = doc.page_content
                 metadata = doc.metadata
                 # Store in ChromaDB with embeddings
@@ -347,7 +350,7 @@ with tab1:
                 else:
                     #status_text.write(f"An error occurred: {filing_collection}")
                     status.update(label=f"An error occurred: {filing_collection}")
-            st.success(f"Retrieved {len(filing_links)+1} filings with {token_count:,} tokens.")
+            st.success(f"Retrieved {len(filing_links)} filings with {token_count:,} tokens.")
         st.session_state.get_insights = False
 
 #####################################################################################
