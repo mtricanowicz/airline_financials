@@ -227,17 +227,18 @@ def token_count(corpus):
     return sum_tokens
 #####################################################################################
 # Define a function to load documents, generate embeddings, and store for retrieval
-import chromadb
-from chromadb.api.models.Collection import Collection
-from langchain_community.document_loaders import PyPDFLoader
-import logging
-import tempfile
 
 # Correct sqlite3 version mismatch when deployed to streamlit
 import pysqlite3 as sqlite3
 __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
+import chromadb
+from chromadb.api.models.Collection import Collection
+from langchain_community.document_loaders import PyPDFLoader
+import logging
+import tempfile
 
 # Suppress debug or info level logs from ChromaDB
 logging.getLogger("chromadb").setLevel(logging.WARNING)
