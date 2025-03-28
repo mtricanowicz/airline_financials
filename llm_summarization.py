@@ -211,6 +211,14 @@ def scrape_filing_pages(airline, year, period, sec_filings_url, doc_base_url, co
         
         return all_links
 #####################################################################################
+# Define a function to count total number of tokens across documents
+def token_counter(corpus):
+    total_tokens = 0
+    for filing in corpus:
+            for section in filing:
+                total_tokens += len(section)
+    return total_tokens
+#####################################################################################
 # Define a function to count to tokens by document
 def token_count(corpus):
     sum_tokens = 0
@@ -241,7 +249,6 @@ def process_filings(pdfs):
         if existing_ids:
             collection.delete(ids=existing_ids) 
     with st.spinner(text="Loading documents...", show_time=True):
-
         #Load the PDF documents
         #load_status = st.empty() # initiate status message while loading
         for pdf in pdfs:
@@ -297,20 +304,20 @@ with tab1:
         with llm_col3:
             # Select year
             llm_year = st.pills("Select Year", sorted(airline_financials["Year"].unique()), default=None, selection_mode="single")
-        # Set up a Run button to prevent processing of documents unless button is clicked.
-        if 'clicked' not in st.session_state:
-            st.session_state.clicked = False
-        def click_button():
-            st.session_state.clicked = True
-        st.button("Run", on_click=click_button)
+        # Set up a Get Insights button to prevent processing of documents unless button is clicked.
+        if 'get_insights' not in st.session_state:
+            st.session_state.get_insights = False
+        def get_insights_button():
+            st.session_state.get_insights = True
+        st.button("Get Insights", on_click=get_insights_button)
 #####################################################################################
     ## OUTPUT/DISPLAY ##
-    # Check if Run button was clicked
-    if st.session_state.clicked:
+    # Check if Get Insights button was clicked
+    if st.session_state.get_insights:
         if llm_airline==None or llm_period==None or llm_year==None:
             st.write("Please make selections above to generate insights.")
         elif llm_airline not in ["AAL", "UAL"]:
-            st.write(f"Cannot scrape filings for {airline}.")
+            st.write(f"Cannot scrape filings for {llm_airline}.")
         else:
             st.write(f"Airline: {llm_airline} | Period: {llm_period}{llm_year}")
         
@@ -333,4 +340,6 @@ with tab1:
                     #status_text.write(f"An error occurred: {filing_collection}")
                     status.update(label=f"An error occurred: {filing_collection}")
             st.success(f"Retrieved {len(filing_links)+1} filings with {token_count:,} tokens.")
+        st.session_state.get_insights = False
+
 #####################################################################################
