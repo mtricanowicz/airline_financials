@@ -12,3 +12,5 @@ openai
 requests
 beautifulsoup4
 python-dateutil
+chromadb
+langchain-community
