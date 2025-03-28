@@ -585,6 +585,30 @@ with tab1:
 
 ## MOST RECENT YEAR AND QUARTER SUMMARY FOR ALL AIRLINES AND ALL METRICS ##
 # Display a summary of the latest reporting periods' metrics
+#####################################################################################
+## SESSION STATE SETUP
+# Initialize a session state that will control when this tab reruns.
+if 'compare_change' not in st.session_state:
+    st.session_state.compare_change = False
+# Define functions to trigger reruns
+def compare_yes_no_2_selection():
+    st.session_state.compare_change = 2
+def base_airline_2_selection():
+    st.session_state.compare_change = 1
+# Initialize a rerun count session state to trigger an extra rerun when applying filters to ensure filters apply properly and don't cause errors in the visualization.
+if 'rerun_count2' not in st.session_state:
+    st.session_state.rerun_count2 = 0
+# Initialize a session state that contains the default selections and that will be updated with user selections for this tab
+if "tab2" not in st.session_state:
+    st.session_state.tab2 = {
+        "compare_yes_no_2": "No",
+        "base_airline_2": airlines[0]
+        }
+# Define function to update the tab session variables
+def update_tab2():
+    st.session_state.tab2["compare_yes_no_2"] = st.session_state.compare_yes_no_2
+    st.session_state.tab2["base_airline_2"] = st.session_state.base_airline_2
+#####################################################################################
 with tab2:
     summary_col1, summary_col2, summary_col3 = st.columns([2, 2, 1])
 #####################################################################################
@@ -592,17 +616,36 @@ with tab2:
     with summary_col3:
         # Allow user to select a base airline to compare others against
         with st.container(border=True):
-            compare_yes_no_2 = st.pills("Would you like to compare against one of the airlines?", options_yes_no, default="No")
-            if(compare_yes_no_2=="Yes"):
-                base_airline_2 = st.pills("Select Airline to Compare Against", airlines, default=airlines[0], key="base_tab2")
+            st.session_state.compare_yes_no_2 = st.pills("Would you like to compare against one of the airlines?", options_yes_no, default="No", on_change=compare_yes_no_2_selection)
+            compare_yes_no_2 = st.session_state.tab2["compare_yes_no_2"]
+            if compare_yes_no_2=="Yes":
+                st.session_state.base_airline_2 = st.pills("Select Airline to Compare Against", airlines, default=airlines[0], key="base_tab2", on_change=base_airline_2_selection)
+                base_airline_2 = st.session_state.tab2["base_airline_2"]
             else:
                 base_airline_2 = airlines[0]
+                st.session_state.base_airline_2 = None
         # Add a toggle to display metric definitions for users who need them
         with st.popover(icon=":material/dictionary:", label="Show definitions of the metrics.", use_container_width=True):
             for metric, definition in metric_definitions:
                 st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
                 st.write(f"{metric} - {definition}", unsafe_allow_html=True)
             st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+        if st.session_state.compare_change == 1:
+            update_tab2()
+            # Check if it's the first rerun, and trigger the first rerun
+            if st.session_state.rerun_count2 == 0:
+                st.session_state.rerun_count2 = 1
+                st.rerun()
+        elif st.session_state.compare_change == 2:
+            update_tab2()
+            # Check if it's the first rerun, and trigger the first rerun
+            if st.session_state.rerun_count2 == 0:
+                st.session_state.rerun_count2 = 1
+                st.rerun()
+            # After the first rerun, trigger the second rerun
+            elif st.session_state.rerun_count2 == 1:
+                st.session_state.rerun_count2 = 2
+                st.rerun()
 #####################################################################################
     ## FILTERING, CALCULATIONS, AND FUNCTIONS ##
     # Filter data for most recent year and quarter
@@ -681,13 +724,20 @@ with tab2:
         st.header(f"Most Recent Quarter: {max(summary_data_q["Period"])}", divider='gray')
         summary_q = data_transform(summary_data_q)
         st.dataframe(summary_q, width=1000, height=(len(summary_q.index)+2)*35+3)
-
+    # Reset the apply_filters state to False and rerun count to 0 until the Apply Filters button is clicked again    
+    if st.session_state.rerun_count2 == 1 and st.session_state.compare_change == 1:
+        st.session_state.compare_change = False
+        st.session_state.rerun_count2 = 0
+    elif st.session_state.rerun_count2 == 2 and st.session_state.compare_change == 2:
+        st.session_state.compare_change = False
+        st.session_state.rerun_count2 = 0
 #####################################################################################
 #####################################################################################
 
 ## SHARE REPURCHASES ##
 # Display share repurchase history of the Big 3 airlines (AAL, DAL, UAL)
 #####################################################################################
+## SESSION STATE SETUP
 # Initialize session state to trigger stock price refresh. Initialize to true to ensure code runs when app is opened.
 if 'refresh_stock_prices' not in st.session_state:
     st.session_state.refresh_stock_prices = True
@@ -879,6 +929,27 @@ with tab3:
 
 ## ChatGPT INSIGHTS ##
 # Display top 10 insights from all financial filings for a selected airline in a selected year. Insights generated by an API call and prompt to ChatGPT-4o-mini.
+#####################################################################################
+## SESSION STATE SETUP ##
+# Initialize a session state that will control when this tab reruns.
+if 'get_insights' not in st.session_state:
+    st.session_state.get_insights = False
+# Initialize a rerun count session state to trigger an extra rerun when applying filters to ensure filters apply properly and don't cause errors in the visualization.
+if 'rerun_count4' not in st.session_state:
+    st.session_state.rerun_count4 = 0
+# Initialize a session state that contains the default selections and that will be updated with user selections for this tab
+if "tab4" not in st.session_state:
+    st.session_state.tab4 = {
+        "llm_airline": None,
+        "llm_period": None,
+        "llm_year": None
+        }
+# Define function to update the tab session variables
+def update_tab4():
+    st.session_state.tab4["llm_airline"] = st.session_state.llm_airline
+    st.session_state.tab4["llm_period"] = st.session_state.llm_period
+    st.session_state.tab4["llm_year"] = st.session_state.llm_year
+#####################################################################################
 with tab4:
 #####################################################################################
     ## LLM SETUP ##
@@ -911,20 +982,30 @@ with tab4:
         llm_col1, llm_col2, llm_col3 = st.columns([1, 1, 2])
         with llm_col1:
             # Select airline
-            llm_airline = st.pills("Select Airline", airlines, default=None, selection_mode="single")
+            st.session_state.llm_airline = st.pills("Select Airline", airlines, default=None, selection_mode="single")
+            llm_airline = st.session_state.tab4["llm_airline"]
         with llm_col2:
             # Select period(s)
             llm_quarters = sorted(airline_financials["Quarter"].unique())
-            llm_period = st.pills("Select Period", llm_quarters, default=None, selection_mode="single")
+            st.session_state.llm_period = st.pills("Select Period", llm_quarters, default=None, selection_mode="single")
+            llm_period = st.session_state.tab4["llm_period"]
         with llm_col3:
             # Select year
-            llm_year = st.pills("Select Year", years, default=None, selection_mode="single")
+            st.session_state.llm_year = st.pills("Select Year", years, default=None, selection_mode="single")
+            llm_year = st.session_state.tab4["llm_year"]
         # Set up a Get Insights button to prevent processing of documents unless button is clicked.
-        if 'get_insights' not in st.session_state:
-            st.session_state.get_insights = False
         def get_insights_button():
             st.session_state.get_insights = True
         st.button("Get Insights", type="primary", on_click=get_insights_button)
+        if st.session_state.get_insights:
+            update_tab4() # update the filter session states
+            # Check if it's the first rerun, and trigger the first rerun
+            if st.session_state.rerun_count4 == 0:
+                st.session_state.rerun_count4 = 1
+                st.rerun()
+            # After the first rerun, trigger the second rerun
+            elif st.session_state.rerun_count4 == 1:
+                st.session_state.rerun_count4 = 0
 #####################################################################################
     ## OUTPUT/DISPLAY ##
     # Check if Get Insights button was clicked
