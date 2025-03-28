@@ -83,6 +83,19 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
+# Custom CSS to style buttons
+st.markdown(
+    """
+    <style>
+    /* Target the Streamlit button */
+    div[data-testid="stButton"] > button {
+        font-size: 10px !important;  /* Change font size */
+        font-weight: bold;           /* Make text bold */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 # Color palette to use for visualizaitons
 airline_colors = {
@@ -170,6 +183,37 @@ tab1, tab2, tab3, tab4 = st.tabs(["Filtered Comparisons", "Latest Results", "Sha
 
 ## USER FILTERED FINANCIAL COMPARISONS ##
 # Display selected comparison data
+#####################################################################################
+## SESSION STATE SETUP ##
+# Initialize a session state that will control when this tab reruns.
+if 'apply_filters' not in st.session_state:
+    st.session_state.apply_filters = True
+# Initialize a rerun count session state to trigger an extra rerun when applying filters to ensure filters apply properly and don't cause errors in the visualization.
+if 'rerun_count' not in st.session_state:
+    st.session_state.rerun_count = 2
+# Initialize a session state that contains the default selections and that will be updated with user selections for this tab
+if "tab1" not in st.session_state:
+    st.session_state.tab1 = {
+        "data_type": "Full Year",
+        "selected_years": sorted(airline_financials_fy["Year"].unique()),
+        "selected_quarters": sorted(airline_financials_fy["Quarter"].unique()),
+        "selected_airlines": ["AAL", "DAL", "UAL"],
+        "compare_yes_no": "Yes",
+        "base_airline": airline_financials_fy["Airline"].unique()[0],
+        "metric_group_select": "All",
+        "selected_metrics": airline_financials_fy.columns.drop(["Year", "Quarter", "Airline", "Period"])[0]
+        }
+# Define function to update the tab session variables
+def update_tab1():
+    st.session_state.tab1["data_type"] = st.session_state.data_type
+    st.session_state.tab1["selected_years"] = st.session_state.selected_years
+    st.session_state.tab1["selected_quarters"] = st.session_state.selected_quarters
+    st.session_state.tab1["selected_airlines"] = st.session_state.selected_airlines
+    st.session_state.tab1["compare_yes_no"] = st.session_state.compare_yes_no
+    st.session_state.tab1["base_airline"] = st.session_state.base_airline
+    st.session_state.tab1["metric_group_select"] = st.session_state.metric_group_select
+    st.session_state.tab1["selected_metrics"] = st.session_state.selected_metrics
+#####################################################################################
 with tab1:
 #####################################################################################
     ## USER INTERACTION ##
@@ -179,7 +223,8 @@ with tab1:
             filter_col1, filter_col2, filter_col3 = st.columns(3)
             # Allow users to select full-year or quarterly data
             with filter_col1:
-                data_type = st.pills("View Full Year or Quarterly Data?", ["Full Year", "Quarterly"], default="Full Year")
+                st.session_state.data_type = st.pills("View Full Year or Quarterly Data?", ["Full Year", "Quarterly"], default="Full Year")
+                data_type = st.session_state.tab1["data_type"]
             if data_type == "Full Year":
                 data = airline_financials_fy
             else:
@@ -187,18 +232,21 @@ with tab1:
             # Allow user to select years for comparison
             years = sorted(data["Year"].unique())
             with filter_col2:
-                selected_years = st.pills("Select Year(s) for Comparison", years, default=years, selection_mode="multi")
+                st.session_state.selected_years = st.pills("Select Year(s) for Comparison", years, default=years, selection_mode="multi")
+                selected_years = st.session_state.tab1["selected_years"]
             if not selected_years:
                 selected_years=years # prevents empty set from triggering an error, displays all years if none are selected        
             # Allow user to select quarters for comparison
             quarters = sorted(data["Quarter"].unique())
             with filter_col3:
                 if data_type == "Quarterly":
-                    selected_quarters = st.pills("Select Quarter(s) for Comparison", quarters, default=quarters, selection_mode="multi")
+                    st.session_state.selected_quarters = st.pills("Select Quarter(s) for Comparison", quarters, default=quarters, selection_mode="multi")
+                    selected_quarters = st.session_state.tab1["selected_quarters"]
                     if not selected_quarters: # prevents empty set from triggering an error, displays all quarters if none are selected
                         selected_quarters=quarters
                 elif data_type == "Full Year":
-                    selected_quarters=quarters
+                    st.session_state.selected_quarters = quarters
+                    selected_quarters = quarters
         # Remove metrics from the data that do not have data for the chosen reporting period
         data = data.dropna(axis=1, how="all") # drop columns (metrics)        
         # Allow user to select airlines to compare
@@ -206,16 +254,19 @@ with tab1:
         with st.container(border=True):
             filter_col4, filter_col5, filter_col6 = st.columns(3)
             with filter_col4:
-                selected_airlines = st.pills("Select Airline(s) for Comparison", airlines, default=["AAL", "DAL", "UAL"], selection_mode="multi")
+                st.session_state.selected_airlines = st.pills("Select Airline(s) for Comparison", airlines, default=["AAL", "DAL", "UAL"], selection_mode="multi")
+                selected_airlines = st.session_state.tab1["selected_airlines"]
                 if not selected_airlines:
                     selected_airlines=[airlines[0]] # prevents empty set from triggering an error, displays AAL if none are selected        
             # Allow user to select a base airline to compare others against
             with filter_col5:
                 if len(selected_airlines) > 1:
-                    compare_yes_no = st.pills("Would you like to compare selected airlines' metrics against one of the airlines?", options_yes_no, default="Yes")
+                    st.session_state.compare_yes_no = st.pills("Would you like to compare selected airlines' metrics against one of the airlines?", options_yes_no, default="Yes")
+                    compare_yes_no = st.session_state.tab1["compare_yes_no"]
                     with filter_col6:
                         if(compare_yes_no=="Yes"):
-                            base_airline = st.pills("Select Airline to Compare Against", selected_airlines, default=selected_airlines[0])
+                            st.session_state.base_airline = st.pills("Select Airline to Compare Against", selected_airlines, default=selected_airlines[0])
+                            base_airline = st.session_state.tab1["base_airline"]
                         else:
                             base_airline = selected_airlines[0]
                 else:
@@ -227,16 +278,21 @@ with tab1:
             filter_col7, filter_col8 = st.columns([1, 2])
             # Provide preselected groups of metrics and allow user to customize selection
             with filter_col7:
-                metric_group_select = st.pills("Select Metrics for Comparison:", metric_groups, default="All")
+                st.session_state.metric_group_select = st.pills("Select Metrics for Comparison:", metric_groups, default="All")
+                metric_group_select = st.session_state.tab1["metric_group_select"]
                 if metric_group_select=="All":
                     selected_metrics = available_metrics
+                    st.session_state.selected_metrics = None
                 elif metric_group_select=="Earnings":
                     selected_metrics = ["Total Revenue", "Operating Income", "Net Income", "Operating Margin", "Net Margin"]
+                    st.session_state.selected_metrics = None
                 elif metric_group_select=="Unit Performance":
                     selected_metrics = ["Yield", "TRASM", "PRASM", "CASM"]
+                    st.session_state.selected_metrics = None
                 elif metric_group_select=="Custom":
                     with filter_col8:
-                        selected_metrics = st.pills("Add or Remove Metrics to Compare", available_metrics, default=available_metrics[0], selection_mode="multi")
+                        st.session_state.selected_metrics = st.pills("Add or Remove Metrics to Compare", available_metrics, default=available_metrics[0], selection_mode="multi")
+                        selected_metrics = st.session_state.tab1["selected_metrics"]
                         if not selected_metrics:
                             selected_metrics = [available_metrics[0]] # prevents empty set from triggering an error, displays first metric in available metrics if none are selected
                 # Add a popover to display metric definitions for users who need them
@@ -245,10 +301,21 @@ with tab1:
                         st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
                         st.write(f"{metric} - {definition}", unsafe_allow_html=True)
                     st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
+        def apply_filters_button():
+            st.session_state.apply_filters = True
+        st.button("Apply Filters", type="primary", on_click=apply_filters_button)
+        if st.session_state.apply_filters:
+            update_tab1() # update the filter session states
+            # Check if it's the first rerun, and trigger the first rerun
+            if st.session_state.rerun_count == 0:
+                st.session_state.rerun_count = 1
+                st.rerun()
+            # After the first rerun, trigger the second rerun
+            elif st.session_state.rerun_count == 1:
+                st.session_state.rerun_count = 2
+                st.rerun()
 #####################################################################################
-    ## FILTERING, CALCULATIONS, AND FUNCTIONS ##
-    # Filter data for selected airlines and metrics
-    filtered_data = (data[data["Airline"].isin(selected_airlines)][data["Year"].isin(selected_years)][data["Quarter"].isin(selected_quarters)].copy()).sort_values(by="Period")
+    ## FUNCTIONS ##
     # Define a function to compare values between airlines and output the percent difference
     def pct_diff(base, comparison):
         # Handle cases where one or both of the comparison values don't exist
@@ -268,6 +335,24 @@ with tab1:
             return -percent_change
         else:
             return percent_change
+    # Define function to alter color of the comparison column values based on sign
+    def color_positive_negative_zero(val):
+        if val is None: # allows function to handle columns that have missing data
+            return ""  # no color if the value is None
+        try:
+            numeric_val = float(val[:-1]) if isinstance(val, str) else val # converts value into float if needed
+        except ValueError:
+            return ""  # no color if conversion fails
+        color = "green" if numeric_val > 0 else "red" if numeric_val < 0 else "" # apply color based on value
+        return f"color: {color}"
+
+    # Define function to apply color based on the airline code
+    def color_airlines(val):
+        return f"color: {airline_colors.get(val, '')}" if val in airline_colors else ""
+#####################################################################################
+    ## FILTERING AND CALCULATIONS ##
+    # Filter data for selected airlines and metrics
+    filtered_data = (data[data["Airline"].isin(selected_airlines)][data["Year"].isin(selected_years)][data["Quarter"].isin(selected_quarters)].copy()).sort_values(by="Period")
     # Calculate percentage difference from the base airline and generate a comparison table with chosen metrics
     comparison_data = []
     for metric in selected_metrics:
@@ -301,20 +386,6 @@ with tab1:
     # Display comparison table and sort by "Period" and "Metric". Overall view of the data. Not used because separate tables are shown for each selected metric to improve readability of the data.
     #st.write("Airline Comparison")
     #st.dataframe(comparison_df.set_index(["Period", "Airline"]).sort_values(by=["Period", "Metric", "Airline"], ascending=True))
-    # Define function to alter color of the comparison column values based on sign
-    def color_positive_negative_zero(val):
-        if val is None: # allows function to handle columns that have missing data
-            return ""  # no color if the value is None
-        try:
-            numeric_val = float(val[:-1]) if isinstance(val, str) else val # converts value into float if needed
-        except ValueError:
-            return ""  # no color if conversion fails
-        color = "green" if numeric_val > 0 else "red" if numeric_val < 0 else "" # apply color based on value
-        return f"color: {color}"
-
-    # Define function to apply color based on the airline code
-    def color_airlines(val):
-        return f"color: {airline_colors.get(val, '')}" if val in airline_colors else ""
 #####################################################################################
     ## OUTPUT/DISPLAY ##
     compare_tab1, compare_tab2 = st.tabs(["Metrics over Time", "Single Period"])
@@ -372,7 +443,7 @@ with tab1:
                     comparison_display = comparison_display.unstack(level="Airline")
                     comparison_display.columns = comparison_display.columns.swaplevel(0, 1)
                     comparison_display = comparison_display.sort_index(axis=1, level=0)
-                    comparison_display = comparison_display.drop(columns=pd.IndexSlice[base_airline, f"vs {base_airline}"])
+                    comparison_display = comparison_display.drop(columns=pd.IndexSlice[base_airline, f"vs {base_airline}"], errors="ignore")
                     conditional_color_columns = [(col, f"vs {base_airline}") for col in comparison_display.columns.levels[0] if (col, f"vs {base_airline}") in comparison_display.columns] # specify the percent difference columns for which to apply conditional color formatting
                     comparison_display = comparison_display.style.map(color_positive_negative_zero, subset=conditional_color_columns) # map color of comparison column based on its sign and color of airline codes based on code ([.map_index(color_airlines, axis="columns", level="Airline")] streamlit doesn't directly support color text in an index)
                 elif len(selected_airlines) > 1 and compare_yes_no=="No":
@@ -504,6 +575,10 @@ with tab1:
             comparison_summary = comparison_summary.sort_index(axis=1, level=0)
             comparison_summary = comparison_summary.reindex([item for item in ordered_metrics if item in comparison_summary.index])
         st.dataframe(comparison_summary, width=1250, height=(len(selected_metrics)+2)*35+3)
+    # Reset the apply_filters state to False and rerun count to 0 until the Apply Filters button is clicked again
+    if st.session_state.rerun_count == 2:
+        st.session_state.apply_filters = False
+        st.session_state.rerun_count = 0
 
 #####################################################################################
 #####################################################################################
@@ -612,6 +687,17 @@ with tab2:
 
 ## SHARE REPURCHASES ##
 # Display share repurchase history of the Big 3 airlines (AAL, DAL, UAL)
+#####################################################################################
+# Initialize session state to trigger stock price refresh. Initialize to true to ensure code runs when app is opened.
+if 'refresh_stock_prices' not in st.session_state:
+    st.session_state.refresh_stock_prices = True
+# Initialize a session state that contains the default selections and that will be updated with user selections for this tab
+if "tab3" not in st.session_state:
+    st.session_state.tab3 = {
+        "last_close": None,
+        "ticker_since_covid": None
+        }
+#####################################################################################
 with tab3:
 #####################################################################################
     ## FILTERING, CALCULATIONS, AND FUNCTIONS ##
@@ -645,11 +731,13 @@ with tab3:
         return "Error: Max attempts reached. Stock price history could not be retrieved"
 #####################################################################################
     ## OUTPUT/DISPLAY ##
-    st.header("2010s Big 3 Share Buyback Campaign", divider='gray')
-    # Create display columns
-    col1, col2 = st.columns([1, 2])
-    # Information about the repurchase programs
+    col1, col2 = st.columns([8, 1])
     with col1:
+        st.header("2010s Big 3 Share Buyback Campaign", divider='gray')
+    # Create display columns
+    col3, col4 = st.columns([1, 2])
+    # Information about the repurchase programs
+    with col3:
         # Aggregate values
         total_shares_repurchase = share_repurchases.groupby("Airline")["Shares (millions)"].sum()
         total_cost_repurchase = share_repurchases.groupby("Airline")["Cost (millions)"].sum()
@@ -659,7 +747,10 @@ with tab3:
         total_average_share_sale = total_proceeds_sale/total_shares_sale
         # Define ticker symbols and fetch last close prices
         tickers = share_repurchases["Airline"].unique().tolist() # repurchase campaign airline tickers
-        last_close = fetch_last_close_prices(tickers, ticker_date)
+        if st.session_state.refresh_stock_prices:
+            st.session_state.last_close = fetch_last_close_prices(tickers, ticker_date)
+            st.session_state.tab3["last_close"] = st.session_state.last_close
+        last_close = st.session_state.tab3["last_close"]
         # Repurchase program summaries for each airline
         for airline in share_repurchases["Airline"].unique():
             # Display airline ticker for identification
@@ -689,10 +780,13 @@ with tab3:
                 repurchase_net_display = f"<p style='margin-bottom:0;'><h3 style='color:{repurchase_net_color};'>{f"{'-$' if round(repurchase_net_value, 1)<0 else '$'}{abs(repurchase_net_value):,.1f} billion {"&nbsp;"*10} {"🔥💰🔥" if round(repurchase_net_value, 1)<0 else "🤷" if round(repurchase_net_value, 1)==0 else "💸" if (repurchase_net_value/total_cost_repurchase[airline]/1000)<0.5 else "💸💸" if (repurchase_net_value/total_cost_repurchase[airline]/1000)<=1 else "💸💸💸"}"}</h3></p>"
                 st.markdown(repurchase_net_display, unsafe_allow_html=True)
     # Historical repurchase data for viewing
-    with col2:
+    with col4:
         # Prepare data to plot gain/loss from repurchases over time since Covid onset
         # Fetch daily closing price since start of 2020Q2
-        ticker_since_covid = fetch_daily_close(tickers, "2020-04-01", datetime.now())
+        if st.session_state.refresh_stock_prices:
+            st.session_state.ticker_since_covid = fetch_daily_close(tickers, "2020-04-01", datetime.now())
+            st.session_state.tab3["ticker_since_covid"] = st.session_state.ticker_since_covid
+        ticker_since_covid = st.session_state.tab3["ticker_since_covid"]
         # Calculate the daily gain/loss in billions based on average repurchase price minus closing price multiplied by number of shares repurchased. Adjust shares outstanding to account for share sales in 2020 and 2021.
         gain = pd.DataFrame()
         for airline in share_repurchases["Airline"].unique():        
@@ -774,6 +868,12 @@ with tab3:
         share_sales_display = share_sales_display.sort_index(axis=1, level=0, sort_remaining=False)
         st.markdown("<h4>Share Sale History</h4>", unsafe_allow_html=True)
         st.dataframe(share_sales_display, width=1300)
+    # Reset the refresh_stock_prices state to False until the Refresh Stock Prices button is clicked again
+    st.session_state.refresh_stock_prices = False
+    with col2:
+        def refresh_stock_prices_button():
+            st.session_state.refresh_stock_prices = True
+        st.button("Refresh Stock Prices", type="primary", on_click=refresh_stock_prices_button)
 #####################################################################################
 #####################################################################################
 
@@ -819,17 +919,26 @@ with tab4:
         with llm_col3:
             # Select year
             llm_year = st.pills("Select Year", years, default=None, selection_mode="single")
+        # Set up a Get Insights button to prevent processing of documents unless button is clicked.
+        if 'get_insights' not in st.session_state:
+            st.session_state.get_insights = False
+        def get_insights_button():
+            st.session_state.get_insights = True
+        st.button("Get Insights", type="primary", on_click=get_insights_button)
 #####################################################################################
     ## OUTPUT/DISPLAY ##
-    # Generate the summary by passing the call to ChatGPT
-    if llm_airline==None or llm_period==None or llm_year==None:
-        summary = "Please make selections above to generate insights."
-    elif llm_year>2023 or (llm_period=="Q4" and llm_year==2023):
-        summary = f"""
-        Cannot provide summary for {llm_year}{llm_period}. ChatGPT's training data cuts off in October 2023.\n
-        Please make a different selection."""
-    else:
-        summary = get_sec_filings_summary(llm_airline, llm_year, llm_period)
-    # Display response from ChatGPT
-    st.write(summary.replace("$", "\\$"))
+    # Check if Get Insights button was clicked
+    if st.session_state.get_insights:
+        # Generate the summary by passing the call to ChatGPT
+        if llm_airline==None or llm_period==None or llm_year==None:
+            st.write("Please make selections above to generate insights.")
+        elif llm_year>2023 or (llm_period=="Q4" and llm_year==2023):
+            st.write(f"""
+            Cannot provide summary for {llm_year}{llm_period}. ChatGPT's training data cuts off in October 2023.\n
+            Please make a different selection.""")
+        else:
+            summary = get_sec_filings_summary(llm_airline, llm_year, llm_period)
+            # Display response from ChatGPT
+            st.write(summary.replace("$", "\\$"))
+        st.session_state.get_insights = False
 #####################################################################################
