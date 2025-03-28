@@ -929,16 +929,17 @@ with tab4:
     ## OUTPUT/DISPLAY ##
     # Check if Get Insights button was clicked
     if st.session_state.get_insights:
-        # Generate the summary by passing the call to ChatGPT
-        if llm_airline==None or llm_period==None or llm_year==None:
-            st.write("Please make selections above to generate insights.")
-        elif llm_year>2023 or (llm_period=="Q4" and llm_year==2023):
-            st.write(f"""
-            Cannot provide summary for {llm_year}{llm_period}. ChatGPT's training data cuts off in October 2023.\n
-            Please make a different selection.""")
-        else:
-            summary = get_sec_filings_summary(llm_airline, llm_year, llm_period)
-            # Display response from ChatGPT
-            st.write(summary.replace("$", "\\$"))
-        st.session_state.get_insights = False
+        with st.spinner(f"Retrieving {llm_year}{llm_period} insights about {llm_airline}...", show_time=True):
+            # Generate the summary by passing the call to ChatGPT
+            if llm_airline==None or llm_period==None or llm_year==None:
+                st.write("Please make selections above to generate insights.")
+            elif llm_year>2023 or (llm_period=="Q4" and llm_year==2023):
+                st.write(f"""
+                Cannot provide summary for {llm_year}{llm_period}. ChatGPT's training data cuts off in October 2023.\n
+                Please make a different selection.""")
+            else:
+                summary = get_sec_filings_summary(llm_airline, llm_year, llm_period)
+                # Display response from ChatGPT
+                st.write(summary.replace("$", "\\$"))
+            st.session_state.get_insights = False
 #####################################################################################
