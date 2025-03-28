@@ -234,6 +234,7 @@ import logging
 import tempfile
 
 # Correct sqlite3 version mismatch when deployed to streamlit
+import pysqlite3 as sqlite3
 __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
