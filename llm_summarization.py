@@ -232,6 +232,12 @@ from chromadb.api.models.Collection import Collection
 from langchain_community.document_loaders import PyPDFLoader
 import logging
 import tempfile
+
+# Correct sqlite3 version mismatch when deployed to streamlit
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
 # Suppress debug or info level logs from ChromaDB
 logging.getLogger("chromadb").setLevel(logging.WARNING)
 

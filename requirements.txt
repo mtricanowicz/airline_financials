@@ -12,5 +12,6 @@ openai
 requests
 beautifulsoup4
 python-dateutil
+pysqlite3-binary
 chromadb
 langchain-community
