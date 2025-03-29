@@ -275,6 +275,7 @@ def process_filings(pdfs):
                 ids=[f"{doc.metadata['title']}-page-{doc.metadata['page_label']}"]
             )
             pdf_counter += 1 # increment the document counter
+            load_status = st.empty() # initiate status message while loading
     return collection
 
 #####################################################################################
