@@ -263,8 +263,9 @@ def process_filings(pdfs):
         documents = loader.load()
         pdf_counter = 0 # initialize the document counter
         # Extract document text and metadata
+        load_status = st.empty() # initiate status message while loading
         for doc in documents:
-            load_status = st.empty() # initiate status message while loading
+            
             load_status.write(f"Processing {doc.metadata['title']}-page-{doc.metadata['page_label']} from filing {pdf_counter+1} of {len(pdfs)}.")
             text = doc.page_content
             metadata = doc.metadata
@@ -274,8 +275,8 @@ def process_filings(pdfs):
                 metadatas=[metadata],
                 ids=[f"{doc.metadata['title']}-page-{doc.metadata['page_label']}"]
             )
-            pdf_counter += 1 # increment the document counter
-        load_status = st.empty() # initiate status message while loading
+            load_status = st.empty() # initiate status message while loading
+        pdf_counter += 1 # increment the document counter
     return collection
 
 #####################################################################################
