@@ -256,30 +256,25 @@ def process_filings(pdfs):
         existing_ids = collection.get()["ids"]
         if existing_ids:
             collection.delete(ids=existing_ids) 
-    with st.spinner(text="Loading documents...", show_time=True):
-        #Load the PDF documents
-        load_status = st.empty() # initiate status message while loading
-        for pdf in pdfs:
-            # Print messages when testing function operation
-            status_text = st.empty()
-            status_text.write(f"Loading document: {pdf}")
-            load_status.write(f"Processing {pdf}...") # updated status message
-            loader = PyPDFLoader(pdf)
-            documents = loader.load()
-            # Extract document text and metadata
-            for doc in documents:
-                load_status.write(f"Processing {doc.metadata['title']}-page-{doc.metadata['page_label']} from {pdf}")
-                text = doc.page_content
-                metadata = doc.metadata
-                # Store in ChromaDB with embeddings
-                
-                collection.add(
-                    documents=[text],
-                    metadatas=[metadata],
-                    ids=[f"{doc.metadata['title']}-page-{doc.metadata['page_label']}"]
-                )
-
-        #load_status.empty() # clear status message
+    #Load the PDF documents
+    for pdf in pdfs:
+        # Print messages when testing function operation
+        #status_text = st.empty()
+        #status_text.write(f"Loading document: {pdf}")
+        loader = PyPDFLoader(pdf)
+        documents = loader.load()
+        # Extract document text and metadata
+        for doc in documents:
+            load_status.write(f"Processing {doc.metadata['title']}-page-{doc.metadata['page_label']} from {pdf}")
+            text = doc.page_content
+            metadata = doc.metadata
+            # Store in ChromaDB with embeddings
+            
+            collection.add(
+                documents=[text],
+                metadatas=[metadata],
+                ids=[f"{doc.metadata['title']}-page-{doc.metadata['page_label']}"]
+            )
         return collection
 
 #####################################################################################
@@ -340,7 +335,8 @@ with tab1:
                 # Load and embed documents from filing links
                 #status_text.write(f"Found {len(filing_links)} document links. Processing the documents...")
                 status.update(label=f"Found {len(filing_links)} document links. Processing the documents...")
-                filing_collection = process_filings(filing_links)
+                with st.spinner(text="Loading documents...", show_time=True):
+                    filing_collection = process_filings(filing_links)
                 if isinstance(filing_collection, Collection):
                     # Count tokens retrieved
                     #status_text.write(f"{filing_collection.count()} documents processed and stored. Counting the tokens...")
@@ -350,7 +346,8 @@ with tab1:
                 else:
                     #status_text.write(f"An error occurred: {filing_collection}")
                     status.update(label=f"An error occurred: {filing_collection}")
-            st.success(f"Retrieved {len(filing_links)} filings with {token_count:,} tokens.")
+                status.update(label=f"Processing complete for {llm_airline} {llm_year}{llm_period} filings.")
+                st.success(f"Retrieved {len(filing_links)} filings with {token_count:,} tokens.")
         st.session_state.get_insights = False
 
 #####################################################################################
