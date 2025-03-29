@@ -360,7 +360,7 @@ with tab1:
                 
                 st.success(f"Retrieved {len(filing_links)} filings with {token_count:,} tokens. Processing documents took {int(elapsed_processing_time//60)} minutes {elapsed_processing_time%60:.2f} seconds.") # display success message upon processing filings and counting tokens
                 
-                status.update(label=f"Processing complete for {llm_airline} {llm_year}{llm_period} filings.", status="complete", expanded=False) # display completion message and collapse status container
+                status.update(label=f"Processing complete for {llm_airline} {llm_year}{llm_period} filings.", state="complete", expanded=False) # display completion message and collapse status container
                 
         st.session_state.get_insights = False
 
