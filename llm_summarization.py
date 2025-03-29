@@ -258,12 +258,12 @@ def process_filings(pdfs):
         if existing_ids:
             collection.delete(ids=existing_ids) 
     #Load the PDF documents
-    load_status = st.empty() # initiate status message while loading
     for pdf in pdfs:
         loader = PyPDFLoader(pdf)
         documents = loader.load()
         pdf_counter = 0 # initialize the document counter
         # Extract document text and metadata
+        load_status = st.empty() # initiate status message while loading
         for doc in documents:
             load_status.write(f"Processing {doc.metadata['title']}-page-{doc.metadata['page_label']} from filing {pdf_counter+1} of {len(pdfs)}.")
             text = doc.page_content
