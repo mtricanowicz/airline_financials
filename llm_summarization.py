@@ -258,6 +258,7 @@ def process_filings(pdfs):
         if existing_ids:
             collection.delete(ids=existing_ids) 
     #Load the PDF documents
+    load_status = st.empty() # initiate status message while loading
     for pdf in pdfs:
         loader = PyPDFLoader(pdf)
         documents = loader.load()
