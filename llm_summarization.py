@@ -245,38 +245,40 @@ import tempfile
 logging.getLogger("chromadb").setLevel(logging.WARNING)
 
 # Load PDFs and Extract Metadata
-@st.cache_resource
+#@st.cache_resource
 def process_filings(pdfs):
     # Set up ChromaDB elements with a temporary directory
-    with tempfile.TemporaryDirectory() as temp_dir:
-        #client = chromadb.EphemeralClient()  # Ephemeral ChromaDB (RAM)
-        client = chromadb.PersistentClient(path="embeddings")  # Persistent ChromaDB (Disk)
-        client.heartbeat() # checks that the ChromaDB client is active and responsive
-        collection = client.get_or_create_collection(name="SEC_Filings") # create Chroma collection
-        # 🚨 **Clear existing data if exists before adding new documents**
-        existing_ids = collection.get()["ids"]
-        if existing_ids:
-            collection.delete(ids=existing_ids) 
+    # Check if a temp directory already exists in the session, if not create on
+    if "chroma_temp_dir" not in st.session_state:
+        st.session_state.chroma_temp_dir = tempfile.TemporaryDirectory()
+    temp_dir = st.session_state.chroma_temp_dir.name  # Get temp dir path
+    # Set up ChromaDB client in the temp directory
+    client = chromadb.PersistentClient(path=temp_dir)  # Persistent ChromaDB (Disk)
+    client.heartbeat() # checks that the ChromaDB client is active and responsive
+    collection = client.get_or_create_collection(name="SEC_Filings") # create Chroma collection
+    # Clear existing data if exists before adding new documents
+    existing_ids = collection.get()["ids"]
+    if existing_ids:
+        collection.delete(ids=existing_ids) 
     #Load the PDF documents
+    load_status = st.empty() # initiate status message while loading
+    pdf_counter = 0 # initialize the document counter
     for pdf in pdfs:
         loader = PyPDFLoader(pdf)
         documents = loader.load()
-        pdf_counter = 0 # initialize the document counter
         # Extract document text and metadata
-        load_status = st.empty() # initiate status message while loading
         for doc in documents:
-            
             load_status.write(f"Processing {doc.metadata['title']}-page-{doc.metadata['page_label']} from filing {pdf_counter+1} of {len(pdfs)}.")
             text = doc.page_content
             metadata = doc.metadata
-            # Store in ChromaDB with embeddings
+            # Store in the ChromaDB with embeddings
             collection.add(
                 documents=[text],
                 metadatas=[metadata],
                 ids=[f"{doc.metadata['title']}-page-{doc.metadata['page_label']}"]
             )
-            load_status = st.empty() # initiate status message while loading
         pdf_counter += 1 # increment the document counter
+    load_status = st.empty() # initiate status message while loading
     return collection
 
 #####################################################################################
