@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 import calendar
 from dateutil.relativedelta import relativedelta
 import re
+import time
 
 st.set_page_config(
     page_title="LLM Summarization Testing",  # Custom title in the browser tab
@@ -201,9 +202,8 @@ def scrape_filing_pages(airline, year, period, sec_filings_url, doc_base_url, co
             # Break loop once start date is reached
             if reached_start_date==True:
                 break
-            
             status_text.empty()
-        status_text.empty()
+        status_text.empty()        
 
         # Print messages when testing function operation
         with st.popover(f"\nRetrieved {len(all_links)} filing documents for the time period:"):
@@ -228,13 +228,14 @@ def token_count(corpus):
     return sum_tokens
 #####################################################################################
 # Define a function to load documents, generate embeddings, and store for retrieval
-
-# Correct sqlite3 version mismatch when deployed to streamlit
+'''
+# Correct sqlite3 version mismatch when deployed to Streamlit
 import pysqlite3 as sqlite3
 __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-
+'''
+import sqlite3
 import chromadb
 from chromadb.api.models.Collection import Collection
 from langchain_community.document_loaders import PyPDFLoader
@@ -248,24 +249,31 @@ logging.getLogger("chromadb").setLevel(logging.WARNING)
 #@st.cache_resource
 def process_filings(pdfs):
     # Set up ChromaDB elements with a temporary directory
+    
     # Check if a temp directory already exists in the session, if not create on
     if "chroma_temp_dir" not in st.session_state:
         st.session_state.chroma_temp_dir = tempfile.TemporaryDirectory()
     temp_dir = st.session_state.chroma_temp_dir.name  # Get temp dir path
+    
     # Set up ChromaDB client in the temp directory
     client = chromadb.PersistentClient(path=temp_dir)  # Persistent ChromaDB (Disk)
     client.heartbeat() # checks that the ChromaDB client is active and responsive
     collection = client.get_or_create_collection(name="SEC_Filings") # create Chroma collection
+    
     # Clear existing data if exists before adding new documents
     existing_ids = collection.get()["ids"]
     if existing_ids:
         collection.delete(ids=existing_ids) 
+    
     #Load the PDF documents
-    load_status = st.empty() # initiate status message while loading
+    time_warning = st.empty() # initiate warning message that will be displayed during processing
+    time_warning.warning("This process may take several minutes, please wait...", icon="⚠️")
+    load_status = st.empty() # initiate status message that will be displayed during processing
     pdf_counter = 0 # initialize the document counter
     for pdf in pdfs:
         loader = PyPDFLoader(pdf)
         documents = loader.load()
+    
         # Extract document text and metadata
         for doc in documents:
             load_status.write(f"Processing {doc.metadata['title']}-page-{doc.metadata['page_label']} from filing {pdf_counter+1} of {len(pdfs)}.")
@@ -278,13 +286,15 @@ def process_filings(pdfs):
                 ids=[f"{doc.metadata['title']}-page-{doc.metadata['page_label']}"]
             )
         pdf_counter += 1 # increment the document counter
-    load_status = st.empty() # initiate status message while loading
+    
+    time_warning.empty() # clear warning message upon completion
+    load_status.empty() # clear status message upon completion
+    
     return collection
-
 #####################################################################################
 
 #####################################################################################
-# Define base URLs for the SEC filings
+# Define source URLs aand html elements for locating the SEC filings
 sec_filings_url = {"AAL": "https://americanairlines.gcs-web.com/sec-filings", "DAL": "https://ir.delta.com/financials/default.aspx#sec", "UAL": "https://ir.united.com/financial-performance/sec-filings"}
 html_doc_base_url = {"AAL": "https://americanairlines.gcs-web.com/node", "DAL": "https://d18rn0p25nwr6d.cloudfront.net/CIK-0000027904", "UAL": "https://ir.united.com/node"}
 pdf_doc_base_url = {"AAL": "https://americanairlines.gcs-web.com/static-files", "DAL": None, "UAL": "https://ir.united.com/static-files"}
@@ -335,23 +345,23 @@ with tab1:
             with st.status(f"Fetching {llm_year}{llm_period} SEC filings for {llm_airline}...", expanded=True) as status:
                 # Retrieve links to the pdf documents of the relevant filings
                 filing_links = scrape_filing_pages(llm_airline, llm_year, llm_period, sec_filings_url, pdf_doc_base_url, container, container_class, filing_group_class)
-                #status_text = st.empty()
                 # Load and embed documents from filing links
-                #status_text.write(f"Found {len(filing_links)} document links. Processing the documents...")
-                status.update(label=f"Found {len(filing_links)} document links. Processing the documents...")
+                status.update(label=f"Found {len(filing_links)} document links. Processing the documents...") # display status update
                 with st.spinner(text="Loading documents...", show_time=True):
+                    start_processing_time = time.time()
                     filing_collection = process_filings(filing_links)
+                    elapsed_processing_time = time.time() - start_processing_time
                 if isinstance(filing_collection, Collection):
                     # Count tokens retrieved
-                    #status_text.write(f"{filing_collection.count()} documents processed and stored. Counting the tokens...")
-                    status.update(label=f"{filing_collection.count()} documents processed and stored. Counting the tokens...")
+                    status.update(label=f"{filing_collection.count()} documents processed and stored. Counting the tokens...") # display status update
                     token_count = token_count(filing_collection.get(include=["documents"])["documents"])
-                    #status_text.empty()
                 else:
-                    #status_text.write(f"An error occurred: {filing_collection}")
-                    status.update(label=f"An error occurred: {filing_collection}")
-                status.update(label=f"Processing complete for {llm_airline} {llm_year}{llm_period} filings.")
-                st.success(f"Retrieved {len(filing_links)} filings with {token_count:,} tokens.")
+                    status.update(label=f"An error occurred: {filing_collection}", state="error") # display error message
+                
+                st.success(f"Retrieved {len(filing_links)} filings with {token_count:,} tokens. Processing documents took {int(elapsed_processing_time//60)} minutes {elapsed_processing_time%60:.2f} seconds.") # display success message upon processing filings and counting tokens
+                
+                status.update(label=f"Processing complete for {llm_airline} {llm_year}{llm_period} filings.", status="complete", expanded=False) # display completion message and collapse status container
+                
         st.session_state.get_insights = False
 
 #####################################################################################
