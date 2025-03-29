@@ -203,6 +203,7 @@ def scrape_filing_pages(airline, year, period, sec_filings_url, doc_base_url, co
                 break
             
             status_text.empty()
+        status_text.empty()
 
         # Print messages when testing function operation
         with st.popover(f"\nRetrieved {len(all_links)} filing documents for the time period:"):
@@ -258,24 +259,22 @@ def process_filings(pdfs):
             collection.delete(ids=existing_ids) 
     #Load the PDF documents
     for pdf in pdfs:
-        # Print messages when testing function operation
-        #status_text = st.empty()
-        #status_text.write(f"Loading document: {pdf}")
         loader = PyPDFLoader(pdf)
         documents = loader.load()
+        pdf_counter = 0 # initialize the document counter
         # Extract document text and metadata
         for doc in documents:
-            load_status.write(f"Processing {doc.metadata['title']}-page-{doc.metadata['page_label']} from {pdf}")
+            load_status.write(f"Processing {doc.metadata['title']}-page-{doc.metadata['page_label']} from filing {pdf_counter+1} of {len(pdfs)}.")
             text = doc.page_content
             metadata = doc.metadata
             # Store in ChromaDB with embeddings
-            
             collection.add(
                 documents=[text],
                 metadatas=[metadata],
                 ids=[f"{doc.metadata['title']}-page-{doc.metadata['page_label']}"]
             )
-        return collection
+            pdf_counter += 1 # increment the document counter
+    return collection
 
 #####################################################################################
 
