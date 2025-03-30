@@ -16,11 +16,15 @@ import calendar
 from dateutil.relativedelta import relativedelta
 import re
 import time
-import chromadb
-from chromadb.api.models.Collection import Collection
 from langchain_community.document_loaders import PyPDFLoader
 import logging
 import tempfile
+# Correct sqlite3 version mismatch when deployed to Streamlit prior to importing ChromaDB libraries. Mismatch is between Streamlit and ChromaDB. 
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+import chromadb
+from chromadb.api.models.Collection import Collection
 
 # Set custom page configuration including the "About" section
 st.set_page_config(
@@ -1137,16 +1141,10 @@ with tab4:
 #####################################################################################
     # Define a function to load documents, generate embeddings, and store for retrieval
 
-    # Correct sqlite3 version mismatch when deployed to Streamlit
-    __import__('pysqlite3')
-    import sys
-    sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-
     # Suppress debug or info level logs from ChromaDB
     logging.getLogger("chromadb").setLevel(logging.WARNING)
 
     # Load PDFs and Extract Metadata
-    #@st.cache_resource
     def process_filings(pdfs):
         # Set up ChromaDB elements with a temporary directory
         
