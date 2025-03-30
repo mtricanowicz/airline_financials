@@ -269,7 +269,7 @@ def process_filings(pdfs):
     
         # Extract document text and metadata
         for doc in documents:
-            load_status.write(f"Processing {doc.metadata['title']}-page-{doc.metadata['page_label']} from filing {pdf_counter+1} of {len(pdfs)}.")
+            load_status.write(f"Processing {doc.metadata['title'] if doc.metadata['title'] else ""}-page-{doc.metadata['page_label']} from filing {pdf_counter+1} of {len(pdfs)}.")
             text = doc.page_content
             metadata = doc.metadata
             # Store in the ChromaDB with embeddings
