@@ -327,7 +327,7 @@ def summarize_sec_filings(airline, year, period, collection, client):
     {context}
 
     Analyze all SEC filings , including all 10-Q, 10-K, 8-K filings, annual reports, and other filings. 
-    Provide the top insights for the year and period specified. Focus on the data from {year}{period} and ignore discussion of previous periods, especially previous quaterly filing data, unless it provides meaningful context for current results. Provide up to 10 insights. Insights should be related to key developments in the following areas: financial, operational, commercial stratgy, labor, executive personnel, and route network. Do NOT include a topic if there is no relevant data or if there is nothing meaningful to report.
+    Provide the top insights for the year and period specified. Focus on the data from {year}{period} and ignore discussion of previous periods unless it provides meaningful context for current results. Provide up to 10 insights. Insights should be related to key developments in the following areas: financial, operational, commercial stratgy, labor, executive personnel, and route network. Do NOT include a topic if there is no relevant data or if there is nothing meaningful to report.
     Do NOT under any circumstances fabricate names, dates, or numerical figures. Ensure the values are present in the underlying data. A fabrication is content not present in the SEC filings including but not limited to any mention of 'John Doe' or 'Jane Doe'.
     Be sure to highlight any major events and their impacts and provide additional context. 
     Format the response in a structured list format grouped by topic. Present insights in chronological order as best as possible. Length of each item should fully detail the insight while being easy to read and digest. Include relevant names when discussing personnel matters. Include accurate figures when discussing financial or other metrics.
@@ -409,12 +409,12 @@ with tab1:
                 else:
                     status.update(label=f"An error occurred: {filing_collection}", state="error") # display error message
                 status.update(label="Generating insights")
-                st.success(f"Processed {len(filing_links)} filings with {collection_character_count:,} characters. Processing documents took {int(elapsed_processing_time//60)} {'minute' if 1<=int(elapsed_processing_time//60<2) else 'minutes'} {elapsed_processing_time%60:.1f} seconds.") # display success message upon processing filings and counting characters
+                st.success(f"Processed {len(filing_links)} filings with {collection_character_count:,} characters. Processing documents took {int(elapsed_processing_time//60)} {'minute' if 1<=int(elapsed_processing_time//60)<2 else 'minutes'} {elapsed_processing_time%60:.1f} seconds.") # display success message upon processing filings and counting characters
                 with st.spinner(text="Generating insights...", show_time=True):
                     start_summary_time = time.time()
                     summary = summarize_sec_filings(llm_airline, llm_year, llm_period, filing_collection, client)
                     elapsed_summary_time = time.time() - start_summary_time
-                st.success(f"Summarization complete in {int(elapsed_summary_time//60)} minutes {elapsed_summary_time%60:.1f} seconds.") # display success message upon processing filings and counting tokens                
+                st.success(f"Summarization complete in {int(elapsed_summary_time//60)} {'minute' if 1<=int(elapsed_summary_time//60)<2 else 'minutes'} {elapsed_summary_time%60:.1f} seconds.") # display success message upon processing filings and counting tokens                
                 status.update(label=f"Processing complete for {llm_airline} {llm_year}{llm_period} filings.", state="complete", expanded=False) # display completion message and collapse status container
             # Display summary insights
             st.write(summary.replace("$", "\\$"))        
