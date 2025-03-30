@@ -304,14 +304,14 @@ def get_retriever(collection, client, k):
 def retrieve_relevant_filings(query, collection, client):
     k=int(0.05*collection.count()) # choose the most relevant 5% of documents present within the retrieved filings
     retriever = get_retriever(collection, client, k)
-    """Retrieve relevant SEC filings based on a natural language query."""
+    # Retrieve relevant SEC filings based on a natural language query.
     docs = retriever.get_relevant_documents(query)
     return [doc.page_content for doc in docs]
 #####################################################################################
 # Define function to use the OpenAI API to generate insights based on the most relevant portions of the retrieved filings
 openai.api_key = st.secrets["API_Keys"]["openai_key"]
 def summarize_sec_filings(airline, year, period, collection, client):
-    #Using the retrieved relevant portions of the period's SEC filings, summarize key results using OpenAI GPT.
+    # Using the retrieved relevant portions of the period's SEC filings, summarize key results using OpenAI GPT.
     # Define overall query to guide relevant document retrieval and summarization
     query = f"{airline} {year}{period} financial and operational highlights."
     # Retrieve relevant documents
