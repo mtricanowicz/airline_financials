@@ -205,27 +205,21 @@ def scrape_filing_pages(airline, year, period, sec_filings_url, doc_base_url, co
             status_text.empty()
         status_text.empty()        
 
-        # Print messages when testing function operation
+        # Display links to filings retrieved
         with st.popover(f"\nRetrieved {len(all_links)} filing documents for the time period:"):
             for link in all_links:
                 st.write(link)
         
         return all_links
 #####################################################################################
-# Define a function to count total number of tokens across documents
-def token_counter(corpus):
-    total_tokens = 0
-    for filing in corpus:
-            for section in filing:
+# Define a function to count to characters across all documents in the filings
+def character_count(filings):
+    total_characters = 0
+    for filing in filings:
+        for document in filing:
+            for section in document:
                 total_tokens += len(section)
-    return total_tokens
-#####################################################################################
-# Define a function to count to tokens by document
-def token_count(corpus):
-    sum_tokens = 0
-    for i in range(len(corpus)):
-        sum_tokens += token_counter(corpus[i])
-    return sum_tokens
+    return total_characters
 #####################################################################################
 # Define a function to load documents, generate embeddings, and store for retrieval
 
@@ -234,7 +228,6 @@ import pysqlite3 as sqlite3
 __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-
 #import sqlite3
 import chromadb
 from chromadb.api.models.Collection import Collection
@@ -292,7 +285,67 @@ def process_filings(pdfs):
     
     return collection
 #####################################################################################
+# Define a function to convert the ChromaDB document embedding collection into a vecorstore that can be used for retrieval
+from langchain.vectorstores import Chroma
+from langchain_huggingface import HuggingFaceEmbeddings
 
+def get_retriever(collection, k):
+    # Use all-MiniLM-L6-v2 as the embedding model since that is the default embedding for ChromaDB and was used to create the collection embeddings
+    embedding_function = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    # Wrap previously created ChromaDB in a retriever
+    vectorstore = Chroma(
+        client=client,  # Use existing ChromaDB client
+        collection_name=collection.name,  # Reference stored collection
+        embedding_function=embedding_function  # Use previously defined embedding function
+    )
+    return vectorstore.as_retriever(search_kwargs={"k": k})  # Retrieve top 5% results
+#####################################################################################
+# Define a function to retrieve relevant documents related to the objective of summarizing the period financial results
+def retrieve_relevant_filings(query, collection):
+    k=int(0.05*collection.count()) # choose the most relevant 5% of documents present within the retrieved filings
+    retriever = get_retriever(collection, k)
+    """Retrieve relevant SEC filings based on a natural language query."""
+    docs = retriever.get_relevant_documents(query)
+    return [doc.page_content for doc in docs]
+#####################################################################################
+# Define function to use the OpenAI API to generate insights based on the most relevant portions of the retrieved filings
+openai.api_key = st.secrets["API_Keys"]["openai_key"]
+def summarize_sec_filings(airline, year, period, collection):
+    #Using the retrieved relevant portions of the period's SEC filings, summarize key results using OpenAI GPT.
+    # Define overall query to guide relevant document retrieval and summarization
+    query = f"{airline} {year}{period} financial and operational highlights."
+    # Retrieve relevant documents
+    relevant_docs = retrieve_relevant_filings(query, collection)
+    # Combine into a single string
+    context = "\n\n".join(relevant_docs)
+    context = context  # add truncation if needed to limit tokens passed to the API
+
+    # Define the summarization prompt
+    prompt = f"""
+    You are an expert financial analyst summarizing SEC filings for {airline} from {year}{period}.
+    Below are relevant filings for the query: {query}
+
+    {context}
+
+    Analyze all SEC filings , including all 10-Q, 10-K, 8-K filings, annual reports, and other filings. 
+    Provide the top insights for the year and period specified. Provide up to 10 insights. Insights should be related to key developments in the following areas: financial, operational, commercial stratgy, labor, executive personnel, and route network. Do NOT include a topic if there is no relevant data or if there is nothing meaningful to report.
+    Do NOT under any circumstances fabricate names, dates, or numerical figures. Ensure the values are present in the underlying data. A fabrication is content not present in the SEC filings including but not limited to any mention of 'John Doe' or 'Jane Doe'.
+    Be sure to highlight any major events and their impacts and provide additional context. 
+    Format the response in a structured list format grouped by topic. Present insights in chronological order as best as possible. Length of each item should fully detail the insight while being easy to read and digest. Include relevant names when discussing personnel matters. Include accurate figures when discussing financial or other metrics.
+    End the response with a single paragraph "Wrap Up".
+    """
+
+    # Send request to OpenAI GPT
+    response = openai.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are an expert financial analyst summarizing SEC filings and presenting them for public consumption. Accuracy is paramount, but you should provide interesting and revelatory insights. Language and style should be a cross between an investment analyst report and business media reporting."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.3
+    )
+
+    return response.choices[0].message.content
 #####################################################################################
 # Define source URLs aand html elements for locating the SEC filings
 sec_filings_url = {"AAL": "https://americanairlines.gcs-web.com/sec-filings", "DAL": "https://ir.delta.com/financials/default.aspx#sec", "UAL": "https://ir.united.com/financial-performance/sec-filings"}
@@ -302,7 +355,6 @@ container = {"AAL": "table", "DAL": "div", "UAL": "table"}
 container_class = {"AAL": "nirtable", "DAL": "module-container", "UAL": "nirtable"}
 filing_group_class = {"AAL": "views-field views-field-field-nir-sec-form", "DAL": None, "UAL": "views-field views-field-field-nir-sec-form"}
 #####################################################################################
-
 
 
 #####################################################################################
@@ -329,7 +381,7 @@ with tab1:
             st.session_state.get_insights = False
         def get_insights_button():
             st.session_state.get_insights = True
-        st.button("Get Insights", on_click=get_insights_button)
+        st.button("Get Insights", type="primary", on_click=get_insights_button)
 #####################################################################################
     ## OUTPUT/DISPLAY ##
     # Check if Get Insights button was clicked
@@ -353,15 +405,21 @@ with tab1:
                     elapsed_processing_time = time.time() - start_processing_time
                 if isinstance(filing_collection, Collection):
                     # Count tokens retrieved
-                    status.update(label=f"{filing_collection.count()} documents processed and stored. Counting the tokens...") # display status update
-                    token_count = token_count(filing_collection.get(include=["documents"])["documents"])
+                    status.update(label=f"{filing_collection.count()} documents processed and stored. Counting the characters...") # display status update
+                    collection_character_count = character_count(filing_collection.get(include=["documents"])["documents"])
                 else:
                     status.update(label=f"An error occurred: {filing_collection}", state="error") # display error message
-                
-                st.success(f"Retrieved {len(filing_links)} filings with {token_count:,} tokens. Processing documents took {int(elapsed_processing_time//60)} minutes {elapsed_processing_time%60:.2f} seconds.") # display success message upon processing filings and counting tokens
-                
+                status.update(label="Generating insights")
+                st.success(f"Processed {len(filing_links)} filings with {token_count:,} characters. Processing documents took {int(elapsed_processing_time//60)} minutes {elapsed_processing_time%60:.1f} seconds.") # display success message upon processing filings and counting tokens
+                with st.spinner(text="Generating insights...", show_time=True):
+                    start_summary_time = time.time()
+                    summary = summarize_sec_filings(llm_airline, llm_year, llm_period, collection)
+                    elapsed_summary_time = time.time() - start_summary_time
+                st.success(f"Summarization complete in {int(elapsed_summary_time//60)} minutes {elapsed_summary_time%60:.1f} seconds.") # display success message upon processing filings and counting tokens                
                 status.update(label=f"Processing complete for {llm_airline} {llm_year}{llm_period} filings.", state="complete", expanded=False) # display completion message and collapse status container
-                
+            # Display summary insights
+            st.write(summary.replace("$", "\\$"))        
+        # Reset session state
         st.session_state.get_insights = False
 
 #####################################################################################
