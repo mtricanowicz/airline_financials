@@ -275,7 +275,7 @@ def process_filings(pdfs):
             collection.add(
                 documents=[text],
                 metadatas=[metadata],
-                ids=[f"{doc.metadata['title']}-page-{doc.metadata['page_label']}"]
+                ids=[f"{doc.metadata.get('title', f'Filing {pdf_counter+1} of {len(pdfs)}')}-page-{doc.metadata.get('page_label', 'Unknown')}"]
             )
         pdf_counter += 1 # increment the document counter
     
