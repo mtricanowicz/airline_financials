@@ -195,23 +195,33 @@ if 'rerun_count' not in st.session_state:
 if "tab1" not in st.session_state:
     st.session_state.tab1 = {
         "data_type": "Full Year",
+        "data": airline_financials_fy,
+        "years": sorted(airline_financials_fy["Year"].unique()),
+        "quarters": sorted(airline_financials_fy["Quarter"].unique()),
         "selected_years": sorted(airline_financials_fy["Year"].unique()),
         "selected_quarters": sorted(airline_financials_fy["Quarter"].unique()),
+        "airlines": airline_financials_fy["Airline"].unique(),
         "selected_airlines": ["AAL", "DAL", "UAL"],
         "compare_yes_no": "Yes",
-        "base_airline": airline_financials_fy["Airline"].unique()[0],
+        "base_airline": ["AAL", "DAL", "UAL"][0],
         "metric_group_select": "All",
+        "available_metrics": airline_financials_fy.columns.drop(["Year", "Quarter", "Airline", "Period"]),
         "selected_metrics": airline_financials_fy.columns.drop(["Year", "Quarter", "Airline", "Period"])[0]
         }
 # Define function to update the tab session variables
 def update_tab1():
     st.session_state.tab1["data_type"] = st.session_state.data_type
     st.session_state.tab1["selected_years"] = st.session_state.selected_years
+    st.session_state.tab1["data"] = st.session_state.data
+    st.session_state.tab1["years"] = st.session_state.years
+    st.session_state.tab1["quarters"] = st.session_state.quarters
     st.session_state.tab1["selected_quarters"] = st.session_state.selected_quarters
+    st.session_state.tab1["airlines"] = st.session_state.airlines
     st.session_state.tab1["selected_airlines"] = st.session_state.selected_airlines
     st.session_state.tab1["compare_yes_no"] = st.session_state.compare_yes_no
     st.session_state.tab1["base_airline"] = st.session_state.base_airline
     st.session_state.tab1["metric_group_select"] = st.session_state.metric_group_select
+    st.session_state.tab1["available_metrics"] = st.session_state.available_metrics
     st.session_state.tab1["selected_metrics"] = st.session_state.selected_metrics
 #####################################################################################
 with tab1:
@@ -225,54 +235,67 @@ with tab1:
             with filter_col1:
                 st.session_state.data_type = st.pills("View Full Year or Quarterly Data?", ["Full Year", "Quarterly"], default="Full Year")
                 data_type = st.session_state.tab1["data_type"]
+            if st.session_state.data_type == "Full Year":
+                st.session_state.data = airline_financials_fy
+            else:
+                st.session_state.data = airline_financials_q
             if data_type == "Full Year":
                 data = airline_financials_fy
             else:
                 data = airline_financials_q
             # Allow user to select years for comparison
+            st.session_state.years = sorted(st.session_state.data["Year"].unique())
             years = sorted(data["Year"].unique())
             with filter_col2:
-                st.session_state.selected_years = st.pills("Select Year(s) for Comparison", years, default=years, selection_mode="multi")
+                st.session_state.selected_years = st.pills("Select Year(s) for Comparison", st.session_state.years, default=st.session_state.years, selection_mode="multi")
                 selected_years = st.session_state.tab1["selected_years"]
             if not selected_years:
+                st.session_state.selected_years = st.session_state.years
                 selected_years=years # prevents empty set from triggering an error, displays all years if none are selected        
             # Allow user to select quarters for comparison
+            st.session_state.quarters = sorted(st.session_state.data["Quarter"].unique())
             quarters = sorted(data["Quarter"].unique())
             with filter_col3:
-                if data_type == "Quarterly":
-                    st.session_state.selected_quarters = st.pills("Select Quarter(s) for Comparison", quarters, default=quarters, selection_mode="multi")
+                if st.session_state.data_type == "Quarterly":
+                    st.session_state.selected_quarters = st.pills("Select Quarter(s) for Comparison", st.session_state.quarters, default=st.session_state.quarters, selection_mode="multi")
                     selected_quarters = st.session_state.tab1["selected_quarters"]
                     if not selected_quarters: # prevents empty set from triggering an error, displays all quarters if none are selected
                         selected_quarters=quarters
-                elif data_type == "Full Year":
-                    st.session_state.selected_quarters = quarters
+                elif st.session_state.data_type == "Full Year":
+                    st.session_state.selected_quarters = st.session_state.quarters
                     selected_quarters = quarters
         # Remove metrics from the data that do not have data for the chosen reporting period
-        data = data.dropna(axis=1, how="all") # drop columns (metrics)        
+        st.session_state.data = st.session_state.data.dropna(axis=1, how="all") # drop columns (metrics)
+        data = data.dropna(axis=1, how="all") # drop columns (metrics)      
         # Allow user to select airlines to compare
+        st.session_state.airlines = st.session_state.data["Airline"].unique()
         airlines = data["Airline"].unique()
         with st.container(border=True):
             filter_col4, filter_col5, filter_col6 = st.columns(3)
             with filter_col4:
-                st.session_state.selected_airlines = st.pills("Select Airline(s) for Comparison", airlines, default=["AAL", "DAL", "UAL"], selection_mode="multi")
+                st.session_state.selected_airlines = st.pills("Select Airline(s) for Comparison", st.session_state.airlines, default=["AAL", "DAL", "UAL"], selection_mode="multi")
                 selected_airlines = st.session_state.tab1["selected_airlines"]
-                if not selected_airlines:
-                    selected_airlines=[airlines[0]] # prevents empty set from triggering an error, displays AAL if none are selected        
+                if not st.session_state.selected_airlines:
+                    st.session_state.selected_airlines = [st.session_state.airlines[0]]
+                    selected_airlines = [airlines[0]] # prevents empty set from triggering an error, displays AAL if none are selected        
             # Allow user to select a base airline to compare others against
             with filter_col5:
-                if len(selected_airlines) > 1:
+                if len(st.session_state.selected_airlines) > 1:
                     st.session_state.compare_yes_no = st.pills("Would you like to compare selected airlines' metrics against one of the airlines?", options_yes_no, default="Yes")
                     compare_yes_no = st.session_state.tab1["compare_yes_no"]
                     with filter_col6:
-                        if(compare_yes_no=="Yes"):
+                        if (st.session_state.compare_yes_no=="Yes"):
                             st.session_state.base_airline = st.pills("Select Airline to Compare Against", selected_airlines, default=selected_airlines[0])
                             base_airline = st.session_state.tab1["base_airline"]
                         else:
-                            base_airline = selected_airlines[0]
+                            st.session_state.base_airline = st.session_state.selected_airlines[0]
+                            base_airline = st.session_state.tab1["selected_airlines"][0]
                 else:
-                    base_airline = selected_airlines[0]        
+                    compare_yes_no = st.session_state.tab1["compare_yes_no"]
+                    base_airline = st.session_state.tab1["selected_airlines"][0]        
         # Allow user to select metrics to compare with a "Select All" option
         available_metrics = data.columns.drop(["Year", "Quarter", "Airline", "Period"])
+        st.session_state.available_metrics = st.session_state.data.columns.drop(["Year", "Quarter", "Airline", "Period"])
         metric_groups = ["All", "Earnings", "Unit Performance", "Custom"]
         with st.container(border=True):
             filter_col7, filter_col8 = st.columns([1, 2])
@@ -280,21 +303,22 @@ with tab1:
             with filter_col7:
                 st.session_state.metric_group_select = st.pills("Select Metrics for Comparison:", metric_groups, default="All")
                 metric_group_select = st.session_state.tab1["metric_group_select"]
-                if metric_group_select=="All":
-                    selected_metrics = available_metrics
-                    st.session_state.selected_metrics = None
-                elif metric_group_select=="Earnings":
-                    selected_metrics = ["Total Revenue", "Operating Income", "Net Income", "Operating Margin", "Net Margin"]
-                    st.session_state.selected_metrics = None
-                elif metric_group_select=="Unit Performance":
-                    selected_metrics = ["Yield", "TRASM", "PRASM", "CASM"]
-                    st.session_state.selected_metrics = None
-                elif metric_group_select=="Custom":
+                if st.session_state.metric_group_select=="All":
+                    st.session_state.selected_metrics = st.session_state.available_metrics
+                    selected_metrics = st.session_state.tab1["available_metrics"]
+                elif st.session_state.metric_group_select=="Earnings":
+                    st.session_state.selected_metrics = ["Total Revenue", "Operating Income", "Net Income", "Operating Margin", "Net Margin"]
+                    selected_metrics = st.session_state.tab1["selected_metrics"]
+                elif st.session_state.metric_group_select=="Unit Performance":
+                    st.session_state.selected_metrics = ["Yield", "TRASM", "PRASM", "CASM"]
+                    selected_metrics = st.session_state.tab1["selected_metrics"]
+                elif st.session_state.metric_group_select=="Custom":
                     with filter_col8:
-                        st.session_state.selected_metrics = st.pills("Add or Remove Metrics to Compare", available_metrics, default=available_metrics[0], selection_mode="multi")
+                        st.session_state.selected_metrics = st.pills("Add or Remove Metrics to Compare", st.session_state.available_metrics, default=st.session_state.available_metrics[0], selection_mode="multi")
                         selected_metrics = st.session_state.tab1["selected_metrics"]
-                        if not selected_metrics:
-                            selected_metrics = [available_metrics[0]] # prevents empty set from triggering an error, displays first metric in available metrics if none are selected
+                        if not st.session_state.selected_metrics:
+                            st.session_state.selected_metrics = [st.session_state.available_metrics[0]]
+                            selected_metrics = [st.session_state.tab1["available_metrics"][0]] # prevents empty set from triggering an error, displays first metric in available metrics if none are selected        
                 # Add a popover to display metric definitions for users who need them
                 with st.popover(icon=":material/dictionary:", label="Show definitions of the available metrics.", use_container_width=True):
                     for metric, definition in metric_definitions:
