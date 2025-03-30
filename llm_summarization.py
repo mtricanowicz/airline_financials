@@ -410,7 +410,7 @@ with tab1:
                 else:
                     status.update(label=f"An error occurred: {filing_collection}", state="error") # display error message
                 status.update(label="Generating insights")
-                st.success(f"Processed {len(filing_links)} filings with {token_count:,} characters. Processing documents took {int(elapsed_processing_time//60)} minutes {elapsed_processing_time%60:.1f} seconds.") # display success message upon processing filings and counting tokens
+                st.success(f"Processed {len(filing_links)} filings with {collection_character_count:,} characters. Processing documents took {int(elapsed_processing_time//60)} minutes {elapsed_processing_time%60:.1f} seconds.") # display success message upon processing filings and counting tokens
                 with st.spinner(text="Generating insights...", show_time=True):
                     start_summary_time = time.time()
                     summary = summarize_sec_filings(llm_airline, llm_year, llm_period, collection)
