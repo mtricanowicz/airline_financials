@@ -391,7 +391,7 @@ with tab1:
 #####################################################################################
     ## FILTERING AND CALCULATIONS ##
     # Filter data for selected airlines and metrics
-    filtered_data = (data[data["Airline"].isin(selected_airlines)][data["Year"].isin(selected_years)][data["Quarter"].isin(selected_quarters)]).sort_values(by="Period")
+    filtered_data = (data[data["Airline"].isin(selected_airlines)][data["Year"].isin(selected_years)][data["Quarter"].isin(selected_quarters)].copy()).sort_values(by="Period")
     # Calculate percentage difference from the base airline and generate a comparison table with chosen metrics
     comparison_data = []
     for metric in selected_metrics:
@@ -928,7 +928,7 @@ with tab3:
             )
             st.plotly_chart(fig_line2)
             # Prepare repurchase data for display
-            share_repurchase_display = share_repurchases
+            share_repurchase_display = share_repurchases.copy()
             share_repurchase_display = share_repurchase_display.drop(columns=["Year", "Quarter", "Shares Repurchased", "Cost"])
             share_repurchase_display["Shares (millions)"] = share_repurchase_display["Shares (millions)"].apply(lambda x: f"{x:,.1f}")
             share_repurchase_display["Cost (millions)"] = share_repurchase_display["Cost (millions)"].apply(lambda x: f"${x:,.0f}")
@@ -1238,7 +1238,6 @@ with tab4:
         return [doc.page_content for doc in docs]
 #####################################################################################
     # Define function to use the OpenAI API to generate insights based on the most relevant portions of the retrieved filings
-    openai.api_key = st.secrets["API_Keys"]["openai_key"]
     def summarize_sec_filings(airline, year, period, collection, client):
         # Using the retrieved relevant portions of the period's SEC filings, summarize key results using OpenAI GPT.
         # Define overall query to guide relevant document retrieval and summarization
