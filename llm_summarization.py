@@ -283,13 +283,13 @@ def process_filings(pdfs):
     time_warning.empty() # clear warning message upon completion
     load_status.empty() # clear status message upon completion
     
-    return collection
+    return collection, client
 #####################################################################################
 # Define a function to convert the ChromaDB document embedding collection into a vecorstore that can be used for retrieval
 from langchain.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 
-def get_retriever(collection, k):
+def get_retriever(collection, client, k):
     # Use all-MiniLM-L6-v2 as the embedding model since that is the default embedding for ChromaDB and was used to create the collection embeddings
     embedding_function = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     # Wrap previously created ChromaDB in a retriever
@@ -301,21 +301,21 @@ def get_retriever(collection, k):
     return vectorstore.as_retriever(search_kwargs={"k": k})  # Retrieve top 5% results
 #####################################################################################
 # Define a function to retrieve relevant documents related to the objective of summarizing the period financial results
-def retrieve_relevant_filings(query, collection):
+def retrieve_relevant_filings(query, collection, client):
     k=int(0.05*collection.count()) # choose the most relevant 5% of documents present within the retrieved filings
-    retriever = get_retriever(collection, k)
+    retriever = get_retriever(collection, client, k)
     """Retrieve relevant SEC filings based on a natural language query."""
     docs = retriever.get_relevant_documents(query)
     return [doc.page_content for doc in docs]
 #####################################################################################
 # Define function to use the OpenAI API to generate insights based on the most relevant portions of the retrieved filings
 openai.api_key = st.secrets["API_Keys"]["openai_key"]
-def summarize_sec_filings(airline, year, period, collection):
+def summarize_sec_filings(airline, year, period, collection, client):
     #Using the retrieved relevant portions of the period's SEC filings, summarize key results using OpenAI GPT.
     # Define overall query to guide relevant document retrieval and summarization
     query = f"{airline} {year}{period} financial and operational highlights."
     # Retrieve relevant documents
-    relevant_docs = retrieve_relevant_filings(query, collection)
+    relevant_docs = retrieve_relevant_filings(query, collection, client)
     # Combine into a single string
     context = "\n\n".join(relevant_docs)
     context = context  # add truncation if needed to limit tokens passed to the API
@@ -401,7 +401,7 @@ with tab1:
                 status.update(label=f"Found {len(filing_links)} document links. Processing the documents...") # display status update
                 with st.spinner(text="Loading documents...", show_time=True):
                     start_processing_time = time.time()
-                    filing_collection = process_filings(filing_links)
+                    filing_collection, client = process_filings(filing_links)
                     elapsed_processing_time = time.time() - start_processing_time
                 if isinstance(filing_collection, Collection):
                     # Count tokens retrieved
@@ -413,7 +413,7 @@ with tab1:
                 st.success(f"Processed {len(filing_links)} filings with {collection_character_count:,} characters. Processing documents took {int(elapsed_processing_time//60)} minutes {elapsed_processing_time%60:.1f} seconds.") # display success message upon processing filings and counting tokens
                 with st.spinner(text="Generating insights...", show_time=True):
                     start_summary_time = time.time()
-                    summary = summarize_sec_filings(llm_airline, llm_year, llm_period, collection)
+                    summary = summarize_sec_filings(llm_airline, llm_year, llm_period, filing_collection, client)
                     elapsed_summary_time = time.time() - start_summary_time
                 st.success(f"Summarization complete in {int(elapsed_summary_time//60)} minutes {elapsed_summary_time%60:.1f} seconds.") # display success message upon processing filings and counting tokens                
                 status.update(label=f"Processing complete for {llm_airline} {llm_year}{llm_period} filings.", state="complete", expanded=False) # display completion message and collapse status container
