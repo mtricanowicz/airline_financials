@@ -80,7 +80,7 @@ def define_period_dates(year, period):
     if period=="FY":
         end_date = (datetime(year, end_month, end_day) + relativedelta(months=2)) # add two months to the end date to capture annual filings that are released up to two months after end of period
     else:
-        end_date = (datetime(year, end_month, end_day) + relativedelta(months=1)) # add one month to the end date to capture quarterly filings that are released up to a month after end of period
+        end_date = (datetime(year, end_month, end_day) + relativedelta(months=1) + relativedelta(days=1)) # add one month to the end date to capture quarterly filings that are released up to a month after end of period
     
     #Print messages when testing function operation
     #print(f"Start Date: {start_date}\nEnd Date: {end_date}")
@@ -327,7 +327,7 @@ def summarize_sec_filings(airline, year, period, collection, client):
     {context}
 
     Analyze all SEC filings , including all 10-Q, 10-K, 8-K filings, annual reports, and other filings. 
-    Provide the top insights for the year and period specified. Provide up to 10 insights. Insights should be related to key developments in the following areas: financial, operational, commercial stratgy, labor, executive personnel, and route network. Do NOT include a topic if there is no relevant data or if there is nothing meaningful to report.
+    Provide the top insights for the year and period specified. Focus on the data from {year}{period} and ignore discussion of previous periods unless it provides importance context for current results. Provide up to 10 insights. Insights should be related to key developments in the following areas: financial, operational, commercial stratgy, labor, executive personnel, and route network. Do NOT include a topic if there is no relevant data or if there is nothing meaningful to report.
     Do NOT under any circumstances fabricate names, dates, or numerical figures. Ensure the values are present in the underlying data. A fabrication is content not present in the SEC filings including but not limited to any mention of 'John Doe' or 'Jane Doe'.
     Be sure to highlight any major events and their impacts and provide additional context. 
     Format the response in a structured list format grouped by topic. Present insights in chronological order as best as possible. Length of each item should fully detail the insight while being easy to read and digest. Include relevant names when discussing personnel matters. Include accurate figures when discussing financial or other metrics.
