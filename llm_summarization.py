@@ -218,7 +218,7 @@ def character_count(filings):
     for filing in filings:
         for document in filing:
             for section in document:
-                total_tokens += len(section)
+                total_characters += len(section)
     return total_characters
 #####################################################################################
 # Define a function to load documents, generate embeddings, and store for retrieval
