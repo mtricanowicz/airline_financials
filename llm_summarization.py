@@ -224,7 +224,6 @@ def character_count(filings):
 # Define a function to load documents, generate embeddings, and store for retrieval
 
 # Correct sqlite3 version mismatch when deployed to Streamlit
-import pysqlite3 as sqlite3
 __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
@@ -269,7 +268,7 @@ def process_filings(pdfs):
     
         # Extract document text and metadata
         for doc in documents:
-            load_status.write(f"Processing {doc.metadata['title'] if doc.metadata['title'] else ""}-page-{doc.metadata['page_label']} from filing {pdf_counter+1} of {len(pdfs)}.")
+            load_status.write(f"Processing {doc.metadata.get('title', '')}-page-{doc.metadata.get('page_label', 'Unknown')} from filing {pdf_counter+1} of {len(pdfs)}.")
             text = doc.page_content
             metadata = doc.metadata
             # Store in the ChromaDB with embeddings
