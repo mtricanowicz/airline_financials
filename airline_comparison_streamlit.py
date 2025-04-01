@@ -1289,6 +1289,8 @@ with tab4:
     # Check if Get Insights button was clicked
     if st.session_state.get_insights:
         
+        st.session_state.tab4["header"].empty()
+
         # Update the filter session states and set the variables
         update_tab4()
         llm_airline = st.session_state.tab4["llm_airline"]
