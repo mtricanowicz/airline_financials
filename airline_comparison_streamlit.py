@@ -1296,7 +1296,8 @@ with tab4:
         llm_year = st.session_state.tab4["llm_year"]
         
         # Set content header
-        st.session_state.tab4["header"].header(f"Airline: {llm_airline} | Period: {llm_year}{llm_period}", divider='gray')
+        if llm_airline is not None and llm_year is not None and llm_period is not None:
+            st.session_state.tab4["header"].header(f"Airline: {llm_airline} | Period: {llm_year}{llm_period}", divider='gray')
 
         # If any filter selections were not made, prompt the user to complete the selections
         if llm_airline==None or llm_period==None or llm_year==None:
