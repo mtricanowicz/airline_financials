@@ -1171,6 +1171,8 @@ with tab4:
     # Define Google Cloud Storage bucket for ChromaDB storage
     gcs_bucket_name = "retrieved_sec_filings"
     gcs_blob_prefix = "chromadb/sec_filings/"
+    # Suppress debug or info level logs from ChromaDB
+    logging.getLogger("chromadb").setLevel(logging.WARNING)
     # Define function to initialize ChromaDB in GCS
     def initialize_chromadb():
         """Initialize ChromaDB to use GCS as storage."""
@@ -1179,16 +1181,23 @@ with tab4:
         client = chromadb.PersistentClient(path=gcs_path)  # Store ChromaDB in GCS
         client.heartbeat() # checks that the ChromaDB client is active and responsive
         return client  
+    # Initialize ChromaDB client if it doesn't exist in session_state
+    if "client" not in st.session_state:
+        st.session_state.client = initialize_chromadb()
+    # Initialize collection if it doesn't exist in session_state
+    if "collection" not in st.session_state:
+        st.session_state.collection = st.session_state.client.get_or_create_collection(name="SEC_Filings")
 #####################################################################################
     # Define a function to load documents, generate embeddings, and store for retrieval
     def process_filings(pdfs):
-        # Suppress debug or info level logs from ChromaDB
-        logging.getLogger("chromadb").setLevel(logging.WARNING)
-        
         # Set up ChromaDB client in the temp directory
-        client = initialize_chromadb()  # Persistent ChromaDB in GCS
-        collection = client.get_or_create_collection(name="SEC_Filings") # create Chroma collection
+        #client = initialize_chromadb()  # Persistent ChromaDB in GCS
+        #collection = client.get_or_create_collection(name="SEC_Filings") # create Chroma collection
         
+        # Access the client and collection from session_state for use
+        client = st.session_state.client
+        collection = st.session_state.collection
+
         # Clear existing data if exists before adding new documents
         existing_ids = collection.get()["ids"]
         if existing_ids:
