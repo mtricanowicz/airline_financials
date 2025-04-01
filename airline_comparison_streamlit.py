@@ -955,7 +955,6 @@ if "tab4" not in st.session_state:
         "llm_airline": None,
         "llm_period": None,
         "llm_year": None,
-        "header": st.empty(),
         "summary": None
         }
 # Define function to update the tab session variables
@@ -1282,9 +1281,12 @@ with tab4:
         st.button("Get Insights", type="primary", on_click=get_insights_button)
 #####################################################################################
     ## OUTPUT/DISPLAY ##
+    
     # Set content header
+    # Create a placeholder for the header at the top
+    header_insights = st.empty()
     if st.session_state.get_insights==False and st.session_state.tab4["llm_airline"] is not None and st.session_state.tab4["llm_year"] is not None and st.session_state.tab4["llm_period"] is not None:
-        st.session_state.tab4["header"].header(f"Airline: {st.session_state.tab4["llm_airline"]} | Period: {st.session_state.tab4["llm_year"]}{st.session_state.tab4["llm_period"]}", divider='gray')
+        header_insights.header(f"Airline: {st.session_state.tab4["llm_airline"]} | Period: {st.session_state.tab4["llm_year"]}{st.session_state.tab4["llm_period"]}", divider='gray')
     
     # Check if Get Insights button was clicked
     if st.session_state.get_insights:
@@ -1297,11 +1299,12 @@ with tab4:
 
         # If any filter selections were not made, prompt the user to complete the selections
         if llm_airline==None or llm_period==None or llm_year==None:
+            header_insights.empty()
             st.error("Please complete selections above to generate insights.", icon="🛑")
         
         # Document retrieval and summarization currently only works for AAL and UAL. If other airlines are selected revert to a general query to the ChatGPT API for responses from training data
         elif llm_airline not in ["AAL", "UAL"]:
-            st.session_state.tab4["header"].header(f"Airline: {llm_airline} | Period: {llm_year}{llm_period}", divider='gray')
+            header_insights.header(f"Airline: {llm_airline} | Period: {llm_year}{llm_period}", divider='gray')
             # Generate the summary by passing the call to ChatGPT
             if llm_year>2023 or (llm_period=="Q4" and llm_year==2023):
                 st.error(f"""
@@ -1317,7 +1320,7 @@ with tab4:
         
         # Execute retrieval and summarization of SEC filings for more accurate and relevant insights
         else:
-            st.session_state.tab4["header"].header(f"Airline: {llm_airline} | Period: {llm_year}{llm_period}", divider='gray')
+            header_insights.header(f"Airline: {llm_airline} | Period: {llm_year}{llm_period}", divider='gray')
             st.info("Insights are sourced from the SEC filings directly.", icon="ℹ️")
             with st.status(f"Fetching {llm_year}{llm_period} SEC filings for {llm_airline}...", expanded=True) as status:
                 # Retrieve links to the pdf documents of the relevant filings
