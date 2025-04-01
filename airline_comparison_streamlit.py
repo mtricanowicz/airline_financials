@@ -955,6 +955,7 @@ if "tab4" not in st.session_state:
         "llm_airline": None,
         "llm_period": None,
         "llm_year": None,
+        "header": st.empty(),
         "summary": None
         }
 # Define function to update the tab session variables
@@ -1283,8 +1284,7 @@ with tab4:
     ## OUTPUT/DISPLAY ##
     # Set content header
     if st.session_state.get_insights==False and st.session_state.tab4["llm_airline"] is not None and st.session_state.tab4["llm_year"] is not None and st.session_state.tab4["llm_period"] is not None:
-        header_insights = st.empty()
-        header_insights.header(f"Airline: {st.session_state.tab4["llm_airline"]} | Period: {st.session_state.tab4["llm_year"]}{st.session_state.tab4["llm_period"]}", divider='gray')
+        st.session_state.tab4["header"].header(f"Airline: {st.session_state.tab4["llm_airline"]} | Period: {st.session_state.tab4["llm_year"]}{st.session_state.tab4["llm_period"]}", divider='gray')
     
     # Check if Get Insights button was clicked
     if st.session_state.get_insights:
@@ -1296,7 +1296,7 @@ with tab4:
         llm_year = st.session_state.tab4["llm_year"]
         
         # Set content header
-        header_insights.header(f"Airline: {llm_airline} | Period: {llm_year}{llm_period}", divider='gray')
+        st.session_state.tab4["header"].header(f"Airline: {llm_airline} | Period: {llm_year}{llm_period}", divider='gray')
 
         # If any filter selections were not made, prompt the user to complete the selections
         if llm_airline==None or llm_period==None or llm_year==None:
