@@ -21,9 +21,9 @@ import logging
 import tempfile
 from google.cloud import storage
 # Correct sqlite3 version mismatch when deployed to Streamlit prior to importing ChromaDB libraries. Mismatch is between Streamlit and ChromaDB. 
-#__import__('pysqlite3')
-#import sys
-#sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 import chromadb
 from chromadb.api.models.Collection import Collection
 
@@ -990,6 +990,25 @@ def update_tab4():
     st.session_state.tab4["llm_period"] = st.session_state.llm_period
     st.session_state.tab4["llm_year"] = st.session_state.llm_year
 #####################################################################################
+# Set up ChromaDB with Google Cloud Storage (GCS)
+# Define Google Cloud Storage bucket for ChromaDB storage and assign file path
+gcs_bucket_name = "retrieved_sec_filings"
+gcs_blob_prefix = "chromadb/sec_filings/"
+# Suppress debug or info level logs from ChromaDB
+logging.getLogger("chromadb").setLevel(logging.WARNING)
+# Define function to initialize ChromaDB in GCS
+def initialize_chromadb():
+    gcs_chromadb_path = f"gs://{gcs_bucket_name}/{gcs_blob_prefix}"  # GCS storage path
+    client = chromadb.PersistentClient(path=gcs_chromadb_path)  # Store ChromaDB in GCS
+    client.heartbeat()  # Check that the ChromaDB client is active and responsive
+    return client
+# Initialize ChromaDB client if it doesn't exist in session_state
+if "client" not in st.session_state:
+    st.session_state.client = initialize_chromadb()
+# Initialize collection if it doesn't exist in session_state
+if "collection" not in st.session_state:
+    st.session_state.collection = st.session_state.client.get_or_create_collection(name="SEC_Filings")
+#####################################################################################
 with tab4:
 #####################################################################################
     ## DEFINE FUNCTIONS ##
@@ -1167,35 +1186,12 @@ with tab4:
                     total_characters += len(section)
         return total_characters
 #####################################################################################
-    # Define functions to set up Google Cloud Storage (GCS)
-    # Define Google Cloud Storage bucket for ChromaDB storage
-    gcs_bucket_name = "retrieved_sec_filings"
-    gcs_blob_prefix = "chromadb/sec_filings/"
-    # Suppress debug or info level logs from ChromaDB
-    logging.getLogger("chromadb").setLevel(logging.WARNING)
-    # Define function to initialize ChromaDB in GCS
-    def initialize_chromadb():
-        """Initialize ChromaDB to use GCS as storage."""
-        gcs_path = f"/gcs/{gcs_bucket_name}/{gcs_blob_prefix}"  # GCS Fuse path
-        os.makedirs(gcs_path, exist_ok=True)  # Ensure the directory exists
-        client = chromadb.PersistentClient(path=gcs_path)  # Store ChromaDB in GCS
-        client.heartbeat() # checks that the ChromaDB client is active and responsive
-        return client  
-    # Initialize ChromaDB client if it doesn't exist in session_state
-    if "client" not in st.session_state:
-        st.session_state.client = initialize_chromadb()
-    # Initialize collection if it doesn't exist in session_state
-    if "collection" not in st.session_state:
-        st.session_state.collection = st.session_state.client.get_or_create_collection(name="SEC_Filings")
-#####################################################################################
     # Define a function to load documents, generate embeddings, and store for retrieval
     def process_filings(pdfs):
-        # Set up ChromaDB client in the temp directory
-        #client = initialize_chromadb()  # Persistent ChromaDB in GCS
-        #collection = client.get_or_create_collection(name="SEC_Filings") # create Chroma collection
+        # Reset ChromaDB before processing new filings to ensure a clean DB
+        st.session_state.client = initialize_chromadb()
+        st.session_state.collection = st.session_state.client.get_or_create_collection(name="SEC_Filings")
         
-        # Access the client and collection from session_state for use
-        client = st.session_state.client
         collection = st.session_state.collection
 
         # Clear existing data if exists before adding new documents
@@ -1228,7 +1224,7 @@ with tab4:
         time_warning.empty() # clear warning message upon completion
         load_status.empty() # clear status message upon completion
 
-        return collection, client
+        return collection, st.session_state.client
 #####################################################################################
     # Define a function to convert the ChromaDB document embedding collection into a vecorstore that can be used for retrieval
     from langchain.vectorstores import Chroma
