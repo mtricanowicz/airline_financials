@@ -1282,8 +1282,9 @@ with tab4:
 #####################################################################################
     ## OUTPUT/DISPLAY ##
     # Set content header
-    if st.session_state.tab4["llm_airline"] is not None and st.session_state.tab4["llm_year"] is not None and st.session_state.tab4["llm_period"] is not None:
-        st.header(f"Airline: {st.session_state.tab4["llm_airline"]} | Period: {st.session_state.tab4["llm_year"]}{st.session_state.tab4["llm_period"]}", divider='gray')
+    if st.session_state.get_insights==False and st.session_state.tab4["llm_airline"] is not None and st.session_state.tab4["llm_year"] is not None and st.session_state.tab4["llm_period"] is not None:
+        header_insights = st.empty()
+        header_insights.header(f"Airline: {st.session_state.tab4["llm_airline"]} | Period: {st.session_state.tab4["llm_year"]}{st.session_state.tab4["llm_period"]}", divider='gray')
     
     # Check if Get Insights button was clicked
     if st.session_state.get_insights:
@@ -1294,6 +1295,9 @@ with tab4:
         llm_period = st.session_state.tab4["llm_period"]
         llm_year = st.session_state.tab4["llm_year"]
         
+        # Set content header
+        header_insights.header(f"Airline: {llm_airline} | Period: {llm_year}{llm_period}", divider='gray')
+
         # If any filter selections were not made, prompt the user to complete the selections
         if llm_airline==None or llm_period==None or llm_year==None:
             st.error("Please make selections above to generate insights.", icon="🛑")
