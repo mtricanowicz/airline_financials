@@ -18,3 +18,4 @@ langchain-community
 langchain-chroma
 langchain-huggingface
 pypdf
+google-cloud-storage

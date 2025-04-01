@@ -19,10 +19,11 @@ import time
 from langchain_community.document_loaders import PyPDFLoader
 import logging
 import tempfile
+from google.cloud import storage
 # Correct sqlite3 version mismatch when deployed to Streamlit prior to importing ChromaDB libraries. Mismatch is between Streamlit and ChromaDB. 
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+#__import__('pysqlite3')
+#import sys
+#sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 import chromadb
 from chromadb.api.models.Collection import Collection
 
@@ -264,9 +265,9 @@ with tab1:
             with filter_col2:
                 st.session_state.selected_years = st.pills("Select Year(s) for Comparison", st.session_state.years, default=st.session_state.years, selection_mode="multi")
                 selected_years = st.session_state.tab1["selected_years"]
-            if not selected_years:
+            if not st.session_state.selected_years:
                 st.session_state.selected_years = st.session_state.years
-                selected_years=years # prevents empty set from triggering an error, displays all years if none are selected        
+                selected_years=st.session_state.tab1["years"] # prevents empty set from triggering an error, displays all years if none are selected        
             # Allow user to select quarters for comparison
             st.session_state.quarters = sorted(st.session_state.data["Quarter"].unique())
             quarters = sorted(data["Quarter"].unique())
@@ -274,11 +275,12 @@ with tab1:
                 if st.session_state.data_type == "Quarterly":
                     st.session_state.selected_quarters = st.pills("Select Quarter(s) for Comparison", st.session_state.quarters, default=st.session_state.quarters, selection_mode="multi")
                     selected_quarters = st.session_state.tab1["selected_quarters"]
-                    if not selected_quarters: # prevents empty set from triggering an error, displays all quarters if none are selected
-                        selected_quarters=quarters
+                    if not st.session_state.selected_quarters: # prevents empty set from triggering an error, displays all quarters if none are selected
+                        st.session_state.selected_quarters = st.session_state.quarters
+                        selected_quarters=st.session_state.tab1["quarters"]
                 elif st.session_state.data_type == "Full Year":
                     st.session_state.selected_quarters = st.session_state.quarters
-                    selected_quarters = quarters
+                    selected_quarters = st.session_state.tab1["quarters"]
         # Remove metrics from the data that do not have data for the chosen reporting period
         st.session_state.data = st.session_state.data.dropna(axis=1, how="all") # drop columns (metrics)
         data = data.dropna(axis=1, how="all") # drop columns (metrics)      
@@ -292,11 +294,11 @@ with tab1:
                 selected_airlines = st.session_state.tab1["selected_airlines"]
                 if not st.session_state.selected_airlines:
                     st.session_state.selected_airlines = [st.session_state.airlines[0]]
-                    selected_airlines = [airlines[0]] # prevents empty set from triggering an error, displays AAL if none are selected        
+                    selected_airlines = st.session_state.tab1["selected_airlines"] # prevents empty set from triggering an error, displays AAL if none are selected        
             # Allow user to select a base airline to compare others against
             with filter_col5:
                 if len(st.session_state.selected_airlines) > 1:
-                    st.session_state.compare_yes_no = st.pills("Would you like to compare selected airlines' metrics against one of the airlines?", options_yes_no, default="Yes")
+                    st.session_state.compare_yes_no = st.pills("Would you like to compare selected airlines' metrics against one of the airlines?", options_yes_no, default="Yes", selection_mode="single")
                     compare_yes_no = st.session_state.tab1["compare_yes_no"]
                     with filter_col6:
                         if (st.session_state.compare_yes_no=="Yes"):
@@ -306,7 +308,9 @@ with tab1:
                             st.session_state.base_airline = st.session_state.selected_airlines[0]
                             base_airline = st.session_state.tab1["selected_airlines"][0]
                 else:
+                    st.session_state.compare_yes_no = "No"
                     compare_yes_no = st.session_state.tab1["compare_yes_no"]
+                    st.session_state.base_airline = st.session_state.selected_airlines[0]
                     base_airline = st.session_state.tab1["selected_airlines"][0]        
         # Allow user to select metrics to compare with a "Select All" option
         available_metrics = data.columns.drop(["Year", "Quarter", "Airline", "Period"])
@@ -988,7 +992,7 @@ def update_tab4():
 #####################################################################################
 with tab4:
 #####################################################################################
-## DEFINE FUNCTIONS ##
+    ## DEFINE FUNCTIONS ##
 #####################################################################################
     # Set OpenAI API key
     openai.api_key = os.getenv("openai_key") # OpenAI API key call when deployed via Azure, Google Cloud Run, or other hosted platform
@@ -1163,23 +1167,26 @@ with tab4:
                     total_characters += len(section)
         return total_characters
 #####################################################################################
+    # Define functions to set up Google Cloud Storage (GCS)
+    # Define Google Cloud Storage bucket for ChromaDB storage
+    gcs_bucket_name = "retrieved_sec_filings"
+    gcs_blob_prefix = "chromadb/sec_filings/"
+    # Define function to initialize ChromaDB in GCS
+    def initialize_chromadb():
+        """Initialize ChromaDB to use GCS as storage."""
+        gcs_path = f"/gcs/{gcs_bucket_name}/{gcs_blob_prefix}"  # GCS Fuse path
+        os.makedirs(gcs_path, exist_ok=True)  # Ensure the directory exists
+        client = chromadb.PersistentClient(path=gcs_path)  # Store ChromaDB in GCS
+        client.heartbeat() # checks that the ChromaDB client is active and responsive
+        return client  
+#####################################################################################
     # Define a function to load documents, generate embeddings, and store for retrieval
-
-    # Suppress debug or info level logs from ChromaDB
-    logging.getLogger("chromadb").setLevel(logging.WARNING)
-
-    # Load PDFs and Extract Metadata
     def process_filings(pdfs):
-        # Set up ChromaDB elements with a temporary directory
-        
-        # Check if a temp directory already exists in the session, if not create on
-        if "chroma_temp_dir" not in st.session_state:
-            st.session_state.chroma_temp_dir = tempfile.TemporaryDirectory()
-        temp_dir = st.session_state.chroma_temp_dir.name  # Get temp dir path
+        # Suppress debug or info level logs from ChromaDB
+        logging.getLogger("chromadb").setLevel(logging.WARNING)
         
         # Set up ChromaDB client in the temp directory
-        client = chromadb.PersistentClient(path=temp_dir)  # Persistent ChromaDB (Disk)
-        client.heartbeat() # checks that the ChromaDB client is active and responsive
+        client = initialize_chromadb()  # Persistent ChromaDB in GCS
         collection = client.get_or_create_collection(name="SEC_Filings") # create Chroma collection
         
         # Clear existing data if exists before adding new documents
@@ -1187,7 +1194,7 @@ with tab4:
         if existing_ids:
             collection.delete(ids=existing_ids) 
         
-        #Load the PDF documents
+        #Load the PDF documents and extract metadata
         time_warning = st.empty() # initiate warning message that will be displayed during processing
         time_warning.warning("This process may take several minutes, please wait...", icon="⚠️")
         load_status = st.empty() # initiate status message that will be displayed during processing
@@ -1211,7 +1218,7 @@ with tab4:
         
         time_warning.empty() # clear warning message upon completion
         load_status.empty() # clear status message upon completion
-        
+
         return collection, client
 #####################################################################################
     # Define a function to convert the ChromaDB document embedding collection into a vecorstore that can be used for retrieval
