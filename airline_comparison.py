@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
@@ -1259,7 +1258,7 @@ with tab4:
         k=int(0.05*collection.count()) # choose the most relevant 5% of documents present within the retrieved filings
         retriever = get_retriever(collection, client, k)
         # Retrieve relevant SEC filings based on a natural language query.
-        docs = retriever.get_relevant_documents(query)
+        docs = retriever.invoke(query)
         return [doc.page_content for doc in docs]
 #####################################################################################
     # Define function to use the OpenAI API to generate insights based on the most relevant portions of the retrieved filings
