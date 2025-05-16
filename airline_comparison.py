@@ -18,11 +18,11 @@ import time
 from langchain_community.document_loaders import PyPDFLoader
 import logging
 import tempfile
-from google.cloud import storage
+#from google.cloud import storage
 # Correct sqlite3 version mismatch when deployed to Streamlit prior to importing ChromaDB libraries. Mismatch is between Streamlit and ChromaDB. 
-__import__('pysqlite3')
+#__import__('pysqlite3')
 import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+#sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 import chromadb
 from chromadb.api.models.Collection import Collection
 
@@ -1321,7 +1321,7 @@ with tab4:
             st.session_state.llm_period = st.pills("Select Period", llm_quarters, default=None, selection_mode="single")
         with llm_col3:
             # Select year
-            st.session_state.llm_year = st.pills("Select Year", years, default=None, selection_mode="single")
+            st.session_state.llm_year = st.pills("Select Year", sorted(airline_financials["Year"].unique()), default=None, selection_mode="single")
         # Set up a Get Insights button to prevent processing of documents unless button is clicked.
         def get_insights_button():
             st.session_state.get_insights = True
