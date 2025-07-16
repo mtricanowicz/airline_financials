@@ -793,10 +793,12 @@ if "tab3" not in st.session_state:
 with tab3:
 #####################################################################################
     ## FILTERING, CALCULATIONS, AND FUNCTIONS ##
-    # Define function to fetch most recent close prices of a set of tickers
     # Date variable to ensure most recent close date is used to fetch latest closing price of the airlines' stock
-    ticker_date = (datetime.now(pytz.timezone("America/New_York"))-timedelta(days=1)) if datetime.now(pytz.timezone("America/New_York")).hour<16 else datetime.now(pytz.timezone("America/New_York")) # set date for closing price (yesterday if market is still open else today) since yfinance's Close data is the latest price when the market is open
-    # Function
+    ticker_date = (
+        (datetime.now(pytz.timezone("America/New_York"))-timedelta(days=1)) if datetime.now(pytz.timezone("America/New_York")).hour<16 # set date for closing price: yesterday if market is still open
+        else datetime.now(pytz.timezone("America/New_York")) # set date for closing price: else today since yfinance's Close data is the latest price when the market is open
+    )
+    # Define function to fetch most recent close prices of a set of tickers
     def fetch_last_close_prices(tickers, ticker_date, max_retries=31):
         retries = 0
         while retries < max_retries: # continuing trying to pull close price for 31 days prior to current day if request doesn't return price data
@@ -821,6 +823,7 @@ with tab3:
                 return f"Error fetching stock price: {e}"
             retries += 1
         return "Error: Max attempts reached. Stock price history could not be retrieved"
+    # Record date that each airline resumed share repurchases (dates sourced from SEC filings)
     repurchase_resumption = {"AAL": None, "DAL": None, "UAL": datetime(2024, 10, 15)}
 #####################################################################################
     ## OUTPUT/DISPLAY ##
