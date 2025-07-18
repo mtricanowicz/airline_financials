@@ -465,7 +465,7 @@ with tab1:
                 comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
                 # Column reformatting steps
                 if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing"]:
-                    comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"{"-$" if x < 0 else "$"}{abs(x):,.0f}") # reformat currency columns to show $ sign
+                    comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"{'-$' if x < 0 else '$'}{abs(x):,.0f}") # reformat currency columns to show $ sign
                 elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
                     comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"{x:,.2f}\u00A2") # reformat unit currency columns to show cents sign
                 elif metric in ["Operating Margin", "Net Margin", "Load Factor"]:
@@ -575,14 +575,14 @@ with tab1:
                     st.plotly_chart(fig_bar)
     # Display a summary of the selected metrics for the selected airlines in the latest reporting period in the selected range
     with compare_tab2:
-        st.header(f"Summary of {max(filtered_data["Period"])} Metrics", divider='gray')
+        st.header(f"Summary of {max(filtered_data['Period'])} Metrics", divider='gray')
         st.write("NOTE: If multiple years and/or quarters are selected, this summary table shows for the last period in the range.")
         st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
         comparison_summary = comparison_df[comparison_df["Period"]==max(filtered_data["Period"])]
         # Column reformatting steps
         def format_value_based_on_metric(value, metric):
             if metric in ["Total Revenue (millions)", "Passenger Revenue (millions)", "Total Expenses (millions)", "Operating Income (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
-                return None if value==None else None if pd.isna(value) else f"{"-$" if value < 0 else "$"}{abs(value):,.0f}" if value.is_integer() else f"{"-$" if value < 0 else "$"}{abs(value):,.2f}" # reformat currency columns to show $ sign
+                return None if value==None else None if pd.isna(value) else f"{'-$' if value < 0 else '$'}{abs(value):,.0f}" if value.is_integer() else f"{'-$' if value < 0 else '$'}{abs(value):,.2f}" # reformat currency columns to show $ sign
             elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
                 return None if value==None else None if pd.isna(value) else f"{value:,.2f}\u00A2" # reformat unit currency columns to show cents sign
             elif metric in ["Operating Margin", "Net Margin", "Load Factor"]:
@@ -594,7 +594,7 @@ with tab1:
         comparison_summary = comparison_summary.set_index(["Metric", "Airline"], drop=True)
         comparison_summary = comparison_summary.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column
         comparison_summary = comparison_summary.drop(columns=["Period"]) # drop period column as the summary only covers a single period
-        comparison_summary = comparison_summary.rename(columns={"Value":f"{max(filtered_data["Period"])}"})
+        comparison_summary = comparison_summary.rename(columns={"Value":f"{max(filtered_data['Period'])}"})
         ordered_metrics = [item + " (millions)" if i < len(available_metrics)-7 else item for i, item in enumerate(available_metrics)]
         if len(selected_airlines) <= 1:
             comparison_summary = comparison_summary.drop(columns=f"vs {base_airline}") # do not display percent difference column if user chooses not to compare
@@ -696,7 +696,7 @@ with tab2:
     # Column reformatting steps
     def format_value_based_on_metric(value, metric):
         if metric in ["Total Revenue (millions)", "Passenger Revenue (millions)", "Total Expenses (millions)", "Operating Income (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
-            return "TBA" if value==None else "TBA" if pd.isna(value) else f"{"-$" if value < 0 else "$"}{abs(value):,.0f}" # reformat currency columns to show $ sign
+            return "TBA" if value==None else "TBA" if pd.isna(value) else f"{'-$' if value < 0 else '$'}{abs(value):,.0f}" # reformat currency columns to show $ sign
         elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
             return "TBA" if value==None else "TBA" if pd.isna(value) else f"{value:,.2f}\u00A2" # reformat unit currency columns to show cents sign
         elif metric in ["Operating Margin", "Net Margin", "Load Factor"]:
@@ -740,7 +740,7 @@ with tab2:
         data_transformed_df = data_transformed_df.set_index(["Metric", "Airline"], drop=True)
         data_transformed_df = data_transformed_df.rename(columns={"Percent Difference":f"vs {base_airline_2}"}) # rename percent difference column
         data_transformed_df = data_transformed_df.drop(columns=["Period"]) # drop period column as the summary only covers a single period
-        data_transformed_df = data_transformed_df.rename(columns={"Value":f"{max(data["Period"])}"})
+        data_transformed_df = data_transformed_df.rename(columns={"Value":f"{max(data['Period'])}"})
         if compare_yes_no_2=="Yes":
             data_transformed_df = data_transformed_df.unstack(level="Airline")
             data_transformed_df.columns = data_transformed_df.columns.swaplevel(0, 1)
@@ -759,11 +759,11 @@ with tab2:
 #####################################################################################
     ## OUTPUT/DISPLAY ##
     with summary_col1:
-        st.header(f"Most Recent Full Year: {max(summary_data_fy["Period"])}", divider='gray')
+        st.header(f"Most Recent Full Year: {max(summary_data_fy['Period'])}", divider='gray')
         summary_fy = data_transform(summary_data_fy)
         st.dataframe(summary_fy, width=1000, height=(len(summary_fy.index)+2)*35+3)
     with summary_col2:
-        st.header(f"Most Recent Quarter: {max(summary_data_q["Period"])}", divider='gray')
+        st.header(f"Most Recent Quarter: {max(summary_data_q['Period'])}", divider='gray')
         summary_q = data_transform(summary_data_q)
         st.dataframe(summary_q, width=1000, height=(len(summary_q.index)+2)*35+3)
     # Reset the apply_filters state to False and rerun count to 0 until the Apply Filters button is clicked again    
@@ -873,7 +873,13 @@ with tab3:
                 else:
                     repurchase_net_value = (((total_average_share_sale[airline]-total_average_share_cost[airline])*(total_shares_sale[airline]))+((close_value-total_average_share_cost[airline])*(total_shares_repurchase[airline]-total_shares_sale[airline])))/1000
                     repurchase_net_color = "green" if round(repurchase_net_value, 1)>0 else "red" if round(repurchase_net_value, 1)<0 else "black"
-                    repurchase_net_display = f"<p style='margin-bottom:0;'><h3 style='color:{repurchase_net_color};'>{f"{'-$' if round(repurchase_net_value, 1)<0 else '$'}{abs(repurchase_net_value):,.1f} billion {"&nbsp;"*10} {"🔥💰🔥" if round(repurchase_net_value, 1)<0 else "🤷" if round(repurchase_net_value, 1)==0 else "💸" if (repurchase_net_value/total_cost_repurchase[airline]/1000)<0.5 else "💸💸" if (repurchase_net_value/total_cost_repurchase[airline]/1000)<=1 else "💸💸💸"}"}</h3></p>"
+                    repurchase_net_display = (
+                        f"<p style='margin-bottom:0;'>"
+                        f"<h3 style='color:{repurchase_net_color};'>"
+                        f"{'-$' if round(repurchase_net_value, 1)<0 else '$'}{abs(repurchase_net_value):,.1f} billion {'&nbsp;'*10} {'🔥💰🔥' if round(repurchase_net_value, 1)<0 else '🤷' if round(repurchase_net_value, 1)==0 else '💸' if (repurchase_net_value/total_cost_repurchase[airline]/1000)<0.5 else '💸💸' if (repurchase_net_value/total_cost_repurchase[airline]/1000)<=1 else '💸💸💸'}"
+                        f"</h3>"
+                        f"</p>"
+                    )
                     st.markdown(repurchase_net_display, unsafe_allow_html=True)
         # Historical repurchase data for viewing
         with col4:
@@ -1117,7 +1123,7 @@ with tab4:
                         filing_link = link["href"]
                         break  # Stop checking once we find the correct link         
                 if filing_link:
-                    full_filing_link = f"{doc_base_url.rsplit("/", 1)[0]}{filing_link}"  # Convert to absolute URL
+                    full_filing_link = f"{doc_base_url.rsplit('/', 1)[0]}{filing_link}"  # Convert to absolute URL
 
                 # If the filing date is within the range, retrieve the document link. If document is before start date, end scraping. Otherwise, skip document link and continue scraping.
                 if start_date <= filing_date <= end_date and filing_group_text in target_filings:
@@ -1334,7 +1340,7 @@ with tab4:
     # Set content header
     header_insights = st.empty()
     if st.session_state.get_insights==False and st.session_state.tab4["llm_airline"] is not None and st.session_state.tab4["llm_year"] is not None and st.session_state.tab4["llm_period"] is not None:
-        header_insights.header(f"Airline: {st.session_state.tab4["llm_airline"]} | Period: {st.session_state.tab4["llm_year"]}{st.session_state.tab4["llm_period"]}", divider='gray')
+        header_insights.header(f"Airline: {st.session_state.tab4['llm_airline']} | Period: {st.session_state.tab4['llm_year']}{st.session_state.tab4['llm_period']}", divider='gray')
     
     # Check if Get Insights button was clicked
     if st.session_state.get_insights:
