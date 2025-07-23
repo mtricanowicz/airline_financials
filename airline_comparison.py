@@ -819,7 +819,7 @@ with tab3:
         retries = 0
         while retries < max_retries: # continuing trying to pull close price for 31 days prior to current day if request doesn't return price data
             try:
-                close_prices = yf.Tickers(tickers).history(period="1d", start=ticker_date, end=ticker_date)["Close"]
+                close_prices = yf.download(tickers, start=ticker_date, end=ticker_date, progress=False)["Close"]
                 if not close_prices.empty:  # Check if no data was returned
                     return close_prices # if data fetched return the close prices
                 ticker_date -= timedelta(days=1) # otherwise go back one day and try again (intended to deal with days the market isn't open when yfinance seems to have no price data)
@@ -832,7 +832,7 @@ with tab3:
         retries = 0
         while retries < max_retries:
             try:
-                close_history = yf.Tickers(tickers).history(period="1d", start=start_date, end=end_date)["Close"]
+                close_history = yf.download(tickers, interval="1d", start=start_date, end=end_date, progress=False)["Close"]
                 if not close_history.empty:  # Check if no data was returned
                     return close_history # if data fetched return the close prices
             except Exception as e: # Handle exceptions and return an error message
