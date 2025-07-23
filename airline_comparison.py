@@ -18,13 +18,8 @@ import time
 from langchain_community.document_loaders import PyPDFLoader
 import logging
 import tempfile
-#from google.cloud import storage
-# Correct sqlite3 version mismatch when deployed to Streamlit prior to importing ChromaDB libraries. Mismatch is between Streamlit and ChromaDB. 
-#__import__('pysqlite3')
 import sys
-#sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-import chromadb
-from chromadb.api.models.Collection import Collection
+import json
 
 # Set custom page configuration including the "About" section
 st.set_page_config(
@@ -40,7 +35,7 @@ st.set_page_config(
         The Filtered Comparisons tab provides customizable views of airline financials. Several metrics can be selected for evaluation over chosen reporting periods.\n
         The Latest Results tab gives a summary of the most recent annual and quarterly results for easy viewing.\n
         The Share Repurchases tab contains a high level overview of the share buyback programs by the three major legacy airilnes (AAL, DAL, UAL) that were carried out in the 2010s and ended with the onset of the Covid-19 pandemic.\n
-        The Insights tab delivers financial, operational, and commercial insights based on the airilne's SEC filings. User selections prompt retrieval of content for a particular airline and time period with summarization provided by ChatGPT.\n
+        The Insights tab delivers financial, operational, and commercial insights based on the airilne's SEC filings. User selections prompt retrieval of content for a particular airline and time period with summarization provided by an OpenAI LLM.\n
         Unless otherwise noted, all metrics are either sourced or calculated from data given in the 10-Q (quarterly filing), 8-K (current report), and 10-K (annual filing) forms reported to the SEC and available on the airlines' investor relations sites linked below.\n
         [AAL](https://americanairlines.gcs-web.com/) | [DAL](https://ir.delta.com/) | [UAL](https://ir.united.com/) | [LUV](https://www.southwestairlinesinvestorrelations.com/)\n
         **Created by:** Michael Tricanowicz
@@ -49,7 +44,19 @@ st.set_page_config(
 )
 
 # Dashboard title
-st.title("Explore US Airline Financial Performance")
+st.markdown(
+    """
+    <h1>
+        Airline Financial Dashboard
+        <img src="https://img.icons8.com/ios-filled/50/airplane-tail-fin.png"
+            alt="airplane-tail-fin"
+            style="vertical-align:top; margin-left: 10px"
+            width="50" height="50">
+    </h1>
+    """,
+    unsafe_allow_html=True
+)
+st.subheader("Explore US Airline Financial Performance")
 
 # CUSTOM CSS ADDITIONS
 # Custom CSS to change tab header size
@@ -119,6 +126,15 @@ airline_colors = {
     "UAL": "#005daa",
     "ALK": "#00385f",
     "LUV": "#f9b612"
+}
+
+# Dictionary to cross reference airline tickers with full names
+airline_names = {
+    "AAL": "American Airlines",
+    "DAL": "Delta Air Lines",
+    "UAL": "United Airlines",
+    "ALK": "Alaska Airlines",
+    "LUV": "Southwest Airlines"
 }
 
 #####################################################################################
@@ -191,7 +207,7 @@ options_yes_no = ["Yes", "No"]
 
 # Create tabs
 # Define top level tabs
-tab1, tab2, tab3, tab4 = st.tabs(["Filtered Comparisons", "Latest Results", "Share Repurchases", "Insights"])
+tab1, tab2, tab3, tab4 = st.tabs(["Filtered Comparisons :material/finance_mode:", "Latest Results :material/calendar_today:", "Share Repurchases :material/paid:", "Insights :material/emoji_objects:"])
 
 #####################################################################################
 #####################################################################################
@@ -245,7 +261,7 @@ with tab1:
     with st.expander("Expand to Set Filters", expanded=False):
         # Allow user to select time periods for comparison
         with st.container(border=True):
-            filter_col1, filter_col2, filter_col3 = st.columns(3)
+            filter_col1, filter_col2, filter_col3 = st.columns([1, 2, 1])
             # Allow users to select full-year or quarterly data
             with filter_col1:
                 st.session_state.data_type = st.pills("View Full Year or Quarterly Data?", ["Full Year", "Quarterly"], default="Full Year")
@@ -287,7 +303,7 @@ with tab1:
         st.session_state.airlines = st.session_state.data["Airline"].unique()
         airlines = data["Airline"].unique()
         with st.container(border=True):
-            filter_col4, filter_col5, filter_col6 = st.columns(3)
+            filter_col4, filter_col5, filter_col6 = st.columns([1, 2, 1])
             with filter_col4:
                 st.session_state.selected_airlines = st.pills("Select Airline(s) for Comparison", st.session_state.airlines, default=["AAL", "DAL", "UAL"], selection_mode="multi")
                 selected_airlines = st.session_state.tab1["selected_airlines"]
@@ -316,7 +332,7 @@ with tab1:
         st.session_state.available_metrics = st.session_state.data.columns.drop(["Year", "Quarter", "Airline", "Period"])
         metric_groups = ["All", "Earnings", "Unit Performance", "Custom"]
         with st.container(border=True):
-            filter_col7, filter_col8 = st.columns([1, 2])
+            filter_col7, filter_col8 = st.columns([1, 3])
             # Provide preselected groups of metrics and allow user to customize selection
             with filter_col7:
                 st.session_state.metric_group_select = st.pills("Select Metrics for Comparison:", metric_groups, default="All")
@@ -430,7 +446,7 @@ with tab1:
     #st.dataframe(comparison_df.set_index(["Period", "Airline"]).sort_values(by=["Period", "Metric", "Airline"], ascending=True))
 #####################################################################################
     ## OUTPUT/DISPLAY ##
-    compare_tab1, compare_tab2 = st.tabs(["Metrics over Time", "Single Period"])
+    compare_tab1, compare_tab2 = st.tabs(["Metrics over Time :material/finance_mode:", "Single Period :material/table:"])
     # Display comparisons for metrics over time
     with compare_tab1:
         for metric in selected_metrics:
@@ -869,7 +885,7 @@ with tab3:
                 if isinstance(close_value, str):
                     repurchase_net_value = close_value
                     repurchase_net_display = repurchase_net_value
-                    st.warning(repurchase_net_display, icon="⚠️")
+                    st.warning(repurchase_net_display, icon=":material/warning:")
                 else:
                     repurchase_net_value = (((total_average_share_sale[airline]-total_average_share_cost[airline])*(total_shares_sale[airline]))+((close_value-total_average_share_cost[airline])*(total_shares_repurchase[airline]-total_shares_sale[airline])))/1000
                     repurchase_net_color = "green" if round(repurchase_net_value, 1)>0 else "red" if round(repurchase_net_value, 1)<0 else "black"
@@ -905,7 +921,7 @@ with tab3:
                     )
                 else:
                     gain[airline] = pd.Series()  # Assign an empty series to avoid breaking code
-                    st.warning(ticker_since_covid + f" for {airline}.", icon="⚠️") # Display error message
+                    st.warning(ticker_since_covid + f" for {airline}.", icon=":material/warning:") # Display error message
             if gain.empty:
                 gain_melt = pd.DataFrame(columns=["Date", "Airline", "Gain"]) # Assign empty plotting dataframe to avoid breaking code
             else:
@@ -1000,38 +1016,15 @@ def update_tab4():
     st.session_state.tab4["llm_period"] = st.session_state.llm_period
     st.session_state.tab4["llm_year"] = st.session_state.llm_year
 #####################################################################################
-# Set up ChromaDB with Google Cloud Storage (GCS)
-# Define Google Cloud Storage bucket for ChromaDB storage and assign file path
-#gcs_bucket_name = "retrieved_sec_filings"
-#gcs_blob_prefix = "chromadb/sec_filings/"
-# Define function to initialize ChromaDB in GCS
-#def initialize_chromadb():
-#    gcs_chromadb_path = f"gs://{gcs_bucket_name}/{gcs_blob_prefix}"  # GCS storage path
-#    client = chromadb.PersistentClient(path=gcs_chromadb_path)  # Store ChromaDB in GCS
-#    client.heartbeat()  # Check that the ChromaDB client is active and responsive
-#    return client
-#####################################################################################
-# Set up ChromaDB with local temp file
-# Define function to initialize ChromaDB in a local temporary directory
-def initialize_chromadb():
-    # Check if a temp directory already exists in the session, if not create on
-    if "chroma_temp_dir" not in st.session_state:
-        st.session_state.chroma_temp_dir = tempfile.TemporaryDirectory()
-    temp_dir = st.session_state.chroma_temp_dir.name  # Get temp dir path
-    client = chromadb.PersistentClient(path=temp_dir)  # ChromaDB client in the temp directory
-    client.heartbeat() # checks that the ChromaDB client is active and responsive
-    return client
-#####################################################################################
-# Suppress debug or info level logs from ChromaDB
-logging.getLogger("chromadb").setLevel(logging.WARNING)
-# Initialize ChromaDB client if it doesn't exist in session_state
-if "client" not in st.session_state:
-    st.session_state.client = initialize_chromadb()
-# Initialize collection if it doesn't exist in session_state
-if "collection" not in st.session_state:
-    st.session_state.collection = st.session_state.client.get_or_create_collection(name="SEC_Filings")
-#####################################################################################
 with tab4:
+#####################################################################################
+    ## IMPORT DATA ##
+#####################################################################################
+    # Import the dictionary of summaries scraped and generated from airline SEC filings
+    # Summaries currently stored for AAL and UAL
+    json_file = "airline_financials_summaries.json"
+    with open(json_file, "r", encoding="utf-8") as f:
+        summaries = json.load(f)
 #####################################################################################
     ## DEFINE FUNCTIONS ##
 #####################################################################################
@@ -1083,264 +1076,32 @@ with tab4:
         
         return start_date, end_date
 #####################################################################################
-    # Define function to extract document links from a page and filter by date
-    def extract_filing_links(url, doc_base_url, container, container_class, filing_group_class, start_date, end_date, reached_start_date):
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, "html.parser")
-            
-        # Find the table containing the document links and their filing dates
-        table = soup.find(container, {"class": container_class})  # Identify table element on page where document entries and links are stored
-        rows = table.find_all("tr") # Identify all rows, where each row is a document entry with a filing date and html link
-        page_links = [] # Initiate the document container list
-        skip_count = 0 # Initiate a counter for number of documents skipped during scraping
-        retrieved_count = 0 # Initiate a counter for number of documents retrieved during scraping
-        target_filings = {"8-K", "10-K", "10-Q"} # Limit documents to main reports to minimize the amount of text retrieved
-        
-        for row in rows:
-            # Extract the date and link from each row
-            time_element = row.find("time", class_="datetime")  # Find <time> element with the class "datetime"
-            filing_group = row.find("td", class_ = filing_group_class) # Find the Filing Group column
-            links = row.find_all("a", href=True) # Find the document link element
-            
-            if time_element and filing_group and links:
-                # Extract the filing date from the "datetime" attribute of the document table
-                filing_date_str = time_element["datetime"]  # Get the full date string (e.g., "2024-11-19T05:00:00Z")      
-                try:
-                    # Parse the filing date (from datetime attribute)
-                    filing_date = datetime.strptime(filing_date_str, "%Y-%m-%dT%H:%M:%SZ")  # Parse full datetime
-                except ValueError:
-                    continue  # Skip if the date format is invalid
-
-                # Extract Filing Group text from the filing_group attribute of the document table
-                filing_group_div = filing_group.find("a") 
-                filing_group_text = filing_group_div.get_text(strip=True) if filing_group_div else ""
-
-                # Find the correct link in the row for the html version of the document (matching "/node/#####/html")
-                filing_link = None
-                doc_term = doc_base_url.rsplit("/", 1)[-1]
-                for link in links:
-                    if re.match(f"^/{doc_term}/", link["href"]):
-                        filing_link = link["href"]
-                        break  # Stop checking once we find the correct link         
-                if filing_link:
-                    full_filing_link = f"{doc_base_url.rsplit('/', 1)[0]}{filing_link}"  # Convert to absolute URL
-
-                # If the filing date is within the range, retrieve the document link. If document is before start date, end scraping. Otherwise, skip document link and continue scraping.
-                if start_date <= filing_date <= end_date and filing_group_text in target_filings:
-                    reached_start_date=False
-                    retrieved_count += 1 # increment count when a document is retrieved
-                    page_links.append(full_filing_link) # add link to list
-                elif start_date <= filing_date <= end_date and filing_group_text not in target_filings:
-                    reached_start_date=False
-                    skip_count +=1 # increment count when a document is skipped
-                elif filing_date < start_date:
-                    reached_start_date=True
-                    break # End loop once beyond oldest document
-                else:
-                    reached_start_date=False
-                    skip_count +=1 # increment count when a document is skipped
-        
-        return page_links, reached_start_date
-#####################################################################################
-    # Define function to extract and scrape pages with date filtering
-    def scrape_filing_pages(airline, year, period, sec_filings_url, doc_base_url, container, container_class, filing_group_class):
-        if airline not in ["AAL", "UAL"]:
-            st.write(f"Cannot scrape filings for {airline}.")
-            return
-        
-        else:
-            # Set up pass through variables
-            current_url = sec_filings_url[airline]
-            doc_base_url = doc_base_url[airline]
-            container = container[airline]
-            container_class = container_class[airline]
-            filing_group_class = filing_group_class[airline]
-            all_links = []
-            
-            # Define start and end dates
-            start_date, end_date = define_period_dates(year, period)
-            
-            # Initialize reached_start_date
-            reached_start_date=False
-            
-            while current_url:
-                
-                # Print messages when testing function operation
-                status_text = st.empty()
-                status_text.write(f"Scraping page: {current_url}")
-                
-                # Extract links from the current page with date filtering
-                page_links, reached_start_date = extract_filing_links(current_url, doc_base_url, container, container_class, filing_group_class, start_date, end_date, reached_start_date)
-                all_links.extend(page_links)
-                
-                # Find the "Next" button to continue paging
-                response = requests.get(current_url)
-                soup = BeautifulSoup(response.text, "html.parser")
-                next_button = soup.find("a", href=True, rel="next")
-                if next_button:
-                    # Construct the next page URL
-                    next_page = next_button['href']
-                    current_url = f"{sec_filings_url[airline]}{next_page}"  # Complete the URL
-                else:
-                    # No "Next" button, stop paging
-                    st.write("No next page found, ending scrape.")
-                    current_url = None
-                
-                # Break loop once start date is reached
-                if reached_start_date==True:
-                    break
-                status_text.empty()
-            status_text.empty()        
-
-            # Display links to filings retrieved
-            with st.popover(f"\nRetrieved {len(all_links)} filing documents for the time period:"):
-                for link in all_links:
-                    st.write(link)
-            
-            return all_links
-#####################################################################################
-    # Define a function to count to characters across all documents in the filings
-    def character_count(filings):
-        total_characters = 0
-        for filing in filings:
-            for document in filing:
-                for section in document:
-                    total_characters += len(section)
-        return total_characters
-#####################################################################################
-    # Define a function to load documents, generate embeddings, and store for retrieval
-    def process_filings(pdfs):
-        # Reset ChromaDB before processing new filings to ensure a clean DB
-        st.session_state.client = initialize_chromadb()
-        st.session_state.collection = st.session_state.client.get_or_create_collection(name="SEC_Filings")
-        
-        collection = st.session_state.collection
-
-        # Clear existing data if exists before adding new documents
-        existing_ids = collection.get()["ids"]
-        if existing_ids:
-            collection.delete(ids=existing_ids) 
-        
-        #Load the PDF documents and extract metadata
-        time_warning = st.empty() # initiate warning message that will be displayed during processing
-        time_warning.warning("This process may take several minutes, please wait...", icon="⚠️")
-        load_status = st.empty() # initiate status message that will be displayed during processing
-        pdf_counter = 0 # initialize the document counter
-        for pdf in pdfs:
-            loader = PyPDFLoader(pdf)
-            documents = loader.load()
-        
-            # Extract document text and metadata
-            for doc in documents:
-                load_status.write(f"Processing {doc.metadata.get('title', '')}-page-{doc.metadata.get('page_label', 'Unknown')} from filing {pdf_counter+1} of {len(pdfs)}.")
-                text = doc.page_content
-                metadata = doc.metadata
-                # Store in the ChromaDB with embeddings
-                collection.add(
-                    documents=[text],
-                    metadatas=[metadata],
-                    ids=[f"{doc.metadata.get('title', f'Filing {pdf_counter+1} of {len(pdfs)}')}-page-{doc.metadata.get('page_label', 'Unknown')}"]
-                )
-            pdf_counter += 1 # increment the document counter
-        
-        time_warning.empty() # clear warning message upon completion
-        load_status.empty() # clear status message upon completion
-
-        return collection, st.session_state.client
-#####################################################################################
-    # Define a function to convert the ChromaDB document embedding collection into a vecorstore that can be used for retrieval
-    from langchain.vectorstores import Chroma
-    from langchain_huggingface import HuggingFaceEmbeddings
-
-    def get_retriever(collection, client, k):
-        # Use all-MiniLM-L6-v2 as the embedding model since that is the default embedding for ChromaDB and was used to create the collection embeddings
-        embedding_function = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-        # Wrap previously created ChromaDB in a retriever
-        vectorstore = Chroma(
-            client=client,  # Use existing ChromaDB client
-            collection_name=collection.name,  # Reference stored collection
-            embedding_function=embedding_function  # Use previously defined embedding function
-        )
-        return vectorstore.as_retriever(search_kwargs={"k": k})  # Retrieve top 5% results
-#####################################################################################
-    # Define a function to retrieve relevant documents related to the objective of summarizing the period financial results
-    def retrieve_relevant_filings(query, collection, client):
-        k=int(0.05*collection.count()) # choose the most relevant 5% of documents present within the retrieved filings
-        retriever = get_retriever(collection, client, k)
-        # Retrieve relevant SEC filings based on a natural language query.
-        docs = retriever.invoke(query)
-        return [doc.page_content for doc in docs]
-#####################################################################################
-    # Define function to use the OpenAI API to generate insights based on the most relevant portions of the retrieved filings
-    def summarize_sec_filings(airline, year, period, collection, client):
-        # Using the retrieved relevant portions of the period's SEC filings, summarize key results using OpenAI GPT.
-        # Define overall query to guide relevant document retrieval and summarization
-        query = f"{airline} {year}{period} financial and operational highlights."
-        # Retrieve relevant documents
-        relevant_docs = retrieve_relevant_filings(query, collection, client)
-        # Combine into a single string
-        context = "\n\n".join(relevant_docs)
-        context = context  # add truncation if needed to limit tokens passed to the API
-
-        # Define the summarization prompt
-        prompt = f"""
-        You are an expert financial analyst summarizing SEC filings for {airline} from {year}{period}.
-        Below are relevant filings for the query: {query}
-
-        {context}
-
-        Analyze all SEC filings , including all 10-Q, 10-K, 8-K filings, annual reports, and other filings. 
-        Provide the top insights for the year and period specified. Focus on the data from {year}{period} and ignore discussion of previous periods unless it provides meaningful context for current results. Provide up to 10 insights. Insights should be related to key developments in the following areas: financial, operational, commercial stratgy, labor, executive personnel, and route network. Do NOT include a topic if there is no relevant data or if there is nothing meaningful to report.
-        Do NOT under any circumstances fabricate names, dates, or numerical figures. Ensure the values are present in the underlying data. A fabrication is content not present in the SEC filings including but not limited to any mention of 'John Doe' or 'Jane Doe'.
-        Be sure to highlight any major events and their impacts and provide additional context. 
-        Format the response in a structured list format grouped by topic. Present insights in chronological order as best as possible. Length of each item should fully detail the insight while being easy to read and digest. Include relevant names when discussing personnel matters. Include accurate figures when discussing financial or other metrics.
-        End the response with a single paragraph "Wrap Up".
-        """
-
-        # Send request to OpenAI GPT
-        response = openai.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are an expert financial analyst summarizing SEC filings and presenting them for public consumption. Accuracy is paramount, but you should provide interesting and revelatory insights. Language and style should be a cross between an investment analyst report and business media reporting."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.3
-        )
-
-        return response.choices[0].message.content
-#####################################################################################
-    # Define source URLs aand html elements for locating the SEC filings
-    sec_filings_url = {"AAL": "https://americanairlines.gcs-web.com/sec-filings", "DAL": "https://ir.delta.com/financials/default.aspx#sec", "UAL": "https://ir.united.com/financial-performance/sec-filings"}
-    html_doc_base_url = {"AAL": "https://americanairlines.gcs-web.com/node", "DAL": "https://d18rn0p25nwr6d.cloudfront.net/CIK-0000027904", "UAL": "https://ir.united.com/node"}
-    pdf_doc_base_url = {"AAL": "https://americanairlines.gcs-web.com/static-files", "DAL": None, "UAL": "https://ir.united.com/static-files"}
-    container = {"AAL": "table", "DAL": "div", "UAL": "table"}
-    container_class = {"AAL": "nirtable", "DAL": "module-container", "UAL": "nirtable"}
-    filing_group_class = {"AAL": "views-field views-field-field-nir-sec-form", "DAL": None, "UAL": "views-field views-field-field-nir-sec-form"}
-#####################################################################################
     ## USER INPUTS ##
+#####################################################################################
     with st.expander("Select an airline, period, and year to see the top insights.", expanded=True):
-        st.info("Insights for DAL (Delta Air Lines) and LUV (Southwest Airlines) are limited to 2023Q3 or earlier due to ChatGPT's training data cutoff date of October 2023. There is no limitation for AAL (American Airlines) or UAL (United Airlines) as this feature sources from the SEC filings directly.", icon="ℹ️")
-        llm_col1, llm_col2, llm_col3 = st.columns([1, 1, 2])
+        st.info("Insights for DAL (Delta Air Lines) and LUV (Southwest Airlines) are limited to 2023Q3 or earlier due to ChatGPT's training data cutoff date of October 2023. There is no limitation for AAL (American Airlines) or UAL (United Airlines) as this feature sources from the SEC filings directly.", icon=":material/info:")
+        llm_col1, llm_col2, llm_col3 = st.columns([1, 2, 1])
         with llm_col1:
             # Select airline
             st.session_state.llm_airline = st.pills("Select Airline", airlines, default=None, selection_mode="single")
         with llm_col2:
+            # Select year
+            st.session_state.llm_year = st.pills("Select Year", sorted(airline_financials["Year"].unique()), default=None, selection_mode="single")
+        with llm_col3:
             # Select period(s)
             llm_quarters = sorted(airline_financials["Quarter"].unique())
             st.session_state.llm_period = st.pills("Select Period", llm_quarters, default=None, selection_mode="single")
-        with llm_col3:
-            # Select year
-            st.session_state.llm_year = st.pills("Select Year", sorted(airline_financials["Year"].unique()), default=None, selection_mode="single")
         # Set up a Get Insights button to prevent processing of documents unless button is clicked.
         def get_insights_button():
             st.session_state.get_insights = True
         st.button("Get Insights", type="primary", on_click=get_insights_button)
 #####################################################################################
     ## OUTPUT/DISPLAY ##
+#####################################################################################
     # Set content header
     header_insights = st.empty()
     if st.session_state.get_insights==False and st.session_state.tab4["llm_airline"] is not None and st.session_state.tab4["llm_year"] is not None and st.session_state.tab4["llm_period"] is not None:
-        header_insights.header(f"Airline: {st.session_state.tab4['llm_airline']} | Period: {st.session_state.tab4['llm_year']}{st.session_state.tab4['llm_period']}", divider='gray')
+        header_insights.header(f"Insights for {st.session_state.tab4['llm_airline']} ({airline_names[st.session_state.tab4['llm_airline']]}) | {st.session_state.tab4['llm_year']}{st.session_state.tab4['llm_period']}", divider='gray')
     
     # Check if Get Insights button was clicked
     if st.session_state.get_insights:
@@ -1350,56 +1111,39 @@ with tab4:
         llm_airline = st.session_state.tab4["llm_airline"]
         llm_period = st.session_state.tab4["llm_period"]
         llm_year = st.session_state.tab4["llm_year"]
-        
+
         # If any filter selections were not made, prompt the user to complete the selections
         if llm_airline==None or llm_period==None or llm_year==None:
             header_insights.empty()
-            st.error("Please complete selections above to generate insights.", icon="🛑")
+            st.error("Please complete selections above to generate insights.", icon=":material/report:")
         
-        # Document retrieval and summarization currently only works for AAL and UAL. If other airlines are selected revert to a general query to the ChatGPT API for responses from training data
-        elif llm_airline not in ["AAL", "UAL"]:
-            header_insights.header(f"Airline: {llm_airline} | Period: {llm_year}{llm_period}", divider='gray')
-            # Generate the summary by passing the call to ChatGPT
-            if llm_year>2023 or (llm_period=="Q4" and llm_year==2023):
-                st.error(f"""
-                Cannot provide summary for {llm_year}{llm_period}. ChatGPT's training data cuts off in October 2023.\n
-                Please make a different selection.
-                """, icon="🛑")
-            else:
-                st.warning("This summary is generated by ChatGPT from its training data. Accuracy cannot be guaranteed.", icon="⚠️")
-                with st.spinner(f"Retrieving {llm_year}{llm_period} insights about {llm_airline}...", show_time=True):
-                    summary = get_sec_filings_summary(llm_airline, llm_year, llm_period)
-                # Store the summary to session state variable
-                st.session_state.tab4["summary"] = summary
-        
-        # Execute retrieval and summarization of SEC filings for more accurate and relevant insights
         else:
-            header_insights.header(f"Airline: {llm_airline} | Period: {llm_year}{llm_period}", divider='gray')
-            st.info("Insights are sourced from the SEC filings directly and summarized by ChatGPT.", icon="ℹ️")
-            with st.status(f"Fetching {llm_year}{llm_period} SEC filings for {llm_airline}...", expanded=True) as status:
-                # Retrieve links to the pdf documents of the relevant filings
-                filing_links = scrape_filing_pages(llm_airline, llm_year, llm_period, sec_filings_url, pdf_doc_base_url, container, container_class, filing_group_class)
-                # Load and embed documents from filing links
-                status.update(label=f"Found {len(filing_links)} document links. Processing the documents...") # display status update
-                with st.spinner(text="Loading documents...", show_time=True):
-                    start_processing_time = time.time()
-                    filing_collection, client = process_filings(filing_links)
-                    elapsed_processing_time = time.time() - start_processing_time
-                if isinstance(filing_collection, Collection):
-                    # Count tokens retrieved
-                    status.update(label=f"{filing_collection.count()} documents processed and stored. Counting the characters...") # display status update
-                    collection_character_count = character_count(filing_collection.get(include=["documents"])["documents"])
+            # Define the start and end dates for the selected period
+            selection_start_date, selection_end_date = define_period_dates(llm_year, llm_period)
+            if selection_start_date > datetime.today():
+                header_insights.header(f"Insights for {llm_airline} ({airline_names[llm_airline]}) | {llm_year}{llm_period}", divider='gray')
+                st.error("The selected period has not yet occurred. No summary is available. Please make another selection.", icon=":material/report:")
+
+            # Document retrieval and summarization currently only works for AAL and UAL. If other airlines are selected revert to a general query to the ChatGPT API for responses from training data
+            elif llm_airline not in ["AAL", "UAL"]:
+                header_insights.header(f"Insights for {llm_airline} ({airline_names[llm_airline]}) | {llm_year}{llm_period}", divider='gray')
+                # Generate the summary by passing the call to ChatGPT
+                if llm_year>2024 or (llm_period=="Q3" and llm_year==2024) or (llm_period=="Q4" and llm_year==2024):
+                    st.error(f"Cannot provide summary for {llm_year}{llm_period}. ChatGPT's training data cuts off in June 2024. Please make a different selection.", icon=":material/report:")
+                    summary = None
+                    st.session_state.tab4["summary"] = summary
                 else:
-                    status.update(label=f"An error occurred: {filing_collection}", state="error") # display error message
-                status.update(label="Generating insights")
-                st.success(f"Processed {len(filing_links)} filings with {collection_character_count:,} characters. Processing documents took {int(elapsed_processing_time//60)} {'minute' if 1<=int(elapsed_processing_time//60)<2 else 'minutes'} {elapsed_processing_time%60:.1f} seconds.") # display success message upon processing filings and counting characters
-                with st.spinner(text="Generating insights...", show_time=True):
-                    start_summary_time = time.time()
-                    summary = summarize_sec_filings(llm_airline, llm_year, llm_period, filing_collection, client)
-                    elapsed_summary_time = time.time() - start_summary_time
-                st.success(f"Summarization complete in {int(elapsed_summary_time//60)} {'minute' if 1<=int(elapsed_summary_time//60)<2 else 'minutes'} {elapsed_summary_time%60:.1f} seconds.") # display success message upon processing filings and counting tokens                
-                status.update(label=f"Processing complete for {llm_airline} {llm_year}{llm_period} filings.", state="complete", expanded=False) # display completion message and collapse status container
-                # Store the summary to session state variable
+                    st.warning("This summary is generated by ChatGPT from its training data. Accuracy cannot be guaranteed.", icon=":material/warning:")
+                    with st.spinner(f"Retrieving {llm_year}{llm_period} insights about {llm_airline}...", show_time=True):
+                        summary = get_sec_filings_summary(llm_airline, llm_year, llm_period)
+                    # Store the summary to session state variable
+                    st.session_state.tab4["summary"] = summary
+            
+            # Execute retrieval and summarization of SEC filings for more accurate and relevant insights
+            else:
+                header_insights.header(f"Insights for {llm_airline} ({airline_names[llm_airline]}) | {llm_year}{llm_period}", divider='gray')
+                st.info("Insights are sourced from the SEC filings directly and summarized by ChatGPT.", icon=":material/info:")
+                summary = summaries[llm_airline][str(llm_year)][llm_period] if llm_period in summaries[llm_airline][str(llm_year)] else None
                 st.session_state.tab4["summary"] = summary
         
         # Reset session state
@@ -1408,4 +1152,6 @@ with tab4:
     # Display summary insights
     if st.session_state.tab4["summary"] is not None:
         st.write(st.session_state.tab4["summary"].replace("$", "\\$"))
+    elif st.session_state.tab4["llm_airline"] is not None and st.session_state.tab4["llm_year"] is not None and st.session_state.tab4["llm_period"] is not None:
+        st.error("No insights available for the selected airline, year, and period. Please make a different selection or check back later.", icon=":material/report:")
 #####################################################################################
