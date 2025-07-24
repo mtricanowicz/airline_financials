@@ -1079,7 +1079,7 @@ with tab4:
     ## USER INPUTS ##
 #####################################################################################
     with st.expander("Select an airline, period, and year to see the top insights.", expanded=True):
-        st.info("Insights for DAL (Delta Air Lines) and LUV (Southwest Airlines) are limited to 2023Q3 or earlier due to ChatGPT's training data cutoff date of October 2023. There is no limitation for AAL (American Airlines) or UAL (United Airlines) as this feature sources from the SEC filings directly.", icon=":material/info:")
+        st.info("Insights for DAL (Delta Air Lines) and LUV (Southwest Airlines) are limited to 2024Q2 or earlier due to ChatGPT's training data cutoff date of June 2024. There is no limitation for AAL (American Airlines) or UAL (United Airlines) as this feature sources from the SEC filings directly.", icon=":material/info:")
         llm_col1, llm_col2, llm_col3 = st.columns([1, 2, 1])
         with llm_col1:
             # Select airline
