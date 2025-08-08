@@ -24,7 +24,7 @@ import json
 # Set custom page configuration including the "About" section
 st.set_page_config(
     page_title="Airline Financial Dashboard",  # Custom title in the browser tab
-    page_icon=":airplane:",  # Custom icon for the browser tab
+    page_icon="site_favicon.png",  # Custom icon for the browser tab
     layout="wide",  # Set the defaul layout for the app
     initial_sidebar_state="auto",  # Sidebar state when app loads
     menu_items={
@@ -43,80 +43,47 @@ st.set_page_config(
     }
 )
 
-# Dashboard title
-st.markdown(
-    """
-    <h1>
-        Airline Financial Dashboard
-        <img src="https://img.icons8.com/ios-filled/50/airplane-tail-fin.png"
-            alt="airplane-tail-fin"
-            style="vertical-align:top; margin-left: 10px"
-            width="50" height="50">
-    </h1>
-    """,
-    unsafe_allow_html=True
-)
-st.subheader("Explore US Airline Financial Performance")
+# Set site logo as title
+st.image(
+    image="site_title.png",
+    width=640, 
+    caption="Explore US Airline Financial Performance"
+    )
 
 # CUSTOM CSS ADDITIONS
-# Custom CSS to change tab header size
 st.markdown("""
     <style>
+    /* --- Change first tab header font size --- */
     [data-testid="stTabs"] button div p {
         font-size: 22px;  /* Change this value to adjust text size */
         /*font-weight: bold;  Optional: Make the text bold */
     }
-    </style>
-    """, unsafe_allow_html=True)
-st.markdown("""
-    <style>
+    /* --- Change second tab header font size --- */
     [data-testid="stTabs"]:nth-of-type(2) button div p {
         font-size: 16px;  /* Change this value to adjust text size */
         /*font-weight: bold;  Optional: Make the text bold */
     }
-    </style>
-    """, unsafe_allow_html=True)
-# Custom CSS for styling pills inside containers
-st.markdown(
-    """
-    <style>
-    /* Target the pills inside a container*/
+    /* --- Change font size of the pills inside a container --- */
     div[data-testid="stExpanderDetails"] div[data-testid="stVerticalBlock"] div[data-testid="stColumn"] div[data-testid="stElementContainer"] div[data-testid="stButtonGroup"] div[data-testid="stPills"] > div {
         font-size: 10px !important;  /* Change font size */
     }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-# Custom CSS to style radio buttons horizontally
-st.markdown("""
-    <style>
+    /* --- Change radio button layout --- */
         .stRadio > div {display: flex; flex-direction: row;}
         .stRadio > div > label {margin-right: 20px;}
-    </style>
-    """, unsafe_allow_html=True)
-# Custom CSS to reduce padding around the divider
-st.markdown("""
-    <style>
+    /* --- Reduce padding around the divider --- */
     .custom-divider {
         border-top: 1px solid #e0e0e0;
         margin-top: 2px;   /* Adjusts the space above */
         margin-bottom: 2px; /* Adjusts the space below */
     }
-    </style>
-""", unsafe_allow_html=True)
-# Custom CSS to style buttons
-st.markdown(
-    """
-    <style>
-    /* Target the Streamlit button */
+    /* --- Style buttons --- */
     div[data-testid="stButton"] > button {
         font-size: 10px !important;  /* Change font size */
         font-weight: bold;           /* Make text bold */
     }
     </style>
     """,
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
 
 # Color palette to use for visualizaitons
@@ -809,6 +776,8 @@ if "tab3" not in st.session_state:
 with tab3:
 #####################################################################################
     ## FILTERING, CALCULATIONS, AND FUNCTIONS ##
+    # Record date that each airline resumed share repurchases (dates sourced from SEC filings)
+    repurchase_resumption = {"AAL": None, "DAL": None, "UAL": datetime(2024, 10, 15)}
     # Date variable to ensure most recent close date is used to fetch latest closing price of the airlines' stock
     ticker_date = (
         (datetime.now(pytz.timezone("America/New_York"))-timedelta(days=1)) if datetime.now(pytz.timezone("America/New_York")).hour<16 # set date for closing price: yesterday if market is still open
@@ -839,8 +808,6 @@ with tab3:
                 return f"Error fetching stock price: {e}"
             retries += 1
         return "Error: Max attempts reached. Stock price history could not be retrieved"
-    # Record date that each airline resumed share repurchases (dates sourced from SEC filings)
-    repurchase_resumption = {"AAL": None, "DAL": None, "UAL": datetime(2024, 10, 15)}
 #####################################################################################
     ## OUTPUT/DISPLAY ##
     col1, col2 = st.columns([9, 1])
