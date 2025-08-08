@@ -46,7 +46,6 @@ st.set_page_config(
 # Set site logo as title
 st.image(
     image="site_title.png",
-    width=640, 
     caption="Explore US Airline Financial Performance"
     )
 
