@@ -2,7 +2,5 @@
 /.streamlit/secrets.toml
 
 # Locally saved SEC filings scrapings
-/SEC_filings/
-/sec_rag/
-/rag_collections/
+/SEC_Filings/
 /Filings_Embeddings_Collections/
