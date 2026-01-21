@@ -111,14 +111,14 @@ share_repurchases = pd.read_excel("airline_financial_data.xlsx", sheet_name="sha
 share_sales = pd.read_excel("airline_financial_data.xlsx", sheet_name="share_sales") # share sale data during Covid-19
 # Airline financial data
 # Add calculated metrics
-airline_financials["Operating Income"] = airline_financials["Total Revenue"] - airline_financials["Total Expenses"]
-airline_financials["Operating Margin"] = round((airline_financials["Operating Income"] / airline_financials["Total Revenue"]) * 100, 2)
-airline_financials["Net Margin"] = round((airline_financials["Net Income"] / airline_financials["Total Revenue"]) * 100, 2)
+airline_financials["Operating Income"] = airline_financials["Operating Revenue"] - airline_financials["Operating Expenses"]
+airline_financials["Operating Margin"] = round((airline_financials["Operating Income"] / airline_financials["Operating Revenue"]) * 100, 2)
+airline_financials["Net Margin"] = round((airline_financials["Net Income"] / airline_financials["Operating Revenue"]) * 100, 2)
 airline_financials["Load Factor"] = round((airline_financials["RPM"] / airline_financials["ASM"]) * 100, 2)
 airline_financials["Yield"] = airline_financials["Passenger Revenue"] / airline_financials["RPM"]
-airline_financials["TRASM"] = airline_financials["Total Revenue"] / airline_financials["ASM"]
+airline_financials["TRASM"] = airline_financials["Operating Revenue"] / airline_financials["ASM"]
 airline_financials["PRASM"] = airline_financials["Passenger Revenue"] / airline_financials["ASM"]
-airline_financials["CASM"] = airline_financials["Total Expenses"] / airline_financials["ASM"]
+airline_financials["CASM"] = airline_financials["Operating Expenses"] / airline_financials["ASM"]
 # Create a Period column to represent the fiscal period and to use for data display
 airline_financials["Quarter"] = airline_financials["Quarter"].apply(lambda x: f"Q{x}" if x != "FY" else x)
 airline_financials["Period"] = airline_financials["Year"].astype(str) + airline_financials["Quarter"].astype(str)
@@ -147,22 +147,22 @@ share_sales["Period"] = share_sales["Year"].astype(str) + share_sales["Quarter"]
 #####################################################################################
 # Definitions of the metrics
 metric_definitions = [
-    ("Total Revenue", "Total amount earned from operations. Also called Operating Revenue."),
+    ("Operating Revenue", "Total amount earned from operations."),
     ("Passenger Revenue", "Revenue primarily composed of passenger ticket sales, loyalty travel awards, and travel-related services performed in conjunction with a passenger's flight."),
-    ("Total Expenses", "Total amount of costs incurred from operations. Also called Operating Expenses."),
-    ("Operating Income", "Income from operations. Total Revenue minus Total Expenses."),
+    ("Operating Expenses", "Total amount of costs incurred from operations."),
+    ("Operating Income", "Income from operations. Operating Revenue minus Operating Expenses."),
     ("Net Income", "Profit."),
     ("Revenue Passenger Mile (RPM)", "A basic measure of sales volume. One RPM represents one passenger flown one mile."),
     ("Available Seat Mile (ASM)", "A basic measure of production. One ASM represents one seat flown one mile."),
     ("Long-Term Debt", "Total long-term debt net of current maturities.<br>NOTE: This metric is reported annually and is therefore shown only for full year data and sourced from 10-K filings."),
     ("Profit Sharing", "Amount of income set aside to fund employee profit sharing programs.<br>NOTE: Quarterly reporting by AAL and UAL of this metric is inconsistent. Data provided may have been obtained from internal sources or estimated by proportioning the annual profit sharing reported by the quarterly operating income reported."),
-    ("Operating Margin", "Operating Income divided by Total Revenue"),
-    ("Net Margin", "Percentage of profit earned for each dollar in revenue. Net Income divided by Total Revenue."),
+    ("Operating Margin", "Operating Income divided by Operating Revenue"),
+    ("Net Margin", "Percentage of profit earned for each dollar in revenue. Net Income divided by Operating Revenue."),
     ("Load Factor", "The percentage of available seats that are filled with revenue passengers. RPMs divided by ASMs."),
     ("Yield", "A measure of airline revenue derived by dividing Passenger Revenue by RPMs."),
-    ("Total Revenue per Available Seat Mile (TRASM)", "Total Revenue divided by ASMs."),
+    ("Total Revenue per Available Seat Mile (TRASM)", "Operating Revenue divided by ASMs."),
     ("Passenger Revenue per Available Seat Mile (PRASM)", "Passenger Revenue divided by ASMs."),
-    ("Cost per Available Seat Mile (CASM)", "Total Expenses divided by ASMs.")
+    ("Cost per Available Seat Mile (CASM)", "Operating Expenses divided by ASMs.")
 ]
 #####################################################################################
 # Create global yes/no options variable
@@ -307,7 +307,7 @@ with tab1:
                     st.session_state.selected_metrics = st.session_state.available_metrics
                     selected_metrics = st.session_state.tab1["available_metrics"]
                 elif st.session_state.metric_group_select=="Earnings":
-                    st.session_state.selected_metrics = ["Total Revenue", "Operating Income", "Net Income", "Operating Margin", "Net Margin"]
+                    st.session_state.selected_metrics = ["Operating Revenue", "Operating Income", "Net Income", "Operating Margin", "Net Margin"]
                     selected_metrics = st.session_state.tab1["selected_metrics"]
                 elif st.session_state.metric_group_select=="Unit Performance":
                     st.session_state.selected_metrics = ["Yield", "TRASM", "PRASM", "CASM"]
@@ -381,7 +381,7 @@ with tab1:
     comparison_data = []
     for metric in selected_metrics:
         # Adjust some of the metrics to scale better for display
-        if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing", "RPM", "ASM"]:
+        if metric in ["Operating Revenue", "Passenger Revenue", "Operating Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing", "RPM", "ASM"]:
             filtered_data[metric] = filtered_data[metric] / 1000000
             filtered_data.rename(columns={metric:f"{metric} (millions)"}, inplace=True)
             metric = metric + " (millions)" 
@@ -417,7 +417,7 @@ with tab1:
     with compare_tab1:
         for metric in selected_metrics:
             # Reflect the renamed metrics new names
-            if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing", "RPM", "ASM"]:
+            if metric in ["Operating Revenue", "Passenger Revenue", "Operating Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing", "RPM", "ASM"]:
                 metric_display = metric + " (millions)"
             else:
                 metric_display = metric
@@ -446,7 +446,7 @@ with tab1:
                 comparison_display = comparison_display.rename(columns={"Percent Difference":f"vs {base_airline}"}) # rename percent difference column to make it more understandable
                 comparison_display = comparison_display.drop(columns=["Metric"]) # drop metric column as it is redundant for a table concerning only a single metric
                 # Column reformatting steps
-                if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing"]:
+                if metric in ["Operating Revenue", "Passenger Revenue", "Operating Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing"]:
                     comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"{'-$' if x < 0 else '$'}{abs(x):,.0f}") # reformat currency columns to show $ sign
                 elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
                     comparison_display[metric_display] = comparison_display[metric_display].apply(lambda x: None if x is None else f"{x:,.2f}\u00A2") # reformat unit currency columns to show cents sign
@@ -504,7 +504,7 @@ with tab1:
                         opacity=0.25
                     )
                     # Adjust the hover over display formatting to improve readability
-                    if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing"]:
+                    if metric in ["Operating Revenue", "Passenger Revenue", "Operating Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing"]:
                         fig_line.update_traces(
                             hovertemplate="%{x}<br>%{y:$,.0f}"
                         )
@@ -563,7 +563,7 @@ with tab1:
         comparison_summary = comparison_df[comparison_df["Period"]==max(filtered_data["Period"])]
         # Column reformatting steps
         def format_value_based_on_metric(value, metric):
-            if metric in ["Total Revenue (millions)", "Passenger Revenue (millions)", "Total Expenses (millions)", "Operating Income (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
+            if metric in ["Operating Revenue (millions)", "Passenger Revenue (millions)", "Operating Expenses (millions)", "Operating Income (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
                 return None if value==None else None if pd.isna(value) else f"{'-$' if value < 0 else '$'}{abs(value):,.0f}" if value.is_integer() else f"{'-$' if value < 0 else '$'}{abs(value):,.2f}" # reformat currency columns to show $ sign
             elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
                 return None if value==None else None if pd.isna(value) else f"{value:,.2f}\u00A2" # reformat unit currency columns to show cents sign
@@ -677,7 +677,7 @@ with tab2:
     summary_data_q = airline_financials_q[airline_financials_q["Period"]==max(airline_financials_q["Period"].unique())].dropna(axis=1, how="all")
     # Column reformatting steps
     def format_value_based_on_metric(value, metric):
-        if metric in ["Total Revenue (millions)", "Passenger Revenue (millions)", "Total Expenses (millions)", "Operating Income (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
+        if metric in ["Operating Revenue (millions)", "Passenger Revenue (millions)", "Operating Expenses (millions)", "Operating Income (millions)", "Net Income (millions)", "Long-Term Debt (millions)", "Profit Sharing (millions)"]:
             return "TBA" if value==None else "TBA" if pd.isna(value) else f"{'-$' if value < 0 else '$'}{abs(value):,.0f}" # reformat currency columns to show $ sign
         elif metric in ["Yield", "TRASM", "PRASM", "CASM"]:
             return "TBA" if value==None else "TBA" if pd.isna(value) else f"{value:,.2f}\u00A2" # reformat unit currency columns to show cents sign
@@ -691,7 +691,7 @@ with tab2:
         data_transformed = []
         for metric in (data.columns).intersection(data.columns.drop(["Year", "Quarter", "Airline", "Period"])):
             # Adjust some of the metrics to scale better for display
-            if metric in ["Total Revenue", "Passenger Revenue", "Total Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing", "RPM", "ASM"]:
+            if metric in ["Operating Revenue", "Passenger Revenue", "Operating Expenses", "Operating Income", "Net Income", "Long-Term Debt", "Profit Sharing", "RPM", "ASM"]:
                 data[metric] = data[metric] / 1000000
                 data.rename(columns={metric:f"{metric} (millions)"}, inplace=True)
                 metric = metric + " (millions)"
