@@ -154,7 +154,7 @@ metric_definitions = [
     ("Net Income", "Profit."),
     ("Revenue Passenger Mile (RPM)", "A basic measure of sales volume. One RPM represents one passenger flown one mile."),
     ("Available Seat Mile (ASM)", "A basic measure of production. One ASM represents one seat flown one mile."),
-    ("Long-Term Debt", "Total long-term debt net of current maturities.<br>NOTE: This metric is reported annually and is therefore shown only for full year data and sourced from 10-K filings."),
+    ("Long-Term Debt", "Total long-term debt net of current maturities.<br>NOTE: This metric is reported annually in the 10-K filings and is always included in the displayed full year metrics. Reporting of this metric is inconsistent in quarterly 10-Q filings, but is shown for the airlines and periods for which data is available."),
     ("Profit Sharing", "Amount of income set aside to fund employee profit sharing programs.<br>NOTE: Quarterly reporting by AAL and UAL of this metric is inconsistent. Data provided may have been obtained from internal sources or estimated by proportioning the annual profit sharing reported by the quarterly operating income reported."),
     ("Operating Margin", "Operating Income divided by Operating Revenue"),
     ("Net Margin", "Percentage of profit earned for each dollar in revenue. Net Income divided by Operating Revenue."),
