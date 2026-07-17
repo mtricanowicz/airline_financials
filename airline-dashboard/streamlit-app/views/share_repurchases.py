@@ -97,14 +97,13 @@ if not history.empty:
 
     # Solid line through each resumption date, then dotted afterward. Airlines
     # that have not resumed stay solid across the full window.
+    hover = "%{x}<br>%{y:$,.1f} billion"
     fig_line = go.Figure()
     for airline in gain.columns:
         series = gain[airline].dropna()
         if series.empty:
             continue
         color = AIRLINE_COLORS.get(airline)
-        label = AIRLINE_NAMES.get(airline, airline)
-        hover = f"{label} ({airline})<br>%{{x}}<br>%{{y:$,.1f}} billion<extra>%{{fullData.name}}</extra>"
         resumption = RESUMPTION.get(airline)
         cutoff = _quarter_end(resumption) if resumption else None
         if cutoff is not None:
@@ -216,12 +215,7 @@ with table_col:
         )
         fig.update_layout(xaxis_title=None, showlegend=False)
         fig.add_hline(y=0, line_dash="dot", line_color="black", opacity=0.5)
-        for trace in fig.data:
-            airline = str(trace.name)
-            label = AIRLINE_NAMES.get(airline, airline)
-            trace.hovertemplate = (
-                f"{label} ({airline})<br>%{{x}}<br>%{{y:$,.2f}} billion<extra>%{{fullData.name}}</extra>"
-            )
+        fig.update_traces(hovertemplate="%{x}<br>%{y:$,.2f} billion")
         st.plotly_chart(fig, use_container_width=True)
 
 
