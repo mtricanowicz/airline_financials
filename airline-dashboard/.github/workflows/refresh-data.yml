@@ -1,0 +1,94 @@
+name: Refresh data
+
+# Quarterly refresh of the generated datasets and insights, followed by a
+# redeploy. Runs after typical filing windows; adjust the cron as needed.
+# Requires the same GCP/Firebase secrets as Deploy plus:
+#   SEC_USER_AGENT  - contact string for SEC EDGAR requests
+#   OPENAI_API_KEY  - key for insight summarization and embeddings
+#   QUOTES_API_URL  - public URL of the deployed quotes-api (for web + Streamlit)
+on:
+  workflow_dispatch:
+    inputs:
+      years:
+        description: "Space-separated years, e.g. 2024 2025"
+        required: true
+  schedule:
+    # 06:00 UTC on the 5th of Feb, May, Aug, Nov.
+    - cron: "0 6 5 2,5,8,11 *"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-data:
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: airline-dashboard/core
+    env:
+      SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      EMBEDDING_BACKEND: openai
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: pip install -e .
+      - name: Determine years
+        id: years
+        run: echo "value=${{ github.event.inputs.years || format('{0}', '2024 2025') }}" >> "$GITHUB_OUTPUT"
+      - name: Build financials and buybacks
+        run: python -m scripts.build_data --years ${{ steps.years.outputs.value }}
+      - name: Generate insights
+        run: python -m sec_pipeline.pipeline --airlines AAL DAL UAL LUV --years ${{ steps.years.outputs.value }}
+      - name: Upload generated data
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-data
+          path: airline-dashboard/data/generated/*.json
+
+  redeploy:
+    needs: build-data
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download generated data
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-data
+          path: airline-dashboard/data/generated
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDP }}
+          service_account: ${{ secrets.GCP_DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Rebuild and deploy Streamlit
+        run: |
+          gcloud builds submit airline-dashboard \
+            --config airline-dashboard/deploy/cloudbuild.streamlit.yaml \
+            --substitutions _QUOTES_API_URL="${{ secrets.QUOTES_API_URL }}" \
+            --project "${{ secrets.GCP_PROJECT_ID }}"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Build static site
+        working-directory: airline-dashboard/web
+        env:
+          NEXT_PUBLIC_QUOTES_API_URL: ${{ secrets.QUOTES_API_URL }}
+        run: |
+          npm install
+          npm run build
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ secrets.GCP_PROJECT_ID }}
+          channelId: live
+          entryPoint: airline-dashboard

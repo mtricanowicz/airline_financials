@@ -1,0 +1,336 @@
+{
+  "repurchases": [
+    {
+      "Year": 2013,
+      "Quarter": "FY",
+      "Airline": "AAL",
+      "Shares Repurchased": 0,
+      "Cost": 0,
+      "Shares (millions)": 0.0,
+      "Cost (millions)": 0.0,
+      "Average Share Price": 0.0,
+      "Period": "2013FY"
+    },
+    {
+      "Year": 2014,
+      "Quarter": "FY",
+      "Airline": "AAL",
+      "Shares Repurchased": 23400000,
+      "Cost": 1000000000,
+      "Shares (millions)": 23.4,
+      "Cost (millions)": 1000.0,
+      "Average Share Price": 42.735042735,
+      "Period": "2014FY"
+    },
+    {
+      "Year": 2015,
+      "Quarter": "FY",
+      "Airline": "AAL",
+      "Shares Repurchased": 85100000,
+      "Cost": 3600000000,
+      "Shares (millions)": 85.1,
+      "Cost (millions)": 3600.0,
+      "Average Share Price": 42.303172738,
+      "Period": "2015FY"
+    },
+    {
+      "Year": 2016,
+      "Quarter": "FY",
+      "Airline": "AAL",
+      "Shares Repurchased": 119800000,
+      "Cost": 4400000000,
+      "Shares (millions)": 119.8,
+      "Cost (millions)": 4400.0,
+      "Average Share Price": 36.7278797997,
+      "Period": "2016FY"
+    },
+    {
+      "Year": 2017,
+      "Quarter": "FY",
+      "Airline": "AAL",
+      "Shares Repurchased": 33900000,
+      "Cost": 1600000000,
+      "Shares (millions)": 33.9,
+      "Cost (millions)": 1600.0,
+      "Average Share Price": 47.197640118,
+      "Period": "2017FY"
+    },
+    {
+      "Year": 2018,
+      "Quarter": "FY",
+      "Airline": "AAL",
+      "Shares Repurchased": 16600000,
+      "Cost": 800000000,
+      "Shares (millions)": 16.6,
+      "Cost (millions)": 800.0,
+      "Average Share Price": 48.1927710843,
+      "Period": "2018FY"
+    },
+    {
+      "Year": 2019,
+      "Quarter": "FY",
+      "Airline": "AAL",
+      "Shares Repurchased": 33800000,
+      "Cost": 1100000000,
+      "Shares (millions)": 33.8,
+      "Cost (millions)": 1100.0,
+      "Average Share Price": 32.5443786982,
+      "Period": "2019FY"
+    },
+    {
+      "Year": 2020,
+      "Quarter": "FY",
+      "Airline": "AAL",
+      "Shares Repurchased": 6400000,
+      "Cost": 145000000,
+      "Shares (millions)": 6.4,
+      "Cost (millions)": 145.0,
+      "Average Share Price": 22.65625,
+      "Period": "2020FY"
+    },
+    {
+      "Year": 2013,
+      "Quarter": "FY",
+      "Airline": "DAL",
+      "Shares Repurchased": 10000000,
+      "Cost": 250000000,
+      "Shares (millions)": 10.0,
+      "Cost (millions)": 250.0,
+      "Average Share Price": 25.0,
+      "Period": "2013FY"
+    },
+    {
+      "Year": 2014,
+      "Quarter": "FY",
+      "Airline": "DAL",
+      "Shares Repurchased": 28600000,
+      "Cost": 1100000000,
+      "Shares (millions)": 28.6,
+      "Cost (millions)": 1100.0,
+      "Average Share Price": 38.4615384615,
+      "Period": "2014FY"
+    },
+    {
+      "Year": 2015,
+      "Quarter": "FY",
+      "Airline": "DAL",
+      "Shares Repurchased": 48400000,
+      "Cost": 2200000000,
+      "Shares (millions)": 48.4,
+      "Cost (millions)": 2200.0,
+      "Average Share Price": 45.4545454545,
+      "Period": "2015FY"
+    },
+    {
+      "Year": 2016,
+      "Quarter": "FY",
+      "Airline": "DAL",
+      "Shares Repurchased": 60000000,
+      "Cost": 2600000000,
+      "Shares (millions)": 60.0,
+      "Cost (millions)": 2600.0,
+      "Average Share Price": 43.3333333333,
+      "Period": "2016FY"
+    },
+    {
+      "Year": 2017,
+      "Quarter": "FY",
+      "Airline": "DAL",
+      "Shares Repurchased": 33000000,
+      "Cost": 1700000000,
+      "Shares (millions)": 33.0,
+      "Cost (millions)": 1700.0,
+      "Average Share Price": 51.5151515152,
+      "Period": "2017FY"
+    },
+    {
+      "Year": 2018,
+      "Quarter": "FY",
+      "Airline": "DAL",
+      "Shares Repurchased": 29000000,
+      "Cost": 1600000000,
+      "Shares (millions)": 29.0,
+      "Cost (millions)": 1600.0,
+      "Average Share Price": 55.1724137931,
+      "Period": "2018FY"
+    },
+    {
+      "Year": 2019,
+      "Quarter": "FY",
+      "Airline": "DAL",
+      "Shares Repurchased": 38000000,
+      "Cost": 2000000000,
+      "Shares (millions)": 38.0,
+      "Cost (millions)": 2000.0,
+      "Average Share Price": 52.6315789474,
+      "Period": "2019FY"
+    },
+    {
+      "Year": 2020,
+      "Quarter": "FY",
+      "Airline": "DAL",
+      "Shares Repurchased": 6700000,
+      "Cost": 377620000,
+      "Shares (millions)": 6.7,
+      "Cost (millions)": 377.62,
+      "Average Share Price": 56.3611940299,
+      "Period": "2020FY"
+    },
+    {
+      "Year": 2013,
+      "Quarter": "FY",
+      "Airline": "UAL",
+      "Shares Repurchased": 0,
+      "Cost": 0,
+      "Shares (millions)": 0.0,
+      "Cost (millions)": 0.0,
+      "Average Share Price": 0.0,
+      "Period": "2013FY"
+    },
+    {
+      "Year": 2014,
+      "Quarter": "FY",
+      "Airline": "UAL",
+      "Shares Repurchased": 6500000,
+      "Cost": 320000000,
+      "Shares (millions)": 6.5,
+      "Cost (millions)": 320.0,
+      "Average Share Price": 49.2307692308,
+      "Period": "2014FY"
+    },
+    {
+      "Year": 2015,
+      "Quarter": "FY",
+      "Airline": "UAL",
+      "Shares Repurchased": 21000000,
+      "Cost": 1200000000,
+      "Shares (millions)": 21.0,
+      "Cost (millions)": 1200.0,
+      "Average Share Price": 57.1428571429,
+      "Period": "2015FY"
+    },
+    {
+      "Year": 2016,
+      "Quarter": "FY",
+      "Airline": "UAL",
+      "Shares Repurchased": 50000000,
+      "Cost": 2600000000,
+      "Shares (millions)": 50.0,
+      "Cost (millions)": 2600.0,
+      "Average Share Price": 52.0,
+      "Period": "2016FY"
+    },
+    {
+      "Year": 2017,
+      "Quarter": "FY",
+      "Airline": "UAL",
+      "Shares Repurchased": 28000000,
+      "Cost": 1800000000,
+      "Shares (millions)": 28.0,
+      "Cost (millions)": 1800.0,
+      "Average Share Price": 64.2857142857,
+      "Period": "2017FY"
+    },
+    {
+      "Year": 2018,
+      "Quarter": "FY",
+      "Airline": "UAL",
+      "Shares Repurchased": 17500000,
+      "Cost": 1200000000,
+      "Shares (millions)": 17.5,
+      "Cost (millions)": 1200.0,
+      "Average Share Price": 68.5714285714,
+      "Period": "2018FY"
+    },
+    {
+      "Year": 2019,
+      "Quarter": "FY",
+      "Airline": "UAL",
+      "Shares Repurchased": 19200000,
+      "Cost": 1600000000,
+      "Shares (millions)": 19.2,
+      "Cost (millions)": 1600.0,
+      "Average Share Price": 83.3333333333,
+      "Period": "2019FY"
+    },
+    {
+      "Year": 2020,
+      "Quarter": "FY",
+      "Airline": "UAL",
+      "Shares Repurchased": 4300000,
+      "Cost": 341400000,
+      "Shares (millions)": 4.3,
+      "Cost (millions)": 341.4,
+      "Average Share Price": 79.3953488372,
+      "Period": "2020FY"
+    }
+  ],
+  "sales": [
+    {
+      "Year": 2020,
+      "Quarter": "FY",
+      "Airline": "AAL",
+      "Shares Sold": 143597509,
+      "Proceeds": 1901355562.59,
+      "Shares (millions)": 143.597509,
+      "Proceeds (millions)": 1901.35556259,
+      "Average Share Price": 13.2408673091,
+      "Period": "2020FY"
+    },
+    {
+      "Year": 2021,
+      "Quarter": "FY",
+      "Airline": "AAL",
+      "Shares Sold": 79599019,
+      "Proceeds": 1082205377.28,
+      "Shares (millions)": 79.599019,
+      "Proceeds (millions)": 1082.20537728,
+      "Average Share Price": 13.5957124959,
+      "Period": "2021FY"
+    },
+    {
+      "Year": 2020,
+      "Quarter": "FY",
+      "Airline": "DAL",
+      "Shares Sold": 6500000,
+      "Proceeds": 158535000.0,
+      "Shares (millions)": 6.5,
+      "Proceeds (millions)": 158.535,
+      "Average Share Price": 24.39,
+      "Period": "2020FY"
+    },
+    {
+      "Year": 2021,
+      "Quarter": "FY",
+      "Airline": "DAL",
+      "Shares Sold": 2100000,
+      "Proceeds": 83433000.0,
+      "Shares (millions)": 2.1,
+      "Proceeds (millions)": 83.433,
+      "Average Share Price": 39.73,
+      "Period": "2021FY"
+    },
+    {
+      "Year": 2020,
+      "Quarter": "FY",
+      "Airline": "UAL",
+      "Shares Sold": 69338841,
+      "Proceeds": 2293578491.5,
+      "Shares (millions)": 69.338841,
+      "Proceeds (millions)": 2293.5784915,
+      "Average Share Price": 33.0778313918,
+      "Period": "2020FY"
+    },
+    {
+      "Year": 2021,
+      "Quarter": "FY",
+      "Airline": "UAL",
+      "Shares Sold": 14200000,
+      "Proceeds": 685282000.0,
+      "Shares (millions)": 14.2,
+      "Proceeds (millions)": 685.282,
+      "Average Share Price": 48.2592957746,
+      "Period": "2021FY"
+    }
+  ]
+}

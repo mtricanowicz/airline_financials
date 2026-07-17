@@ -1,0 +1,49 @@
+# ---- Secrets & environment ----
+.env
+.env.*
+!.env.example
+*.key
+secrets.toml
+.streamlit/secrets.toml
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# ---- Pipeline caches & artifacts ----
+core/.cache/
+core/**/chroma/
+core/**/*.sqlite3
+data/raw/
+data/embeddings/
+
+# ---- Node / Next.js ----
+node_modules/
+web/.next/
+web/out/
+web/.turbo/
+web/public/data/
+npm-debug.log*
+yarn-error.log*
+
+# ---- Web app (temporarily excluded) ----
+# Exclude all web app related files for now pending further development and deployment.
+web/
+.firebaserc
+firebase.json
+
+# ---- Firebase ----
+.firebase/
+firebase-debug.log*
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db

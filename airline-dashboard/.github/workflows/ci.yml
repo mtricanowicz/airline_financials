@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths: ["airline-dashboard/**"]
+  pull_request:
+    paths: ["airline-dashboard/**"]
+
+jobs:
+  core:
+    name: Core pipeline tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: airline-dashboard/core
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Test
+        run: pytest -q
+
+  web:
+    name: Web type-check and build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: airline-dashboard/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: airline-dashboard/web/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Type-check
+        run: npm run typecheck
+      - name: Build
+        run: npm run build
