@@ -12,6 +12,9 @@ on:
       years:
         description: "Space-separated years, e.g. 2024 2025"
         required: true
+      periods:
+        description: "Space-separated periods, e.g. Q2 FY (defaults to all)"
+        required: false
   schedule:
     # 06:00 UTC on the 5th of Feb, May, Aug, Nov.
     - cron: "0 6 5 2,5,8,11 *"
@@ -41,10 +44,13 @@ jobs:
       - name: Determine years
         id: years
         run: echo "value=${{ github.event.inputs.years || format('{0}', '2024 2025') }}" >> "$GITHUB_OUTPUT"
+      - name: Determine periods
+        id: periods
+        run: echo "value=${{ github.event.inputs.periods || format('{0}', 'Q1 Q2 Q3 Q4 FY') }}" >> "$GITHUB_OUTPUT"
       - name: Build financials and buybacks
-        run: python -m scripts.build_data --years ${{ steps.years.outputs.value }}
+        run: python -m scripts.build_data --years ${{ steps.years.outputs.value }} --periods ${{ steps.periods.outputs.value }}
       - name: Generate insights
-        run: python -m sec_pipeline.pipeline --airlines AAL DAL UAL LUV --years ${{ steps.years.outputs.value }}
+        run: python -m sec_pipeline.pipeline --airlines AAL DAL UAL LUV --years ${{ steps.years.outputs.value }} --periods ${{ steps.periods.outputs.value }}
       - name: Upload generated data
         uses: actions/upload-artifact@v4
         with:
