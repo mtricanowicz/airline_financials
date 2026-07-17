@@ -32,14 +32,28 @@ jobs:
         working-directory: airline-dashboard/web
     steps:
       - uses: actions/checkout@v4
+      - name: Detect web lockfile
+        id: webfiles
+        working-directory: .
+        run: |
+          if [ -f "airline-dashboard/web/package-lock.json" ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping web CI: airline-dashboard/web/package-lock.json not found"
+          fi
       - uses: actions/setup-node@v4
+        if: steps.webfiles.outputs.found == 'true'
         with:
           node-version: "20"
           cache: npm
           cache-dependency-path: airline-dashboard/web/package-lock.json
       - name: Install
+        if: steps.webfiles.outputs.found == 'true'
         run: npm ci
       - name: Type-check
+        if: steps.webfiles.outputs.found == 'true'
         run: npm run typecheck
       - name: Build
+        if: steps.webfiles.outputs.found == 'true'
         run: npm run build

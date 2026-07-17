@@ -72,19 +72,33 @@ jobs:
         run: |
           gcloud builds submit airline-dashboard \
             --config airline-dashboard/deploy/cloudbuild.streamlit.yaml \
-            --substitutions _QUOTES_API_URL="${{ secrets.QUOTES_API_URL }}" \
+            --substitutions=SHORT_SHA="${{ github.sha }}",_QUOTES_API_URL="${{ secrets.QUOTES_API_URL }}" \
             --project "${{ secrets.GCP_PROJECT_ID }}"
+      - name: Detect web lockfile
+        id: webfiles
+        run: |
+          if [ -f "airline-dashboard/web/package-lock.json" ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping web deploy: airline-dashboard/web/package-lock.json not found"
+          fi
       - uses: actions/setup-node@v4
+        if: steps.webfiles.outputs.found == 'true'
         with:
           node-version: "20"
+          cache: npm
+          cache-dependency-path: airline-dashboard/web/package-lock.json
       - name: Build static site
+        if: steps.webfiles.outputs.found == 'true'
         working-directory: airline-dashboard/web
         env:
           NEXT_PUBLIC_QUOTES_API_URL: ${{ secrets.QUOTES_API_URL }}
         run: |
-          npm install
+          npm ci
           npm run build
       - name: Deploy to Firebase Hosting
+        if: steps.webfiles.outputs.found == 'true'
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
