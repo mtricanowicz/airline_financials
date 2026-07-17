@@ -9,15 +9,19 @@ name: Refresh data
 on:
   workflow_dispatch:
     inputs:
+      airlines:
+        description: "Space-separated airlines, e.g. AAL DAL UAL LUV ALK JBLU ULCC"
+        required: false
       years:
-        description: "Space-separated years, e.g. 2024 2025"
-        required: true
+        description: "Space-separated years, e.g. 2026 (defaults to latest completed period year)"
+        required: false
       periods:
-        description: "Space-separated periods, e.g. Q2 FY (defaults to all)"
+        description: "Space-separated periods, e.g. Q2 (defaults to latest completed period)"
         required: false
   schedule:
-    # 06:00 UTC on the 5th of Feb, May, Aug, Nov.
-    - cron: "0 6 5 2,5,8,11 *"
+    # 06:00 UTC on the last day of Jan, Apr, Jul, Oct.
+    - cron: "0 6 31 1,7,10 *"
+    - cron: "0 6 30 4 *"
 
 permissions:
   contents: read
@@ -41,16 +45,62 @@ jobs:
           python-version: "3.11"
       - name: Install
         run: pip install -e .
-      - name: Determine years
-        id: years
-        run: echo "value=${{ github.event.inputs.years || format('{0}', '2024 2025') }}" >> "$GITHUB_OUTPUT"
-      - name: Determine periods
-        id: periods
-        run: echo "value=${{ github.event.inputs.periods || format('{0}', 'Q1 Q2 Q3 Q4 FY') }}" >> "$GITHUB_OUTPUT"
+      - name: Determine run parameters
+        id: params
+        run: |
+          month="$(date -u +%m)"
+          year="$(date -u +%Y)"
+
+          case "$month" in
+            01|02|03)
+              default_year="$((year - 1))"
+              default_period="Q4 FY"
+              ;;
+            04|05|06)
+              default_year="$year"
+              default_period="Q1"
+              ;;
+            07|08|09)
+              default_year="$year"
+              default_period="Q2"
+              ;;
+            10|11|12)
+              default_year="$year"
+              default_period="Q3"
+              ;;
+          esac
+
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            airlines="AAL DAL UAL LUV ALK JBLU ULCC"
+            years="$default_year"
+            periods="$default_period"
+          else
+            airlines="${{ github.event.inputs.airlines }}"
+            years="${{ github.event.inputs.years }}"
+            periods="${{ github.event.inputs.periods }}"
+
+            if [ -z "$airlines" ]; then
+              airlines="AAL DAL UAL LUV ALK JBLU ULCC"
+            fi
+            if [ -z "$years" ]; then
+              years="$default_year"
+            fi
+            if [ -z "$periods" ]; then
+              periods="$default_period"
+            fi
+          fi
+
+          echo "airlines=$airlines" >> "$GITHUB_OUTPUT"
+          echo "years=$years" >> "$GITHUB_OUTPUT"
+          echo "periods=$periods" >> "$GITHUB_OUTPUT"
+
+          echo "Using airlines: $airlines"
+          echo "Using years: $years"
+          echo "Using periods: $periods"
       - name: Build financials and buybacks
-        run: python -m scripts.build_data --years ${{ steps.years.outputs.value }} --periods ${{ steps.periods.outputs.value }}
+        run: python -m scripts.build_data --airlines ${{ steps.params.outputs.airlines }} --years ${{ steps.params.outputs.years }} --periods ${{ steps.params.outputs.periods }}
       - name: Generate insights
-        run: python -m sec_pipeline.pipeline --airlines AAL DAL UAL LUV --years ${{ steps.years.outputs.value }} --periods ${{ steps.periods.outputs.value }}
+        run: python -m sec_pipeline.pipeline --airlines ${{ steps.params.outputs.airlines }} --years ${{ steps.params.outputs.years }} --periods ${{ steps.params.outputs.periods }}
       - name: Upload generated data
         uses: actions/upload-artifact@v4
         with:
