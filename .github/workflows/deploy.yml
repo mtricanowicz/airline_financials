@@ -61,9 +61,6 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     environment: production
-    defaults:
-      run:
-        working-directory: airline-dashboard/web
     steps:
       - uses: actions/checkout@v4
       - name: Detect web lockfile
@@ -83,9 +80,11 @@ jobs:
           cache-dependency-path: airline-dashboard/web/package-lock.json
       - name: Install
         if: steps.webfiles.outputs.found == 'true'
+        working-directory: airline-dashboard/web
         run: npm ci
       - name: Build static site
         if: steps.webfiles.outputs.found == 'true'
+        working-directory: airline-dashboard/web
         env:
           NEXT_PUBLIC_QUOTES_API_URL: ${{ secrets.QUOTES_API_URL }}
         run: npm run build
