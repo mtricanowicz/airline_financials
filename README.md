@@ -1,59 +1,98 @@
-# Airline Financial Dashboard
-Compare financial metrics for US airlines.<br>
-Explore the dashboard at: [https://www.airlinefinancialdashboard.com/](https://www.airlinefinancialdashboard.com/)
+# Airline Financial Dashboard (v2)
+Compare financial and operating metrics for major US airlines.
+Live app: https://www.airlinefinancialdashboard.com/
 
 ## Overview
-This dashboard enables quick and intuitive comparisons of the financial performance of major US commercial airlines. Data is provided from 2014. This starting point was chosen because it was the first year after all of the major airlines had completed mergers, marking the completion of a cycle of consolidation and the start of the present industry landscape.<br>
-The airlines covered (and their stock tickers) are American Airlines (AAL), Delta Air Lines (DAL), United Airlines (UAL), and Southwest Airlines (LUV). LUV quarterly data is provided from 2024.<br>
-Unless otherwise noted, all metrics are either sourced or calculated from data given in the 10-Q (quarterly filing), 8-K (current report), and 10-K (annual filing) forms reported to the SEC and available on the airlines' investor relations sites.<br>
-The dashboard is deployed using [Streamlit](https://streamlit.io/) and is hosted with [Google Cloud Run](https://cloud.google.com/run).
+This repository now centers on the v2 platform under [airline-dashboard](airline-dashboard), which separates data generation, APIs, and front ends into maintainable components.
+
+Data starts in 2014, which reflects the post-merger modern era for major US carriers. The current v2 dataset and UI support these tickers:
+- AAL
+- DAL
+- UAL
+- LUV
+- ALK
+- JBLU
+- ULCC
+
+Unless noted, metrics are sourced or derived from SEC filings (10-Q, 8-K, 10-K), with specific operational metrics maintained in a manual sheet and merged in the core data pipeline.
+
+## Architecture
+The v2 stack is organized as:
+- [airline-dashboard/core](airline-dashboard/core): shared Python data and insights pipeline
+- [airline-dashboard/quotes-api](airline-dashboard/quotes-api): FastAPI service for live quote data
+- [airline-dashboard/streamlit-app](airline-dashboard/streamlit-app): Streamlit fallback/reference UI
+- [airline-dashboard/web](airline-dashboard/web): Next.js web front end (target replacement UI)
+- [airline-dashboard/data](airline-dashboard/data): manual and generated data
+- [airline-dashboard/deploy](airline-dashboard/deploy): deployment configs and runbooks
+
+Data flow summary:
+1. Core pipeline generates canonical JSON in `airline-dashboard/data/generated`.
+2. Both front ends read the generated JSON.
+3. Live quote views call `quotes-api`.
 
 ## Filtered Comparisons
-The Filtered Comparisons tab provides customizable views of airline financials. Several metrics can be selected for evaluation over chosen reporting periods.<br>
-<br>
-Metrics covered:
-- **Total Revenue:** Total amount earned from operations. Also called Operating Revenue.
-- **Passenger Revenue:** Revenue primarily composed of passenger ticket sales, loyalty travel awards, and travel-related services performed in conjunction with a passenger's flight.
-- **Total Expenses:** Total amount of costs incurred from operations. Also called Operating Expenses.
-- **Operating Income:** Income from operations. Total Revenue minus Total Expenses.
-- **Net Income:** Profit.
-- **Revenue Passenger Mile (RPM):** A basic measure of sales volume. One RPM represents one passenger flown one mile.
-- **Available Seat Mile (ASM):** A basic measure of production. One ASM represents one seat flown one mile.
-- **Long-Term Debt:** Total long-term debt net of current maturities.<br>
-    NOTE: This metric is reported annually and is therefore shown only for full year data and sourced from 10-K filings.
-- **Profit Sharing:** Amount of income set aside to fund employee profit sharing programs.<br>
-    NOTE: Quarterly reporting by AAL and UAL of this metric is inconsistent. Data provided may have been obtained from internal sources or estimated by proportioning the annual profit sharing reported by the quarterly operating income reported.
-- **Operating Margin:** Operating Income divided by Total Revenue
-- **Net Margin:** Percentage of profit earned for each dollar in revenue. Net Income divided by Total Revenue.
-- **Load Factor:** The percentage of available seats that are filled with revenue passengers. RPMs divided by ASMs.
-- **Yield:** A measure of airline revenue derived by dividing Passenger Revenue by RPMs.
-- **Total Revenue per Available Seat Mile (TRASM):** Total Revenue divided by ASMs.
-- **Passenger Revenue per Available Seat Mile (PRASM):** Passenger Revenue divided by ASMs.
-- **Cost per Available Seat Mile (CASM):** Total Expenses divided by ASMs.
-<br><br>
+Filtered Comparisons remains a core feature in v2 and supports:
+- selecting airlines
+- selecting year/period windows
+- selecting metric groups or custom metric sets
+- viewing tables and trend charts
 
-These metrics are manually identified and recorded on a quaterly basis from the 10-Q form for Q1-Q3, from the 8-K form for Q4, and from the 10-K form for FY and stored in [a xlsx file](https://github.com/mtricanowicz/airline_financials/blob/main/airline_financial_data.xlsx "airline_financial_data.xlsx") within this repo. This xlsx file is used as the basis of all calculations, tables, and visualizations in the Filtered Comparison and Latest Results tabs.<br>
-Throughout this app, data manipulation and visualization is accomplished primarily through the use of the [pandas](https://pandas.pydata.org/) and [plotly](https://plotly.com/python/) libraries.
+The v2 implementation moves data prep out of UI runtime and relies on precomputed datasets, which improves performance and reduces rerun overhead.
 
 ## Latest Results
-The Latest Results tab gives a summary of the most recent annual and quarterly results for easy viewing. The summaries show all airlines and all metrics, but give the user the option of displaying comparisons against one airline.<br>
+Latest Results continues to provide period snapshots for annual and quarterly views, with optional airline-to-airline comparison. In v2 this view is backed by generated JSON rather than in-app spreadsheet transformations.
 
 ## Share Repurchases
-The Share Repurchases tab contains a high level overview of the share buyback programs by the three major legacy airilnes (AAL, DAL, UAL) that were carried out in the 2010s and ended with the onset of the Covid-19 pandemic.<br>
-Stock price data is retrieved using the [yfinance](https://pypi.org/project/yfinance/) Python library which uses the Yahoo Finance API to fetch the requested ticker information.<br>
-Share repurchase data during the repurchase program is manually identified and recorded from the 10-Q, 8-K, and 10-K forms. Share sales occurred during the Covid-19 crisis and sale data is manually identified and recorded primarily from 8-K filings, but also from 10-Q forms. This data is also stored in the [same xlsx file](https://github.com/mtricanowicz/airline_financials/blob/main/airline_financial_data.xlsx "airline_financial_data.xlsx") as the primary metrics.<br>
-The net gain/loss of the repurchases is calculated by determining how many repurchased shares are still held. The difference between the repurchase price of these shares and the current share price gives a running unrealized gain/loss added to the realized gain/loss from the total amount spent to repurchase less the total amount raised from sales of the number of shares sold.
+Share Repurchases is preserved in v2 with the same intent:
+- repurchase history
+- share sales history
+- running net gain/loss views based on market prices
+
+Source data remains curated from filings and merged into generated outputs by the core build process.
 
 ## Insights
-The Insights tab delivers financial, operational, and commercial insights based on the airilne's SEC filings. User selections prompt retrieval of content for a particular airline and time period with summarization provided by ChatGPT.<br>
-This dashboard loads insights from a pre-defined dictionary of period summaries. That dictionary was created by using a pipeline of functions to retrieve the relevant 10-Q, 8-K, and 10-K documents contained within reporting period via the [SEC EDGAR](https://www.sec.gov/search-filings/edgar-application-programming-interfaces) submissions and archive APIs. The APIs are used to enumerate the relevant airlines and filing documents, download all materials related to those documents, and then prepare structured JSON files containing the document contents. The content stored in the JSON files are then parsed to have embeddings created and stored within a [ChromaDB](https://docs.trychroma.com/docs/overview) collection. The collection of embeddings is converted to a vectorstore using [langchain](https://python.langchain.com/docs/concepts/vectorstores/ "Vector stores") to enable a retrieval augmented generation (RAG) function to extract a subset of the most relevant documents using [langchain](https://python.langchain.com/api_reference/core/retrievers/langchain_core.retrievers.BaseRetriever.html#langchain_core.retrievers.BaseRetriever, "BaseRetriever") to pass to ChatGPT for summarization. Finally, the [OpenAI API](https://openai.com/api/) is used to pass the extracted text with a prompt to ChatGPT to generate relevant and meaningful insights related to the airline's financial, operational, and commercial performance.<br>
-As the insights presented are summaries generated by an LLM, inaccuracies may exist. Therefore, it is recommended to use caution if using any of the insights obtained. 
+Insights in v2 are generated through the consolidated SEC pipeline package in [airline-dashboard/core/sec_pipeline](airline-dashboard/core/sec_pipeline):
+- SEC EDGAR retrieval
+- filing parsing/chunking
+- embedding and retrieval
+- LLM summarization by airline/year/period
+
+Outputs are written to generated JSON and served to front ends as precomputed content.
+
+## Metric sourcing model
+v2 uses a hybrid model:
+- Auto (XBRL/company facts): Operating Revenue, Operating Expenses, Net Income, Long-Term Debt
+- Manual sheet: RPM, ASM, Profit Sharing, buybacks, share sales
+- Derived: Operating Income, margins, Load Factor, Yield, TRASM, PRASM, CASM
+
+## Deployment
+Current production deployment is based on the v2 components:
+- Cloud Run for `quotes-api`
+- Cloud Run for `streamlit-app`
+- GitHub Actions workflows in [.github/workflows](.github/workflows) for CI, deploy, and data refresh automation
+
+For operational details, see [airline-dashboard/deploy/README.md](airline-dashboard/deploy/README.md).
+
+## Legacy archive
+Legacy root-level app assets have been archived for reference in [legacy-archive](legacy-archive).
+
+These files are not the active v2 deployment path.
+
+## Repo guides
+Start here for component-level documentation:
+- [airline-dashboard/README.md](airline-dashboard/README.md)
+- [airline-dashboard/core/README.md](airline-dashboard/core/README.md)
+- [airline-dashboard/streamlit-app/README.md](airline-dashboard/streamlit-app/README.md)
+- [airline-dashboard/web/README.md](airline-dashboard/web/README.md)
+- [airline-dashboard/deploy/README.md](airline-dashboard/deploy/README.md)
 
 ## Sources
-[AAL](https://americanairlines.gcs-web.com/ "AAL IR") | [DAL](https://ir.delta.com/ "DAL IR") | [UAL](https://ir.united.com/ "UAL IR") | [LUV](https://www.southwestairlinesinvestorrelations.com/ "LUV IR")<br>
-<br>
+- AAL: https://americanairlines.gcs-web.com/
+- DAL: https://ir.delta.com/
+- UAL: https://ir.united.com/
+- LUV: https://www.southwestairlinesinvestorrelations.com/
+- ALK: https://investor.alaskaair.com/
+- JBLU: https://investor.jetblue.com/
+- ULCC: https://ir.flyfrontier.com/
 
-
-**Created by:**<br>
-Michael Tricanowicz
-
+Created by Michael Tricanowicz.
