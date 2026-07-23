@@ -138,6 +138,7 @@ def merge_sources(auto: pd.DataFrame, manual: pd.DataFrame) -> pd.DataFrame:
     # Prefer the auto value; fall back to the manual value where auto is absent.
     for metric in overlap:
         merged[metric] = merged[metric].fillna(merged[f"{metric}_manual"])
+
     return merged
 
 
@@ -159,6 +160,34 @@ def add_derived(df: pd.DataFrame) -> pd.DataFrame:
     df["PRASM"] = pax_rev / asm
     df["CASM"] = op_exp / asm
     df["Period"] = df["Year"].astype(str) + df["Quarter"].astype(str)
+
+    # Reorder columns into preferred order of metrics
+    preferred_column_order = list(
+        dict.fromkeys(
+            column for column in [
+                "Airline",
+                "Year",
+                "Quarter",
+                "Period",
+                "Operating Revenue",
+                "Passenger Revenue",
+                "Operating Expenses",
+                "Operating Income",
+                "Net Income",
+                "Operating Margin",
+                "Net Margin",
+                "Long-Term Debt",
+                "Profit Sharing"
+            ]
+        )
+    )
+    # Redefine the preferred column list to ensure it only contains columns that exist in the merged DataFrame.
+    preferred_column_order = [column for column in preferred_column_order if column in df.columns]
+    # Define the remaining columns that are not in the preferred order.
+    remaining_column_order = [column for column in df.columns if column not in preferred_column_order]
+    # Reorder the merged DataFrame columns to have preferred columns first, followed by the remaining columns.
+    df = df[preferred_column_order + remaining_column_order]
+
     return df
 
 

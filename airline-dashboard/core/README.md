@@ -43,6 +43,19 @@ credentials.
 
 ## Running
 
+### Build Data (financials.json & buybacks.json)
+
+```powershell
+python .\airline-dashboard\core\scripts\build_data.py `
+  --airlines AAL DAL UAL LUV ALK JBLU ULCC `
+  --years 2014 2015 2016 2017 2018 2019 2020 2021 2022 2023 2024 2025 2026 `
+  --periods Q1 Q2 Q3 Q4 FY `
+  --overwrite
+```
+For ```airlines```, ```years```, and ```periods``` choose any set of tickers, years, and periods separated by spaces. The ```--overwrite``` command is optional and if not passed will only fill for data not present.
+
+### SEC Pipeline (insights.json)
+
 Command line:
 
 ```powershell
