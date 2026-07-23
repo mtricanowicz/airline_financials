@@ -32,7 +32,7 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col1:
     airline = st.selectbox("Airline", airlines, index=None, placeholder="Select")
 with col2:
-    years = sorted(insights.get(airline, {}).keys()) if airline else []
+    years = sorted(insights.get(airline, {}).keys(), reverse=True) if airline else []
     year = st.selectbox("Year", years, index=None, placeholder="Select")
 with col3:
     periods = sorted(insights.get(airline, {}).get(year, {}).keys()) if airline and year else []

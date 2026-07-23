@@ -18,11 +18,17 @@ from typing import Any
 # Candidate us-gaap tags per metric, tried in priority order.
 DURATION_METRICS: dict[str, list[str]] = {
     "Operating Revenue": [
-        "Revenues",
         "RevenueFromContractWithCustomerExcludingAssessedTax",
+        "Revenues",
+        "SalesRevenueNet",
     ],
-    "Operating Expenses": ["OperatingExpenses", "CostsAndExpenses"],
+    "Operating Expenses": [
+        "OperatingExpenses",
+        "OperatingCostsAndExpenses",
+        "CostsAndExpenses",
+    ],
     "Net Income": ["NetIncomeLoss"],
+    #"Earnings Per Share": ["EarningsPerShareDiluted"]
 }
 
 INSTANT_METRICS: dict[str, list[str]] = {
