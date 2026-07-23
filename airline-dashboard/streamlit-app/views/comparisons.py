@@ -199,9 +199,9 @@ with tab_time:
                     if (a, f"vs {base_airline}") in table.columns
                 ]
                 styled = table.style.map(color_positive_negative, subset=color_cols)
-                st.dataframe(styled, use_container_width=True)
+                st.dataframe(styled, width="stretch")
             else:
-                st.dataframe(table, use_container_width=True)
+                st.dataframe(table, width="stretch")
 
         if show_time:
             with col_line:
@@ -225,7 +225,7 @@ with tab_time:
                 else:
                     hover = "%{x}<br>%{y:,.0f}"
                 fig.update_traces(hovertemplate=hover)
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width="stretch")
 
         if show_compare:
             with col_bar:
@@ -256,7 +256,7 @@ with tab_time:
                 fig_bar.update_layout(xaxis_title=None, xaxis_tickangle=-45)
                 fig_bar.add_hline(y=0, line_dash="dot", line_color="gray", opacity=0.75)
                 fig_bar.update_traces(hovertemplate="%{x}<br>%{y:.2f}%")
-                st.plotly_chart(fig_bar, use_container_width=True)
+                st.plotly_chart(fig_bar, width="stretch")
 
 with tab_period:
     latest = max(periods)
@@ -293,6 +293,6 @@ with tab_period:
             for a in summary.columns.get_level_values(0).unique()
             if (a, f"vs {base_airline}") in summary.columns
         ]
-        st.dataframe(summary.style.map(color_positive_negative, subset=color_cols), use_container_width=True)
+        st.dataframe(summary.style.map(color_positive_negative, subset=color_cols), width="stretch")
     else:
-        st.dataframe(summary, use_container_width=True)
+        st.dataframe(summary, width="stretch")

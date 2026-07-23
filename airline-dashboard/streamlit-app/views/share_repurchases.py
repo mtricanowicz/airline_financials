@@ -199,7 +199,7 @@ with summary_col:
 
 with table_col:
     if fig_line is not None:
-        st.plotly_chart(fig_line, use_container_width=True)
+        st.plotly_chart(fig_line, width="stretch")
     else:
         st.warning("Live price history unavailable. Start quotes-api or check its URL.")
 
@@ -216,7 +216,7 @@ with table_col:
         fig.update_layout(xaxis_title=None, showlegend=False)
         fig.add_hline(y=0, line_dash="dot", line_color="black", opacity=0.5)
         fig.update_traces(hovertemplate="%{x}<br>%{y:$,.2f} billion")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
 
 def pivot_history(df: pd.DataFrame, value_cols: list[str]) -> pd.DataFrame:
@@ -234,7 +234,7 @@ with st.expander("Show share repurchase and share sale history tables", expanded
     r["Average Share Price"] = r["Average Share Price"].map(lambda x: f"${x:,.2f}")
     st.dataframe(
         pivot_history(r, ["Shares (millions)", "Cost (millions)", "Average Share Price"]),
-        use_container_width=True,
+        width="stretch",
     )
 
     if not sales.empty:
@@ -245,7 +245,7 @@ with st.expander("Show share repurchase and share sale history tables", expanded
         s["Average Share Price"] = s["Average Share Price"].map(lambda x: f"${x:,.2f}")
         st.dataframe(
             pivot_history(s, ["Shares (millions)", "Proceeds (millions)", "Average Share Price"]),
-            use_container_width=True,
+            width="stretch",
         )
 
 

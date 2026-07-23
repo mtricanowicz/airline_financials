@@ -42,12 +42,12 @@ with col_b:
     selected_airlines = st.multiselect("Airline(s)", airlines, default=default_airlines)
     selected_airlines = selected_airlines or airlines[:1]
     compare = (
-        st.toggle("Compare against a base airline", value=False)
+        st.toggle("Compare against an airline?", value=False)
         if len(selected_airlines) > 1
         else False
     )
-    base_airline = st.selectbox("Base airline", selected_airlines) if compare else selected_airlines[0]
-    if st.button("Show definitions of the metrics.", icon=":material/dictionary:", use_container_width=True):
+    base_airline = st.selectbox("Select Airline to Compare Against", selected_airlines) if compare else selected_airlines[0]
+    if st.button("Show definitions of the metrics.", icon=":material/dictionary:", width="stretch"):
         show_metric_definitions()
 
 
@@ -106,9 +106,9 @@ def render(data: pd.DataFrame, title: str) -> None:
             for a in summary.columns.get_level_values(0).unique()
             if (a, f"vs {base_airline}") in summary.columns
         ]
-        st.dataframe(summary.style.map(color_positive_negative, subset=color_cols), use_container_width=True)
+        st.dataframe(summary.style.map(color_positive_negative, subset=color_cols), width="stretch")
     else:
-        st.dataframe(summary, use_container_width=True)
+        st.dataframe(summary, width="stretch")
 
 
 with col_a:

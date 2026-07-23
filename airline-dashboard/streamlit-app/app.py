@@ -78,7 +78,7 @@ nav_weights = [len(page.title) + 5 for page in pages]
 nav_cols = st.columns([*nav_weights, sum(nav_weights)], gap="small")
 for col, page in zip(nav_cols, pages):
     with col:
-        st.page_link(page, use_container_width=True)
+        st.page_link(page, width="stretch")
 
 current_page.run()
 
