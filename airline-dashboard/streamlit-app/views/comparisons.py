@@ -137,7 +137,7 @@ airline_order = sorted(selected_airlines)
 show_time = len(selected_years) > 1 or len(selected_quarters) > 1
 show_compare = len(selected_airlines) > 1 and compare
 
-tab_time, tab_period = st.tabs(["Metrics over time", "Single period"])
+tab_time, tab_period = st.tabs(["Metrics Over Time", "Single Period"])
 
 with tab_time:
     for metric in selected_metrics:
