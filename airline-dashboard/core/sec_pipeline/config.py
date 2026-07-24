@@ -65,6 +65,9 @@ AIRLINE_CIK_FALLBACK: dict[str, str] = {
     "JBLU": "0001158463",   # JetBlue Airways Corp
     "ULCC": "0001670076",   # Frontier Group Holdings Inc
     "HA":   "0001172222",   # Hawaiian Holdings Inc
+    "SAVE": "0001498710",   # Spirit Aviation Holdings
+    "ALGT": "0001362468",   # Allegiant Travel Company
+    "SNCY": "0001743907",   # Sun Country Airlines Holdings LLC
 }
 
 AIRLINE_NAMES: dict[str, str] = {
@@ -76,6 +79,9 @@ AIRLINE_NAMES: dict[str, str] = {
     "JBLU": "JetBlue Airways",
     "ULCC": "Frontier Airlines",
     "HA":   "Hawaiian Airlines",
+    "SAVE": "Spirit Airlines",
+    "ALGT": "Allegiant Air",
+    "SNCY": "Sun Country Airlines",
 }
 
 # Filing forms relevant to a reporting period.

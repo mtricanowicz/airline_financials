@@ -14,6 +14,7 @@ import streamlit as st
 from lib.data import load_financials, split_by_period
 from lib.formatting import (
     AIRLINE_COLORS,
+    AIRLINE_GROUPS,
     CENTS_METRICS,
     CURRENCY_METRICS,
     METRIC_DEFINITIONS,
@@ -28,7 +29,7 @@ from lib.formatting import (
 st.header(":material/finance_mode: Filtered Comparisons")
 
 
-@st.dialog("Metric definitions", width="large")
+@st.dialog("Metric Definitions", width="large")
 def show_metric_definitions() -> None:
     for metric, definition in METRIC_DEFINITIONS:
         st.markdown(f"**{metric}** - {definition}")
@@ -61,18 +62,18 @@ with st.expander("Set filters", expanded=True):
     with st.container(border=True):
         col1, col2, col3 = st.columns([1, 2, 1])
         with col1:
-            data_type = st.radio("View Full Year or Quarterly Data?", ["Full Year", "Quarterly"], horizontal=True)
+            data_type = st.radio("View Full Year or Quarterly data?", ["Full Year", "Quarterly"], horizontal=True)
         data = fy_data if data_type == "Full Year" else q_data
 
         years = sorted(data["Year"].unique())
         with col2:
-            selected_years = st.multiselect("Select Year(s) for Comparison", years, default=years)
+            selected_years = st.multiselect("Select Years for comparison", years, default=years)
         selected_years = selected_years or years
 
         with col3:
             if data_type == "Quarterly":
                 quarters = sorted(data["Quarter"].unique())
-                selected_quarters = st.multiselect("Select Quarter(s) for Comparison", quarters, default=quarters)
+                selected_quarters = st.multiselect("Select Quarters for comparison", quarters, default=quarters)
                 selected_quarters = selected_quarters or quarters
             else:
                 selected_quarters = ["FY"]
@@ -81,19 +82,24 @@ with st.expander("Set filters", expanded=True):
     with st.container(border=True):
         col4, col5, col6 = st.columns([1, 2, 1])
         with col4:
-            default_airlines = [a for a in ["AAL", "DAL", "UAL"] if a in airlines] or airlines[:1]
-            selected_airlines = st.multiselect("Select Airline(s) for Comparison", airlines, default=default_airlines)
-            selected_airlines = selected_airlines or airlines[:1]
-
-        with col5:
-            compare = (
-                st.toggle("Would you like to compare selected airlines' metrics against one of the airlines?", value=len(selected_airlines) > 1)
-                if len(selected_airlines) > 1
-                else False
-            )
+            airline_group = st.radio("Select Airlines for comparison:", ["All", "Major Global Airlines", "Large National Airlines", "Small & Midsize Airlines", "Custom"], horizontal=False, index=1)
+        if airline_group == "All":
+            selected_airlines = airlines
+        elif airline_group in AIRLINE_GROUPS:
+            selected_airlines = [a for a in AIRLINE_GROUPS[airline_group] if a in airlines]
+        else:
+            with col5:
+                default_airlines = [a for a in ["AAL", "DAL", "UAL"] if a in airlines] or airlines[:1]
+                selected_airlines = st.multiselect("Add or remove Airlines to compare", airlines, default=default_airlines)
+                selected_airlines = selected_airlines or airlines[:1]    
         with col6:
+            compare = (
+                            st.toggle("Would you like to compare selected airlines' metrics against one of the airlines?", value=len(selected_airlines) > 1)
+                            if len(selected_airlines) > 1
+                            else False
+                        )
             base_airline = (
-                st.selectbox("Select Airline to Compare Against", selected_airlines)
+                st.selectbox("Select Airline to compare against:", selected_airlines)
                 if compare
                 else selected_airlines[0]
             )
@@ -101,23 +107,27 @@ with st.expander("Set filters", expanded=True):
     available_metrics = [
         c for c in data.columns if c not in ("Year", "Quarter", "Airline", "Period")
     ]
+    default_metric_goup_index = (
+        0 if airline_group in ("Major Global Airlines", "Large National Airlines")
+        else 1
+    )
     with st.container(border=True):
-        col7, col8 = st.columns([1, 3])
+        col7, col8, col9 = st.columns([1, 2, 1])
         with col7:
-            group = st.radio("Select Metrics for Comparison:", ["All", "Earnings", "Unit Performance", "Custom"], horizontal=True)
-        if group == "All":
+            metric_group = st.radio("Select Metrics for Comparison:", ["All", "Earnings", "Unit Performance", "Custom"], horizontal=True, index=default_metric_goup_index)
+        if metric_group == "All":
             selected_metrics = available_metrics
-        elif group in METRIC_GROUPS:
-            selected_metrics = [m for m in METRIC_GROUPS[group] if m in available_metrics]
+        elif metric_group in METRIC_GROUPS:
+            selected_metrics = [m for m in METRIC_GROUPS[metric_group] if m in available_metrics]
         else:
             with col8:
                 selected_metrics = st.multiselect(
-                    "Add or Remove Metrics to Compare", available_metrics, default=available_metrics[:1]
+                    "Add or remove Metrics to compare:", available_metrics, default=available_metrics[:1]
                 )
                 selected_metrics = selected_metrics or available_metrics[:1]
-
-        if st.button("Show definitions of the available metrics.", icon=":material/dictionary:"):
-            show_metric_definitions()
+        with col9:
+            if st.button("Show definitions of the available metrics", icon=":material/dictionary:"):
+                show_metric_definitions()
 
 # ---------------------------------------------------------------------------
 # Filter and compute

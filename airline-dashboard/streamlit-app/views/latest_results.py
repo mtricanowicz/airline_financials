@@ -11,6 +11,7 @@ import streamlit as st
 
 from lib.data import load_financials, split_by_period
 from lib.formatting import (
+    AIRLINE_GROUPS,
     CENTS_METRICS,
     METRIC_DEFINITIONS,
     MILLIONS_METRICS,
@@ -22,7 +23,7 @@ from lib.formatting import (
 st.header(":material/calendar_today: Latest Results")
 
 
-@st.dialog("Metric definitions", width="large")
+@st.dialog("Metric Definitions", width="large")
 def show_metric_definitions() -> None:
     for metric, definition in METRIC_DEFINITIONS:
         st.markdown(f"**{metric}** - {definition}")
@@ -38,16 +39,23 @@ airlines = sorted(financials["Airline"].unique())
 
 col_a, col_b = st.columns([4, 1])
 with col_b:
-    default_airlines = [a for a in ["AAL", "DAL", "UAL"] if a in airlines] or airlines[:1]
-    selected_airlines = st.multiselect("Airline(s)", airlines, default=default_airlines)
-    selected_airlines = selected_airlines or airlines[:1]
+
+    airline_group = st.radio("Select Airlines for Comparison:", ["All", "Major Global Airlines", "Large National Airlines", "Small & Midsize Airlines", "Custom"], horizontal=False, index=1)
+    if airline_group == "All":
+        selected_airlines = airlines
+    elif airline_group in AIRLINE_GROUPS:
+        selected_airlines = [a for a in AIRLINE_GROUPS[airline_group] if a in airlines]
+    else:
+        default_airlines = [a for a in ["AAL", "DAL", "UAL"] if a in airlines] or airlines[:1]
+        selected_airlines = st.multiselect("Airline(s)", airlines, default=default_airlines)
+        selected_airlines = selected_airlines or airlines[:1]
     compare = (
         st.toggle("Compare against an airline?", value=False)
         if len(selected_airlines) > 1
         else False
     )
     base_airline = st.selectbox("Select Airline to Compare Against", selected_airlines) if compare else selected_airlines[0]
-    if st.button("Show definitions of the metrics.", icon=":material/dictionary:", width="stretch"):
+    if st.button("Show definitions of the metrics", icon=":material/dictionary:", width="stretch"):
         show_metric_definitions()
 
 

@@ -21,6 +21,9 @@ AIRLINE_COLORS: dict[str, str] = {
     "JBLU": "#0000aa",
     "ULCC": "#248168",
     "HA":   "#4b2d89",
+    "SAVE": "#ffec00",
+    "ALGT": "#f48220",
+    "SNCY": "#f58232",
 }
 
 AIRLINE_NAMES: dict[str, str] = {
@@ -32,6 +35,9 @@ AIRLINE_NAMES: dict[str, str] = {
     "JBLU": "JetBlue Airways",
     "ULCC": "Frontier Airlines",
     "HA":   "Hawaiian Airlines",
+    "SAVE": "Spirit Airlines",
+    "ALGT": "Allegiant Air",
+    "SNCY": "Sun Country Airlines",
 }
 
 AIRLINE_LOGO_FILES: dict[str, str] = {
@@ -43,6 +49,29 @@ AIRLINE_LOGO_FILES: dict[str, str] = {
     "JBLU": "logo_JBLU.png",
     "ULCC": "logo_ULCC.png",
     "HA":   "logo_HA.png",
+    "SAVE": "logo_SAVE.png",
+    "ALGT": "logo_ALGT.png",
+    "SNCY": "logo_SNCY.png",
+}
+
+AIRLINE_GROUPS = {
+    "Major Global Airlines": [
+        "AAL",
+        "DAL",
+        "UAL",
+    ],
+    "Large National Airlines": [
+        "LUV",
+    ],
+    "Small & Midsize Airlines": [
+        "ALK",
+        "JBLU",
+        "ULCC",
+        "HA",
+        "SAVE",
+        "ALGT",
+        "SNCY",
+    ],
 }
 
 # Metrics reported in dollars; displayed in millions with a currency prefix.
@@ -69,11 +98,11 @@ METRIC_GROUPS = {
     "Earnings": [
         "Operating Revenue",
         "Operating Expenses",
-        "Net Income",
-        "Long-Term Debt",
         "Operating Income",
+        "Net Income",
         "Operating Margin",
         "Net Margin",
+        "Long-Term Debt",
     ],
     "Unit Performance": ["Yield", "TRASM", "PRASM", "CASM"],
 }
