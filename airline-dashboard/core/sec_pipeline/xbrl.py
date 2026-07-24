@@ -19,8 +19,9 @@ from typing import Any
 DURATION_METRICS: dict[str, list[str]] = {
     "Operating Revenue": [
         "RevenueFromContractWithCustomerExcludingAssessedTax",
-        "Revenues",
+        "SalesRevenueServicesNet",
         "SalesRevenueNet",
+        "Revenues",
     ],
     "Operating Expenses": [
         "OperatingExpenses",
@@ -109,7 +110,11 @@ def extract_metric(facts: dict[str, Any], metric: str, year: int, period: str) -
     if period != "Q4":
         for tag in tags:
             val = _pick_duration(_facts_for_tag(facts, tag), year, period)
-            if val is not None:
+            # Revenue and expenses should not be zero for an active airline
+            if metric in {"Operating Revenue", "Operating Expenses"}:
+                if val is not None and val > 0:
+                    return val
+            elif val is not None:
                 return val
         return None
 

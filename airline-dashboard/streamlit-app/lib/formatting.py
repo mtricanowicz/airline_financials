@@ -77,21 +77,22 @@ METRIC_GROUPS = {
 
 METRIC_DEFINITIONS: list[tuple[str, str]] = [
     ("Operating Revenue", "Total amount earned from operations."),
-    ("Passenger Revenue", "Revenue primarily composed of passenger ticket sales, loyalty travel awards, and travel-related services performed in conjunction with a passenger's flight."),
+    ("Passenger Revenue*", "Revenue primarily composed of passenger ticket sales, loyalty travel awards, and travel-related services performed in conjunction with a passenger's flight."),
     ("Operating Expenses", "Total amount of costs incurred from operations."),
     ("Operating Income", "Income from operations. Operating Revenue minus Operating Expenses."),
     ("Net Income", "Profit."),
-    ("Revenue Passenger Mile (RPM)", "A basic measure of sales volume. One RPM represents one passenger flown one mile."),
-    ("Available Seat Mile (ASM)", "A basic measure of production. One ASM represents one seat flown one mile."),
-    ("Long-Term Debt", "Total long-term debt net of current maturities."),
-    ("Profit Sharing", "Amount of income set aside to fund employee profit sharing programs. NOTE: Quarterly reporting by AAL and UAL of this metric is inconsistent. Data provided may have been obtained from internal sources or estimated by proportioning the annual profit sharing reported by the quarterly operating income reported."),
     ("Operating Margin", "Operating Income divided by Operating Revenue"),
     ("Net Margin", "Percentage of profit earned for each dollar in revenue. Net Income divided by Operating Revenue."),
-    ("Load Factor", "The percentage of available seats that are filled with revenue passengers. RPMs divided by ASMs."),
-    ("Yield", "A measure of airline revenue derived by dividing Passenger Revenue by RPMs."),
-    ("Total Revenue per Available Seat Mile (TRASM)", "Operating Revenue divided by ASMs."),
-    ("Passenger Revenue per Available Seat Mile (PRASM)", "Passenger Revenue divided by ASMs."),
-    ("Cost per Available Seat Mile (CASM)", "Operating Expenses divided by ASMs."),
+    ("Long-Term Debt", "Total long-term debt net of current maturities."),
+    ("Profit Sharing*", "Amount of income set aside to fund employee profit sharing programs. NOTE: Quarterly reporting by AAL and UAL of this metric is inconsistent. Data provided may have been obtained from internal sources or estimated by proportioning the annual profit sharing reported by the quarterly operating income reported."),
+    ("Revenue Passenger Mile (RPM)*", "A basic measure of sales volume. One RPM represents one passenger flown one mile."),
+    ("Available Seat Mile (ASM)*", "A basic measure of production. One ASM represents one seat flown one mile."),
+    ("Load Factor*", "The percentage of available seats that are filled with revenue passengers. RPMs divided by ASMs."),
+    ("Yield*", "A measure of airline revenue derived by dividing Passenger Revenue by RPMs."),
+    ("Total Revenue per Available Seat Mile (TRASM)*", "Operating Revenue divided by ASMs."),
+    ("Passenger Revenue per Available Seat Mile (PRASM)*", "Passenger Revenue divided by ASMs."),
+    ("Cost per Available Seat Mile (CASM)*", "Operating Expenses divided by ASMs."),
+    ("\\*", "Could not be retrieved automatically from SEC filing data. This metric is sourced directly from SEC filings through manual review or derived from filing data collected manually.")
 ]
 
 
