@@ -57,23 +57,25 @@ SEC_MAX_REQUESTS_PER_SECOND = 8.0
 # Fallback CIK map. The pipeline prefers the live ticker->CIK map from SEC and
 # falls back to these values if the network lookup is unavailable.
 AIRLINE_CIK_FALLBACK: dict[str, str] = {
-    "AAL": "0000006201",  # American Airlines Group Inc
-    "DAL": "0000027904",  # Delta Air Lines Inc
-    "UAL": "0000100517",  # United Airlines Holdings Inc
-    "LUV": "0000092380",  # Southwest Airlines Co
-    "ALK": "0000766421",  # Alaska Air Group Inc
-    "JBLU": "0001158463",  # JetBlue Airways Corp
-    "ULCC": "0001670076",  # Frontier Group Holdings Inc
+    "AAL":  "0000006201",   # American Airlines Group Inc
+    "DAL":  "0000027904",   # Delta Air Lines Inc
+    "UAL":  "0000100517",   # United Airlines Holdings Inc
+    "LUV":  "0000092380",   # Southwest Airlines Co
+    "ALK":  "0000766421",   # Alaska Air Group Inc
+    "JBLU": "0001158463",   # JetBlue Airways Corp
+    "ULCC": "0001670076",   # Frontier Group Holdings Inc
+    "HA":   "0001172222",   # Hawaiian Holdings Inc
 }
 
 AIRLINE_NAMES: dict[str, str] = {
-    "AAL": "American Airlines",
-    "DAL": "Delta Air Lines",
-    "UAL": "United Airlines",
-    "LUV": "Southwest Airlines",
-    "ALK": "Alaska Airlines",
+    "AAL":  "American Airlines",
+    "DAL":  "Delta Air Lines",
+    "UAL":  "United Airlines",
+    "LUV":  "Southwest Airlines",
+    "ALK":  "Alaska Airlines",
     "JBLU": "JetBlue Airways",
     "ULCC": "Frontier Airlines",
+    "HA":   "Hawaiian Airlines",
 }
 
 # Filing forms relevant to a reporting period.

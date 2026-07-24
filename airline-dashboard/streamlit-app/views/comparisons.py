@@ -262,10 +262,12 @@ with tab_period:
     latest = max(periods)
     st.subheader(f"Summary of {latest}", divider="gray")
     st.caption("When multiple periods are selected, this shows the latest one in the range.")
+    metric_order: list[str] = []
     summary_rows = []
     for metric in selected_metrics:
         scaled, display_col = scale_for_display(filtered.copy(), metric)
         scaled = scaled[scaled["Period"] == latest]
+        metric_order.append(display_col)
         base_val = scaled[scaled["Airline"] == base_airline][display_col]
         base_val = base_val.iloc[0] if not base_val.empty else None
         for airline in selected_airlines:
@@ -286,6 +288,7 @@ with tab_period:
     summary = summary.unstack("Airline")
     summary.columns = summary.columns.swaplevel(0, 1)
     summary = summary.sort_index(axis=1, level=0)
+    summary = summary.reindex(metric_order)
     if show_compare:
         summary = summary.drop(columns=[(base_airline, f"vs {base_airline}")], errors="ignore")
         color_cols = [

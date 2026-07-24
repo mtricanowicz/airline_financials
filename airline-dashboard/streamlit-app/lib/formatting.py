@@ -13,33 +13,36 @@ from pathlib import Path
 import pandas as pd
 
 AIRLINE_COLORS: dict[str, str] = {
-    "AAL": "#9DA6AB",
-    "DAL": "#C01933",
-    "UAL": "#005daa",
-    "ALK": "#01426a",
-    "LUV": "#f9b612",
-    "JBLU": "#003876",
+    "AAL":  "#9DA6AB",
+    "DAL":  "#C01933",
+    "UAL":  "#005daa",
+    "ALK":  "#01426a",
+    "LUV":  "#f9b612",
+    "JBLU": "#0000aa",
     "ULCC": "#248168",
+    "HA":   "#4b2d89",
 }
 
 AIRLINE_NAMES: dict[str, str] = {
-    "AAL": "American Airlines",
-    "DAL": "Delta Air Lines",
-    "UAL": "United Airlines",
-    "ALK": "Alaska Airlines",
-    "LUV": "Southwest Airlines",
+    "AAL":  "American Airlines",
+    "DAL":  "Delta Air Lines",
+    "UAL":  "United Airlines",
+    "ALK":  "Alaska Airlines",
+    "LUV":  "Southwest Airlines",
     "JBLU": "JetBlue Airways",
     "ULCC": "Frontier Airlines",
+    "HA":   "Hawaiian Airlines",
 }
 
 AIRLINE_LOGO_FILES: dict[str, str] = {
-    "AAL": "logo_AAL.png",
-    "DAL": "logo_DAL.png",
-    "UAL": "logo_UAL.png",
-    "ALK": "logo_ALK.png",
-    "LUV": "logo_LUV.png",
+    "AAL":  "logo_AAL.png",
+    "DAL":  "logo_DAL.png",
+    "UAL":  "logo_UAL.png",
+    "ALK":  "logo_ALK.png",
+    "LUV":  "logo_LUV.png",
     "JBLU": "logo_JBLU.png",
     "ULCC": "logo_ULCC.png",
+    "HA":   "logo_HA.png",
 }
 
 # Metrics reported in dollars; displayed in millions with a currency prefix.
@@ -56,7 +59,7 @@ CURRENCY_METRICS = [
 # Metrics scaled into millions for display but shown without a currency symbol.
 MILLIONS_METRICS = CURRENCY_METRICS + ["RPM", "ASM"]
 
-# Per-seat-mile metrics reported in cents.
+# Unit metrics reported in cents.
 CENTS_METRICS = ["Yield", "TRASM", "PRASM", "CASM"]
 
 # Metrics reported as percentages.

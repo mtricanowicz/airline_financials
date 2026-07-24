@@ -28,7 +28,11 @@ DURATION_METRICS: dict[str, list[str]] = {
         "OperatingCostsAndExpenses",
         "CostsAndExpenses",
     ],
-    "Net Income": ["NetIncomeLoss"],
+    "Net Income": [
+        "NetIncomeLoss",
+        "ProfitLoss",
+        "NetIncomeLossAvailableToCommonStockholdersBasic",
+    ],
     #"Earnings Per Share": ["EarningsPerShareDiluted"]
 }
 
