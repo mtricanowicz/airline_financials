@@ -14,6 +14,7 @@ import streamlit as st
 from lib.data import load_financials, split_by_period
 from lib.formatting import (
     AIRLINE_COLORS,
+    AIRLINE_NAMES,
     AIRLINE_GROUPS,
     CENTS_METRICS,
     CURRENCY_METRICS,
@@ -24,6 +25,7 @@ from lib.formatting import (
     color_positive_negative,
     format_metric_value,
     pct_diff,
+    airline_label_html,
 )
 
 st.header(":material/finance_mode: Filtered Comparisons")
@@ -60,7 +62,7 @@ def scale_for_display(df: pd.DataFrame, metric: str) -> tuple[pd.DataFrame, str]
 # ---------------------------------------------------------------------------
 with st.expander("Set filters", expanded=True):
     with st.container(border=True):
-        col1, col2, col3 = st.columns([1, 2, 1])
+        col1, col2, col3 = st.columns([1, 3, 1])
         with col1:
             data_type = st.radio("View Full Year or Quarterly data?", ["Full Year", "Quarterly"], horizontal=True)
         data = fy_data if data_type == "Full Year" else q_data
@@ -80,7 +82,7 @@ with st.expander("Set filters", expanded=True):
 
     airlines = sorted(data["Airline"].unique())
     with st.container(border=True):
-        col4, col5, col6 = st.columns([1, 2, 1])
+        col4, col5, col6 = st.columns([1, 3, 1])
         with col4:
             airline_group = st.radio("Select Airlines for comparison:", ["All", "Major Global Airlines", "Large National Airlines", "Small & Midsize Airlines", "Custom"], horizontal=False, index=1)
         if airline_group == "All":
@@ -92,6 +94,10 @@ with st.expander("Set filters", expanded=True):
                 default_airlines = [a for a in ["AAL", "DAL", "UAL"] if a in airlines] or airlines[:1]
                 selected_airlines = st.multiselect("Add or remove Airlines to compare", airlines, default=default_airlines)
                 selected_airlines = selected_airlines or airlines[:1]    
+        with col5:
+            if airline_group != "Custom":
+                st.markdown("<small>Airlines selected:</small>", unsafe_allow_html=True)
+            st.markdown(" | ".join([airline_label_html(airline, text=f"{AIRLINE_NAMES.get(airline, airline)}", logo_height_em=0.95, logo_before_text=True, gap_rem=0.25) for airline in selected_airlines]), unsafe_allow_html=True)
         with col6:
             compare = (
                             st.toggle("Would you like to compare selected airlines' metrics against one of the airlines?", value=len(selected_airlines) > 1)
@@ -112,9 +118,9 @@ with st.expander("Set filters", expanded=True):
         else 1
     )
     with st.container(border=True):
-        col7, col8, col9 = st.columns([1, 2, 1])
+        col7, col8, col9 = st.columns([1, 3, 1])
         with col7:
-            metric_group = st.radio("Select Metrics for Comparison:", ["All", "Earnings", "Unit Performance", "Custom"], horizontal=True, index=default_metric_goup_index)
+            metric_group = st.radio("Select Metrics for Comparison:", ["All", "Earnings", "Unit Performance", "Custom"], horizontal=False, index=default_metric_goup_index)
         if metric_group == "All":
             selected_metrics = available_metrics
         elif metric_group in METRIC_GROUPS:
@@ -125,6 +131,9 @@ with st.expander("Set filters", expanded=True):
                     "Add or remove Metrics to compare:", available_metrics, default=available_metrics[:1]
                 )
                 selected_metrics = selected_metrics or available_metrics[:1]
+        with col8:
+            if metric_group != "Custom":
+                st.markdown("<small>Metrics selected:</small><br>" + " | ".join(selected_metrics), unsafe_allow_html=True)
         with col9:
             if st.button("Show definitions of the available metrics", icon=":material/dictionary:"):
                 show_metric_definitions()

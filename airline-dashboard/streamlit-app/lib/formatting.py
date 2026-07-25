@@ -187,6 +187,57 @@ def get_airline_logo_path(airline: str) -> Path | None:
     return logo_path if logo_path.exists() else None
 
 
+def airline_label_html(
+    airline: str,
+    text: str | None = None,
+    logo_height_em: float = 1.05,
+    logo_before_text: bool = True,
+    gap_rem: float = 0.28,
+    font_weight: int | str = 400,
+) -> str:
+    """Return normal inline text with the airline logo beside it."""
+    display_text = text or airline
+    logo_path = get_airline_logo_path(airline)
+    image_html = ""
+    if logo_path is not None:
+        encoded = base64.b64encode(logo_path.read_bytes()).decode("ascii")
+        image_html = (
+            f"<img src='data:image/png;base64,{encoded}' "
+            f"alt='{escape(airline)} logo' "
+            f"style='"
+            f"height:{logo_height_em:.2f}em;"
+            f"width:auto;"
+            f"display:block;"
+            f"object-fit:contain;"
+            f"flex:0 0 auto;"
+            f"'/>"
+        )
+    text_html = (
+        f"<span style='"
+        f"margin:0;"
+        f"padding:0;"
+        f"line-height:1.2;"
+        f"font-weight:{font_weight};"
+        f"'>"
+        f"{escape(display_text)}"
+        f"</span>"
+    )
+    if logo_before_text:
+        content_html = f"{image_html}{text_html}"
+    else:
+        content_html = f"{text_html}{image_html}"
+    return (
+        f"<span style='"
+        f"display:inline-flex;"
+        f"align-items:center;"
+        f"gap:{gap_rem:.2f}rem;"
+        f"vertical-align:middle;"
+        f"'>"
+        f"{content_html}"
+        f"</span>"
+    )
+
+
 def airline_header_html(
     airline: str,
     text: str,
