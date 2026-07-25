@@ -39,7 +39,6 @@ airlines = sorted(financials["Airline"].unique())
 
 col_a, col_b = st.columns([4, 1])
 with col_b:
-
     airline_group = st.radio("Select Airlines for Comparison:", ["All", "Major Global Airlines", "Large National Airlines", "Small & Midsize Airlines", "Custom"], horizontal=False, index=1)
     if airline_group == "All":
         selected_airlines = airlines

@@ -92,7 +92,7 @@ with st.expander("Set filters", expanded=True):
         else:
             with col5:
                 default_airlines = [a for a in ["AAL", "DAL", "UAL"] if a in airlines] or airlines[:1]
-                selected_airlines = st.multiselect("Add or remove Airlines to compare", airlines, default=default_airlines)
+                selected_airlines = st.multiselect("Add or remove Airlines to compare:", airlines, default=default_airlines)
                 selected_airlines = selected_airlines or airlines[:1]    
         with col5:
             if airline_group != "Custom":
@@ -113,14 +113,14 @@ with st.expander("Set filters", expanded=True):
     available_metrics = [
         c for c in data.columns if c not in ("Year", "Quarter", "Airline", "Period")
     ]
-    default_metric_goup_index = (
+    default_metric_group_index = (
         0 if airline_group in ("Major Global Airlines", "Large National Airlines")
         else 1
     )
     with st.container(border=True):
         col7, col8, col9 = st.columns([1, 3, 1])
         with col7:
-            metric_group = st.radio("Select Metrics for Comparison:", ["All", "Earnings", "Unit Performance", "Custom"], horizontal=False, index=default_metric_goup_index)
+            metric_group = st.radio("Select Metrics for Comparison:", ["All", "Earnings", "Unit Performance", "Custom"], horizontal=False, index=default_metric_group_index)
         if metric_group == "All":
             selected_metrics = available_metrics
         elif metric_group in METRIC_GROUPS:
