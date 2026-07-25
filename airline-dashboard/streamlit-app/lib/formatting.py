@@ -72,6 +72,11 @@ AIRLINE_GROUPS = {
         "ALGT",
         "SNCY",
     ],
+    "Defunct Airlines": [
+        "HA",
+        "SAVE",
+        "SNCY",
+    ],
 }
 
 # Metrics reported in dollars; displayed in millions with a currency prefix.
@@ -102,6 +107,8 @@ METRIC_GROUPS = {
         "Net Income",
         "Operating Margin",
         "Net Margin",
+    ],
+    "Debt & Liquidity": [
         "Long-Term Debt",
     ],
     "Unit Performance": ["Yield", "TRASM", "PRASM", "CASM"],

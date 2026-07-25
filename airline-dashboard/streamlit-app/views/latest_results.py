@@ -11,10 +11,12 @@ import streamlit as st
 
 from lib.data import load_financials, split_by_period
 from lib.formatting import (
+    AIRLINE_NAMES,
     AIRLINE_GROUPS,
     CENTS_METRICS,
     METRIC_DEFINITIONS,
     MILLIONS_METRICS,
+    airline_label_html,
     color_positive_negative,
     format_metric_value,
     pct_diff,
@@ -39,15 +41,19 @@ airlines = sorted(financials["Airline"].unique())
 
 col_a, col_b = st.columns([4, 1])
 with col_b:
-    airline_group = st.radio("Select Airlines for Comparison:", ["All", "Major Global Airlines", "Large National Airlines", "Small & Midsize Airlines", "Custom"], horizontal=False, index=1)
+    airline_group = st.radio("Select Airlines for Comparison:", ["All", *[group for group in AIRLINE_GROUPS if group != "Defunct Airlines"]], horizontal=False, index=1)
     if airline_group == "All":
-        selected_airlines = airlines
+        airline_options = [a for a in airlines if a not in AIRLINE_GROUPS["Defunct Airlines"]]
+        default_airlines = airline_options
     elif airline_group in AIRLINE_GROUPS:
-        selected_airlines = [a for a in AIRLINE_GROUPS[airline_group] if a in airlines]
+        airline_options = [a for a in AIRLINE_GROUPS[airline_group] if a in airlines and a not in AIRLINE_GROUPS["Defunct Airlines"]]
+        default_airlines = airline_options
     else:
-        default_airlines = [a for a in ["AAL", "DAL", "UAL"] if a in airlines] or airlines[:1]
-        selected_airlines = st.multiselect("Airline(s)", airlines, default=default_airlines)
-        selected_airlines = selected_airlines or airlines[:1]
+        airline_options = airlines
+        default_airlines = airlines
+    selected_airlines = st.multiselect("Add or remove Airlines to compare:", airline_options, default=default_airlines)
+    selected_airlines = selected_airlines or airline_options[:1]
+    st.markdown("<br>".join([airline_label_html(airline, text=f"{AIRLINE_NAMES.get(airline, airline)} ({airline})", logo_height_em=0.95, logo_before_text=True, gap_rem=0.25) for airline in selected_airlines]), unsafe_allow_html=True)
     compare = (
         st.toggle("Compare against an airline?", value=False)
         if len(selected_airlines) > 1
