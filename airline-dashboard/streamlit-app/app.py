@@ -14,6 +14,10 @@ from pathlib import Path
 
 import streamlit as st
 
+from lib.data import (
+    fetch_live_quotes,
+)
+
 from lib.formatting import (
     AIRLINE_NAMES,
     AIRLINE_IR,
@@ -22,6 +26,7 @@ from lib.formatting import (
     about_sidebar_html,
     airline_label_html,
     get_other_dashboard_link,
+    stock_ticker_html,
 )
 
 _APP_DIR = Path(__file__).parent
@@ -44,20 +49,23 @@ st.set_page_config(
     },
 )
 
+
 # Site logo / title banner, shown on every page.
 st.image(
     str(_BRANDING_DIR / "site_title.png"),
     caption="Explore US Airline Financial Performance",
 )
 
+
+# Collapsible sidebar with reference information including sections for About, Airlines Covered, and Other Industry Dashboards
+# Sidebar also includes a live stock ticker toggle
 st.logo(
     str(_BRANDING_DIR / "site_title.png"),
     link="https://airline.industryfinancials.com",
     icon_image=str(_BRANDING_DIR / "site_favicon.png"),
 )
-
-# Collapsible sidebar with reference information including sections for About, Airlines Covered, and Other Industry Dashboards
 with st.sidebar:
+    activate_stock_ticker = st.toggle("Activate Stock Ticker", value=True)
     with st.expander("About the Airline Financial Dashboard", expanded=False):
         st.markdown(
             about_sidebar_html(),
@@ -104,8 +112,12 @@ with st.sidebar:
             unsafe_allow_html=True
         )
 
+
+# App page definitions and navigation setup.
+# Directory containing the view scripts for the different pages of the app.
 _VIEWS = _APP_DIR / "views"
 
+# List of pages for the app.
 pages = [
     st.Page(str(_VIEWS / "comparisons.py"), title="Filtered Comparisons", icon=":material/finance_mode:", default=True),
     st.Page(str(_VIEWS / "latest_results.py"), title="Latest Results", icon=":material/calendar_today:"),
@@ -125,5 +137,29 @@ for col, page in zip(nav_cols, pages):
     with col:
         st.page_link(page, width="stretch")
 
+
+# Stock ticker setup and rendering
+# Define a container for the stock ticker at the bottom of the page, initialized as empty.
+stock_ticker_container = st.bottom
+stock_ticker_container.empty()
+# Define the list of stock tickers to display, excluding defunct airlines.
+STOCK_TICKERS = tuple(
+    ticker
+    for ticker in AIRLINE_NAMES
+    if ticker not in AIRLINE_GROUPS.get("Defunct Airlines", [])
+)
+# Define the stock ticker rendering function and schedule it to run every 60 seconds.
+@st.fragment(run_every="60s")
+def render_stock_ticker() -> None:
+    quotes = fetch_live_quotes(STOCK_TICKERS)
+    stock_ticker_container.html(
+        stock_ticker_html(quotes)
+    )
+# Render the stock ticker if it is activated.
+if activate_stock_ticker:
+    render_stock_ticker()
+
+
+# Run the current page.
 current_page.run()
 

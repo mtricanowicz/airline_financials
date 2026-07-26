@@ -23,7 +23,7 @@ from pydantic import BaseModel
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("quotes-api")
 
-DEFAULT_TICKERS = ["AAL", "DAL", "UAL", "LUV", "ALK"]
+DEFAULT_TICKERS = ["AAL", "DAL", "UAL", "LUV", "ALK", "JBLU", "ULCC", "ALGT"]
 ALLOWED_ORIGINS = [o for o in os.getenv("ALLOWED_ORIGINS", "*").split(",") if o]
 
 app = FastAPI(title="Airline Dashboard Quotes API", version="0.1.0")
@@ -196,3 +196,133 @@ def history(
             with _lock:
                 _history_cache[key] = payload
     return HistoryResponse(history=payload)
+
+
+# Additions to support "live" stock quotes for crawling ticker
+# Live quote cache and TTL for intraday quotes.
+LIVE_QUOTE_CACHE_TTL_SECONDS = 60
+_live_quote_cache: dict[
+    str,
+    tuple[dt.datetime, LiveQuote],
+] = {}
+
+
+class LiveQuote(BaseModel):
+    ticker: str
+    price: float | None
+    change: float | None = None
+    change_percent: float | None = None
+    as_of: str | None = None
+    market_state: str | None = None
+    error: str | None = None
+
+
+class LiveQuotesResponse(BaseModel):
+    quotes: list[LiveQuote]
+
+
+# Live quote fetching and caching
+def get_live_quote_cached(ticker: str) -> LiveQuote:
+    """Return an intraday quote cached for a short interval."""
+    now = dt.datetime.now(dt.timezone.utc)
+
+    with _lock:
+        cached = _live_quote_cache.get(ticker)
+
+        if cached is not None:
+            fetched_at, quote = cached
+            age_seconds = (now - fetched_at).total_seconds()
+
+            if age_seconds < LIVE_QUOTE_CACHE_TTL_SECONDS:
+                return quote
+    quote = _fetch_live_quote(ticker)
+    # Cache successful responses only, allowing transient failures to retry.
+    if quote.price is not None:
+        with _lock:
+            _live_quote_cache[ticker] = (now, quote)
+
+    return quote
+
+
+def _fetch_live_quote(ticker: str) -> LiveQuote:
+    """Fetch the latest available intraday price and daily change."""
+    try:
+        hist = yf.Ticker(ticker).history(
+            period="1d",
+            interval="1m",
+            prepost=False,
+        )
+        if hist.empty:
+            return LiveQuote(
+                ticker=ticker,
+                price=None,
+                error="no intraday data",
+            )
+
+        closes = hist["Close"].dropna()
+        if closes.empty:
+            return LiveQuote(
+                ticker=ticker,
+                price=None,
+                error="no close data",
+            )
+
+        price = float(closes.iloc[-1])
+        # Obtain the prior trading day's close separately so the ticker shows
+        # change relative to the previous session, not the first minute today.
+        daily = yf.Ticker(ticker).history(
+            period="5d",
+            interval="1d",
+            prepost=False,
+        )
+        daily_closes = daily["Close"].dropna()
+
+        if len(daily_closes) >= 2:
+            previous_close = float(daily_closes.iloc[-2])
+        elif len(daily_closes) == 1:
+            previous_close = float(daily_closes.iloc[-1])
+        else:
+            previous_close = price
+        change = price - previous_close
+        change_percent = (
+            change / previous_close * 100
+            if previous_close
+            else 0.0
+        )
+        timestamp = closes.index[-1]
+        return LiveQuote(
+            ticker=ticker,
+            price=round(price, 2),
+            change=round(change, 2),
+            change_percent=round(change_percent, 2),
+            as_of=timestamp.isoformat(),
+        )
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Live quote fetch failed for %s: %s", ticker, exc)
+
+        return LiveQuote(
+            ticker=ticker,
+            price=None,
+            error="live fetch failed",
+        )
+
+
+@app.get("/live-quotes", response_model=LiveQuotesResponse)
+def live_quotes(
+    tickers: str = Query(
+        default=",".join(DEFAULT_TICKERS),
+        description="Comma-separated tickers",
+    ),
+) -> LiveQuotesResponse:
+    symbols = [
+        ticker.strip().upper()
+        for ticker in tickers.split(",")
+        if ticker.strip()
+    ]
+    return LiveQuotesResponse(
+        quotes=[
+            get_live_quote_cached(ticker)
+            for ticker in symbols
+        ]
+    )
+

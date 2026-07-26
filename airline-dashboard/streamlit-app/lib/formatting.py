@@ -16,8 +16,8 @@ AIRLINE_COLORS: dict[str, str] = {
     "AAL":  "#9DA6AB",
     "DAL":  "#C01933",
     "UAL":  "#005daa",
-    "ALK":  "#01426a",
     "LUV":  "#f9b612",
+    "ALK":  "#01426a",
     "JBLU": "#0000aa",
     "ULCC": "#248168",
     "HA":   "#4b2d89",
@@ -30,8 +30,8 @@ AIRLINE_NAMES: dict[str, str] = {
     "AAL":  "American Airlines",
     "DAL":  "Delta Air Lines",
     "UAL":  "United Airlines",
-    "ALK":  "Alaska Airlines",
     "LUV":  "Southwest Airlines",
+    "ALK":  "Alaska Airlines",
     "JBLU": "JetBlue Airways",
     "ULCC": "Frontier Airlines",
     "HA":   "Hawaiian Airlines",
@@ -44,8 +44,8 @@ AIRLINE_IR: dict[str, str] = {
     "AAL":  "https://americanairlines.gcs-web.com/",
     "DAL":  "https://ir.delta.com/",
     "UAL":  "https://ir.united.com/",
-    "ALK":  "https://investor.alaskaair.com/",
     "LUV":  "https://www.southwestairlinesinvestorrelations.com/",
+    "ALK":  "https://investor.alaskaair.com/",
     "JBLU": "https://investors.jetblue.com/",
     "ULCC": "https://ir.flyfrontier.com/",
     "HA":   None,
@@ -58,8 +58,8 @@ AIRLINE_LOGO_FILES: dict[str, str] = {
     "AAL":  "logo_AAL.png",
     "DAL":  "logo_DAL.png",
     "UAL":  "logo_UAL.png",
-    "ALK":  "logo_ALK.png",
     "LUV":  "logo_LUV.png",
+    "ALK":  "logo_ALK.png",
     "JBLU": "logo_JBLU.png",
     "ULCC": "logo_ULCC.png",
     "HA":   "logo_HA.png",
@@ -302,7 +302,6 @@ def airline_header_html(
 def about_sidebar_html() -> str:
     """Return HTML for the About section in the sidebar."""
     return """
-    ### Airline Financial Dashboard
     <div style="font-size: 0.875rem;">
         <p>
             Explore U.S. airline financial performance through clear and accessible
@@ -398,3 +397,127 @@ def get_other_dashboard_link(
         f"{content}"
         "</span>"
     )
+
+
+def stock_ticker_html(
+    quotes: dict[str, dict],
+    unavailable_message: str = "Stock prices temporarily unavailable.",
+) -> str:
+    """Return scrolling financial-news-style stock ticker HTML."""
+    items: list[str] = []
+    for ticker, quote in quotes.items():
+        price = quote.get("price")
+        change = quote.get("change")
+        change_percent = quote.get("change_percent")
+        if price is None:
+            continue
+        safe_ticker = escape(ticker)
+        if change is None or change_percent is None:
+            movement_html = ""
+        else:
+            change = float(change)
+            change_percent = float(change_percent)
+            if change > 0:
+                movement_class = "stock-ticker-positive"
+                arrow = "▲"
+                sign = "+"
+            elif change < 0:
+                movement_class = "stock-ticker-negative"
+                arrow = "▼"
+                sign = ""
+            else:
+                movement_class = "stock-ticker-neutral"
+                arrow = "—"
+                sign = ""
+            movement_html = (
+                f'<span class="{movement_class}">'
+                f"{arrow} {sign}{change:,.2f} "
+                f"({sign}{change_percent:.2f}%)"
+                "</span>"
+            )
+        items.append(
+            f"""
+            <span class="stock-ticker-item">
+                <strong>{safe_ticker}</strong>
+                <span>${float(price):,.2f}</span>
+                {movement_html}
+            </span>
+            """
+        )
+    if items:
+        content = "".join(items)
+
+        ticker_content = f"""
+            <div class="stock-ticker-track">
+                <div class="stock-ticker-sequence">
+                    {content}
+                </div>
+                <div class="stock-ticker-sequence" aria-hidden="true">
+                    {content}
+                </div>
+            </div>
+        """
+    else:
+        ticker_content = f"""
+            <div class="stock-ticker-unavailable">
+                {escape(unavailable_message)}
+            </div>
+        """
+    return f"""
+    <style>
+        .stock-ticker-shell {{
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            background: #111827;
+            color: #ffffff;
+            border-top: 1px solid #374151;
+            padding: 0.45rem 0;
+            font-size: 0.875rem;
+        }}
+        .stock-ticker-track {{
+            display: flex;
+            width: max-content;
+            animation: stock-ticker-scroll 40s linear infinite;
+        }}
+        .stock-ticker-shell:hover .stock-ticker-track {{
+            animation-play-state: paused;
+        }}
+        .stock-ticker-sequence {{
+            display: inline-flex;
+            align-items: center;
+        }}
+        .stock-ticker-item {{
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin-right: 2rem;
+        }}
+        .stock-ticker-unavailable {{
+            width: 100%;
+            text-align: center;
+            color: #d1d5db;
+        }}
+        .stock-ticker-positive {{
+            color: #22c55e;
+        }}
+        .stock-ticker-negative {{
+            color: #ef4444;
+        }}
+        .stock-ticker-neutral {{
+            color: #d1d5db;
+        }}
+        @keyframes stock-ticker-scroll {{
+            from {{
+                transform: translateX(0);
+            }}
+
+            to {{
+                transform: translateX(-50%);
+            }}
+        }}
+    </style>
+    <div class="stock-ticker-shell">
+        {ticker_content}
+    </div>
+    """

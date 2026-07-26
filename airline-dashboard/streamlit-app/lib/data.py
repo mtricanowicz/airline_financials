@@ -121,3 +121,25 @@ def fetch_history(
             df.loc[df.index > pd.Timestamp(end), ticker] = float("nan")
     return df
 
+
+@st.cache_data(ttl=60, show_spinner=False)
+def fetch_live_quotes(
+    tickers: tuple[str, ...],
+) -> dict[str, dict]:
+    """Fetch short-lived intraday quotes for the persistent ticker."""
+    try:
+        resp = requests.get(
+            f"{QUOTES_API_URL}/live-quotes",
+            params={"tickers": ",".join(tickers)},
+            timeout=15,
+        )
+        resp.raise_for_status()
+
+        return {
+            quote["ticker"]: quote
+            for quote in resp.json().get("quotes", [])
+            if quote.get("price") is not None
+        }
+
+    except (requests.RequestException, ValueError, KeyError):
+        return {}

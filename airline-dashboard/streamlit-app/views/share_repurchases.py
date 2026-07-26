@@ -140,7 +140,14 @@ summary_col, table_col = st.columns([1, 2])
 with summary_col:
     for airline in tickers:
         st.markdown(
-            airline_header_html(airline, f"{AIRLINE_NAMES.get(airline, airline)} ({airline})", heading_level=4, logo_height_em=1.50),
+            airline_header_html(
+                airline,
+                f"{AIRLINE_NAMES.get(airline, airline)} ({airline})",
+                heading_level=4,
+                logo_height_em=1.50,
+                logo_before_text=True,
+                gap_rem=0.85,
+            ),
             unsafe_allow_html=True,
         )
         quote = quotes.get(airline)
