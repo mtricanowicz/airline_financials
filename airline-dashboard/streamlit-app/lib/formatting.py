@@ -552,9 +552,6 @@ def fixed_stock_ticker_html(
 
             transition: opacity 150ms ease;
         }}
-        [data-testid="stSidebar"] {{
-            z-index: 1000 !important;
-        }}
     </style>
     <div class="fixed-stock-ticker">
         {ticker_html}
