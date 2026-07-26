@@ -26,7 +26,7 @@ from lib.formatting import (
     about_sidebar_html,
     airline_label_html,
     get_other_dashboard_link,
-    stock_ticker_html,
+    fixed_stock_ticker_html,
 )
 
 _APP_DIR = Path(__file__).parent
@@ -65,7 +65,7 @@ st.logo(
     icon_image=str(_BRANDING_DIR / "site_favicon.png"),
 )
 with st.sidebar:
-    activate_stock_ticker = st.toggle("Activate Stock Ticker", value=True)
+    st.toggle("Activate Stock Ticker", value=True, key="activate_stock_ticker")
     with st.expander("About the Airline Financial Dashboard", expanded=False):
         st.markdown(
             about_sidebar_html(),
@@ -139,9 +139,7 @@ for col, page in zip(nav_cols, pages):
 
 
 # Stock ticker setup and rendering
-# Define a container for the stock ticker at the bottom of the page, initialized as empty.
-stock_ticker_container = st.bottom
-stock_ticker_container.empty()
+
 # Define the list of stock tickers to display, excluding defunct airlines.
 STOCK_TICKERS = tuple(
     ticker
@@ -149,15 +147,19 @@ STOCK_TICKERS = tuple(
     if ticker not in AIRLINE_GROUPS.get("Defunct Airlines", [])
 )
 # Define the stock ticker rendering function and schedule it to run every 60 seconds.
+ticker_placeholder = st.empty()
 @st.fragment(run_every="60s")
 def render_stock_ticker() -> None:
-    quotes = fetch_live_quotes(STOCK_TICKERS)
-    stock_ticker_container.html(
-        stock_ticker_html(quotes)
+    activated = st.session_state.get("activate_stock_ticker", True)
+    quotes = fetch_live_quotes(STOCK_TICKERS) if activated else {}
+    ticker_placeholder.html(
+        fixed_stock_ticker_html(
+            quotes,
+            activated=activated,
+        )
     )
-# Render the stock ticker if it is activated.
-if activate_stock_ticker:
-    render_stock_ticker()
+# Render the stock ticker with activation controlled by the sidebar toggle.
+render_stock_ticker()
 
 
 # Run the current page.

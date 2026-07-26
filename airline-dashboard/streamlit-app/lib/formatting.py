@@ -521,3 +521,42 @@ def stock_ticker_html(
         {ticker_content}
     </div>
     """
+
+
+def fixed_stock_ticker_html(
+    quotes: dict[str, dict],
+    activated: bool,
+) -> str:
+    ticker_html = stock_ticker_html(quotes) if activated else ""
+    return f"""
+    <style>
+        :root {{
+            --stock-ticker-height: 2rem;
+        }}
+        .fixed-stock-ticker {{
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: var(--stock-ticker-height);
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+
+            z-index: 50;
+
+            visibility: {"visible" if activated else "hidden"};
+            opacity: {"1" if activated else "0"};
+            pointer-events: {"auto" if activated else "none"};
+
+            transition: opacity 150ms ease;
+        }}
+        [data-testid="stSidebar"] {{
+            z-index: 1000 !important;
+        }}
+    </style>
+    <div class="fixed-stock-ticker">
+        {ticker_html}
+    </div>
+    """
