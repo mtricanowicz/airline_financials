@@ -46,7 +46,7 @@ AIRLINE_IR: dict[str, str] = {
     "UAL":  "https://ir.united.com/",
     "LUV":  "https://www.southwestairlinesinvestorrelations.com/",
     "ALK":  "https://investor.alaskaair.com/",
-    "JBLU": "https://investors.jetblue.com/",
+    "JBLU": "https://www.investor.jetblue.com/",
     "ULCC": "https://ir.flyfrontier.com/",
     "HA":   None,
     "SAVE": None,
@@ -446,7 +446,6 @@ def stock_ticker_html(
         )
     if items:
         content = "".join(items)
-
         ticker_content = f"""
             <div class="stock-ticker-track">
                 <div class="stock-ticker-sequence">
@@ -549,7 +548,6 @@ def fixed_stock_ticker_html(
             visibility: {"visible" if activated else "hidden"};
             opacity: {"1" if activated else "0"};
             pointer-events: {"auto" if activated else "none"};
-
             transition: opacity 150ms ease;
         }}
     </style>

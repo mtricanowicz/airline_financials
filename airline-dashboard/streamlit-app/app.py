@@ -139,7 +139,6 @@ for col, page in zip(nav_cols, pages):
 
 
 # Stock ticker setup and rendering
-
 # Define the list of stock tickers to display, excluding defunct airlines.
 STOCK_TICKERS = tuple(
     ticker
