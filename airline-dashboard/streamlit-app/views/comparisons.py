@@ -69,13 +69,13 @@ with st.expander("Set filters", expanded=True):
 
         years = sorted(data["Year"].unique())
         with col2:
-            selected_years = st.multiselect("Select Years for comparison", years, default=years)
+            selected_years = st.multiselect("Select Years for comparison:", years, default=years)
         selected_years = selected_years or years
 
         with col3:
             if data_type == "Quarterly":
                 quarters = sorted(data["Quarter"].unique())
-                selected_quarters = st.multiselect("Select Quarters for comparison", quarters, default=quarters)
+                selected_quarters = st.multiselect("Select Quarters for comparison:", quarters, default=quarters)
                 selected_quarters = selected_quarters or quarters
             else:
                 selected_quarters = ["FY"]
@@ -97,7 +97,18 @@ with st.expander("Set filters", expanded=True):
         with col5:
             selected_airlines = st.multiselect("Add or remove Airlines to compare:", airline_options, default=default_airlines)
             selected_airlines = selected_airlines or airline_options[:1]
-            st.markdown(" | ".join([airline_label_html(airline, text=f"{AIRLINE_NAMES.get(airline, airline)} ({airline})", logo_height_em=0.95, logo_before_text=True, gap_rem=0.25) for airline in selected_airlines]), unsafe_allow_html=True)
+            st.markdown(
+                " | ".join([
+                    airline_label_html(
+                        airline,
+                        text=f"{AIRLINE_NAMES.get(airline, airline)} ({airline})",
+                        logo_height_em=0.95,
+                        logo_before_text=True,
+                        gap_rem=0.25
+                    ) for airline in selected_airlines
+                ]),
+                unsafe_allow_html=True
+            )
         with col6:
             compare = (
                             st.toggle("Would you like to compare selected airlines' metrics against one of the airlines?", value=len(selected_airlines) > 1)

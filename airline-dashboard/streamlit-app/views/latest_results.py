@@ -59,7 +59,7 @@ with col_b:
         if len(selected_airlines) > 1
         else False
     )
-    base_airline = st.selectbox("Select Airline to Compare Against", selected_airlines) if compare else selected_airlines[0]
+    base_airline = st.selectbox("Select Airline to compare against:", selected_airlines) if compare else selected_airlines[0]
     if st.button("Show definitions of the metrics", icon=":material/dictionary:", width="stretch"):
         show_metric_definitions()
 

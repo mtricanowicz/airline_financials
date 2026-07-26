@@ -14,6 +14,16 @@ from pathlib import Path
 
 import streamlit as st
 
+from lib.formatting import (
+    AIRLINE_NAMES,
+    AIRLINE_IR,
+    AIRLINE_GROUPS,
+    AIRLINE_DEFUNCT_REASONS,
+    about_sidebar_html,
+    airline_label_html,
+    get_other_dashboard_link,
+)
+
 _APP_DIR = Path(__file__).parent
 _ASSETS_DIR = _APP_DIR.parent / "assets"
 _BRANDING_DIR = _ASSETS_DIR / "branding"
@@ -25,28 +35,9 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
     menu_items={
         "About": """
-        ## Airline Financial Dashboard
-        Explore recent US airline financial performance with easy-to-read comparisons and the latest full-year and quarterly metrics.
+        Financial data is assembled from airline SEC filings and standardized into a common quarterly and annual reporting structure. Automatically retrieved XBRL facts are supplemented with manually reviewed filing data where structured values are unavailable or unreliable.
 
-        This dashboard covers major US carriers and combines:
-        - auto-derived metrics from SEC filings,
-        - manually curated operating metrics,
-        - and computed performance metrics like margins, yield, and unit costs.
-
-        Pages:
-        - The **Filtered Comparisons** tab provides customizable views of airline financials. Several metrics can be selected for evaluation over chosen reporting periods.\n
-        - The **Latest Results** tab gives a summary of the most recent annual and quarterly results for easy viewing.\n
-        - The **Share Repurchases** tab contains a high level overview of the share buyback programs by the three major legacy airilnes (AAL, DAL, UAL) that were carried out in the 2010s and ended with the onset of the Covid-19 pandemic.\n
-        - The **Insights** tab delivers financial, operational, and commercial insights based on the airilne's SEC filings. User selections prompt retrieval of content for a particular airline and time period with summarization provided by an OpenAI LLM.\n
-
-        Investor relations links:
-        [AAL](https://americanairlines.gcs-web.com/) | 
-        [DAL](https://ir.delta.com/) | 
-        [UAL](https://ir.united.com/) | 
-        [LUV](https://www.southwestairlinesinvestorrelations.com/) | 
-        [ALK](https://investor.alaskaair.com/) | 
-        [JBLU](https://investors.jetblue.com/) | 
-        [ULCC](https://ir.flyfrontier.com/)
+        Derived metrics are calculated from the underlying reported financial and operating data. Historical values may reflect later comparative disclosures, restatements, or issuer-specific reporting practices.
 
         **Created by:** Michael Tricanowicz
         """
@@ -58,6 +49,60 @@ st.image(
     str(_BRANDING_DIR / "site_title.png"),
     caption="Explore US Airline Financial Performance",
 )
+
+st.logo(
+    str(_BRANDING_DIR / "site_title.png"),
+    link="https://airline.industryfinancials.com",
+    icon_image=str(_BRANDING_DIR / "site_favicon.png"),
+)
+
+# Collapsible sidebar with reference information including sections for About, Airlines Covered, and Other Industry Dashboards
+with st.sidebar:
+    with st.expander("About the Airline Financial Dashboard", expanded=False):
+        st.markdown(
+            about_sidebar_html(),
+            unsafe_allow_html=True
+        )
+    with st.expander("Airlines Covered", expanded=True):
+        for group in (g for g in AIRLINE_GROUPS if g != "Defunct Airlines"):
+            st.markdown(f"#### {group}", unsafe_allow_html=True)
+            for airline in sorted(AIRLINE_GROUPS[group], key=lambda airline: AIRLINE_NAMES.get(airline, airline)):
+                if airline in AIRLINE_DEFUNCT_REASONS:
+                    st.markdown(
+                        airline_label_html(
+                            airline,
+                            text=f"*{AIRLINE_NAMES.get(airline, airline)} ({airline}) - {AIRLINE_DEFUNCT_REASONS[airline]}*",
+                            logo_height_em=1.05,
+                            logo_before_text=True,
+                            gap_rem=0.25,
+                            font_size="0.875rem",
+                            logo_alignment="flex-start",
+                        ),
+                        unsafe_allow_html=True
+                    )
+                else:
+                    st.markdown(
+                        airline_label_html(
+                            airline,
+                            text=f"{AIRLINE_NAMES.get(airline, airline)} ([{airline}]({AIRLINE_IR.get(airline, '#')}))",
+                            logo_height_em=1.05,
+                            logo_before_text=True,
+                            gap_rem=0.25,
+                            font_size="0.875rem",
+                            logo_alignment="flex-start",
+                        ),
+                        unsafe_allow_html=True
+                    )
+        st.markdown("<small><br>Active airlines<br>*Defunct airlines*</small>", unsafe_allow_html=True)
+    with st.expander("Other Industry Dashboards", expanded=True):
+        st.markdown(
+            get_other_dashboard_link(
+                icon_path=_BRANDING_DIR / "site_favicon_steel.png",
+                name="Steel Dashboard (Coming Soon)",
+                link=None
+            ),
+            unsafe_allow_html=True
+        )
 
 _VIEWS = _APP_DIR / "views"
 
