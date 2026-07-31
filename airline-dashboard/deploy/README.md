@@ -69,5 +69,12 @@ python -m scripts.build_data --years 2014 2015 2016 2017 2018 2019 2020 2021 202
 python -m sec_pipeline.pipeline --airlines AAL DAL UAL LUV ALK JBLU ULCC --years 2014 2015 2016 2017 2018 2019 2020 2021 2022 2023 2024 2025 2026
 ```
 
+To refresh share repurchase/share sale history in `buybacks.json` during a local
+refresh, pass `--share-data` to the build command:
+
+```powershell
+python -m scripts.build_data --years 2014 2015 2016 2017 2018 2019 2020 2021 2022 2023 2024 2025 2026 --share-data
+```
+
 Set `SEC_USER_AGENT` and `OPENAI_API_KEY` in `core/.env` first. For a network
 free sample dataset, run `python -m scripts.make_sample_data` instead.

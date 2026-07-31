@@ -35,7 +35,14 @@ from sec_pipeline.xbrl import extract_financials
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("build_data")
 
-AUTO_METRICS = ["Operating Revenue", "Operating Expenses", "Net Income", "Long-Term Debt"]
+AUTO_METRICS = [
+    "Operating Revenue",
+    "Operating Expenses",
+    "Net Income",
+    "Long-Term Debt",
+    "Operating Cash Flow",
+    "Capital Expenditures",
+]
 MANUAL_METRICS = ["Passenger Revenue", "RPM", "ASM", "Profit Sharing"]
 MISMATCH_TOLERANCE = 0.02  # 2% relative difference
 
@@ -98,6 +105,25 @@ def load_auto(airlines: list[str], years: list[int], periods: list[str]) -> pd.D
     return pd.DataFrame(rows)
 
 
+def _scope_frame(
+    df: pd.DataFrame,
+    airlines: list[str],
+    years: list[int],
+    periods: list[str],
+) -> pd.DataFrame:
+    """Return only rows within the requested airline/year/quarter scope."""
+    if df.empty:
+        return df
+    out = df.copy()
+    if "Airline" in out.columns:
+        out = out[out["Airline"].isin(airlines)]
+    if "Year" in out.columns:
+        out = out[out["Year"].isin(years)]
+    if "Quarter" in out.columns:
+        out = out[out["Quarter"].isin(periods)]
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Merge and derive
 # ---------------------------------------------------------------------------
@@ -106,17 +132,23 @@ def _report_mismatches(merged: pd.DataFrame) -> None:
         manual_col = f"{metric}_manual"
         if manual_col not in merged.columns:
             continue
-        for _, row in merged.iterrows():
-            auto_val, manual_val = row.get(metric), row.get(manual_col)
-            if pd.isna(auto_val) or pd.isna(manual_val) or not manual_val:
-                continue
-            rel = abs(auto_val - manual_val) / abs(manual_val)
-            if rel > MISMATCH_TOLERANCE:
-                log.warning(
-                    "%s %s %s: %s auto=%.0f manual=%.0f (%.1f%%)",
-                    row["Airline"], row["Year"], row["Quarter"], metric,
-                    auto_val, manual_val, rel * 100,
-                )
+        auto_vals = pd.to_numeric(merged[metric], errors="coerce")
+        manual_vals = pd.to_numeric(merged[manual_col], errors="coerce")
+        valid = auto_vals.notna() & manual_vals.notna() & (manual_vals != 0)
+        rel = (auto_vals - manual_vals).abs() / manual_vals.abs()
+        bad_mask = valid & (rel > MISMATCH_TOLERANCE)
+        if not bad_mask.any():
+            continue
+        bad_rows = merged.loc[bad_mask, ["Airline", "Year", "Quarter"]].copy()
+        bad_rows["auto"] = auto_vals.loc[bad_mask]
+        bad_rows["manual"] = manual_vals.loc[bad_mask]
+        bad_rows["rel"] = rel.loc[bad_mask] * 100
+        for row in bad_rows.itertuples(index=False):
+            log.warning(
+                "%s %s %s: %s auto=%.0f manual=%.0f (%.1f%%)",
+                row.Airline, row.Year, row.Quarter, metric,
+                row.auto, row.manual, row.rel,
+            )
 
 
 def merge_sources(auto: pd.DataFrame, manual: pd.DataFrame) -> pd.DataFrame:
@@ -150,6 +182,8 @@ def add_derived(df: pd.DataFrame) -> pd.DataFrame:
     op_rev, op_exp = col("Operating Revenue"), col("Operating Expenses")
     net_inc, pax_rev = col("Net Income"), col("Passenger Revenue")
     rpm, asm = col("RPM"), col("ASM")
+    ltd, curr_mat, cash_eq, unr_cash, r_cash, st_inv = col("Long-Term Debt"), col("Current Maturities"), col("Cash & Cash Equivalents"), col("Unrestricted Cash"), col("Restricted Cash"), col("Short-Term Investments")
+    ocf, capex = col("Operating Cash Flow"), col("Capital Expenditures").abs()
 
     df["Operating Income"] = op_rev - op_exp
     df["Operating Margin"] = ((df["Operating Income"] / op_rev) * 100).round(2)
@@ -160,6 +194,11 @@ def add_derived(df: pd.DataFrame) -> pd.DataFrame:
     df["PRASM"] = pax_rev / asm
     df["CASM"] = op_exp / asm
     df["Period"] = df["Year"].astype(str) + df["Quarter"].astype(str)
+    df["Total Debt"] = ltd.fillna(0) + curr_mat.fillna(0)
+    df["Cash & Cash Equivalents"] = (cash_eq.combine_first((unr_cash.fillna(0) + r_cash.fillna(0)).where(unr_cash.notna() | r_cash.notna())))
+    df["Total Liquidity"] = col("Cash & Cash Equivalents") + st_inv.fillna(0)
+    df["Net Debt"] = col("Total Debt") - col("Total Liquidity")
+    df["Free Cash Flow"] = ocf - capex
 
     # Reorder columns into preferred order of metrics
     preferred_column_order = list(
@@ -176,17 +215,42 @@ def add_derived(df: pd.DataFrame) -> pd.DataFrame:
                 "Net Income",
                 "Operating Margin",
                 "Net Margin",
+                "Earnings Per Share",
+                "RPM",
+                "ASM",
+                "Load Factor",
+                "Yield",
+                "TRASM",
+                "PRASM",
+                "CASM",
+                "Profit Sharing",
                 "Long-Term Debt",
-                "Profit Sharing"
+                "Current Maturities",
+                "Total Debt",
+                "Cash & Cash Equivalents",
+                "Short-Term Investments",
+                "Total Liquidity",
+                "Net Debt",
+                "Operating Cash Flow",
+                "Capital Expenditures",
+                "Free Cash Flow",
             ]
         )
+    )
+    columns_to_drop = list(
+            dict.fromkeys(
+                column for column in [
+                    "Unrestricted Cash",
+                    "Restricted Cash",
+                ]
+            )
     )
     # Redefine the preferred column list to ensure it only contains columns that exist in the merged DataFrame.
     preferred_column_order = [column for column in preferred_column_order if column in df.columns]
     # Define the remaining columns that are not in the preferred order.
     remaining_column_order = [column for column in df.columns if column not in preferred_column_order]
     # Reorder the merged DataFrame columns to have preferred columns first, followed by the remaining columns.
-    df = df[preferred_column_order + remaining_column_order]
+    df = df[preferred_column_order + remaining_column_order].drop(columns=columns_to_drop, errors='ignore')
 
     return df
 
@@ -219,7 +283,7 @@ def build_buybacks(repurchases: pd.DataFrame, sales: pd.DataFrame) -> dict[str, 
 # ---------------------------------------------------------------------------
 def _records(df: pd.DataFrame) -> list[dict[str, Any]]:
     """Convert a frame to JSON-safe records (NaN -> None)."""
-    return json.loads(df.astype(object).where(pd.notna(df), None).to_json(orient="records"))
+    return df.astype(object).where(pd.notna(df), None).to_dict(orient="records")
 
 
 def _write(path: Path, payload: Any) -> None:
@@ -285,14 +349,29 @@ def _merge_buybacks(existing: dict[str, list[dict[str, Any]]], new: dict[str, li
     }
 
 
-def build(airlines: list[str], years: list[int], periods: list[str], overwrite: bool = False) -> None:
+def build(
+    airlines: list[str],
+    years: list[int],
+    periods: list[str],
+    overwrite: bool = False,
+    share_data: bool = False,
+) -> None:
     auto = load_auto(airlines, years, periods)
     manual_metrics, repurchases, sales = load_manual()
+    repurchases_full = repurchases.copy()
+    sales_full = sales.copy()
+
+    # Scope manual metrics to the requested slice so subset runs are idempotent.
+    manual_metrics = _scope_frame(manual_metrics, airlines, years, periods)
+
     merged = merge_sources(auto, manual_metrics)
     merged = add_derived(merged)
 
     drop = [c for c in merged.columns if c.endswith("_manual")]
     merged = merged.drop(columns=drop).sort_values(["Airline", "Year", "Quarter"])
+
+    # Final guard: only requested keys are eligible to update persisted financials.
+    merged = _scope_frame(merged, airlines, years, periods)
 
     if not overwrite:
         existing_financials = _load_existing_financials()
@@ -300,13 +379,9 @@ def build(airlines: list[str], years: list[int], periods: list[str], overwrite: 
 
     _write(FINANCIALS_PATH, _records(merged))
 
-    new_buybacks = build_buybacks(repurchases, sales)
-    if overwrite:
-        buybacks = new_buybacks
-    else:
-        existing_buybacks = _load_existing_buybacks()
-        buybacks = _merge_buybacks(existing_buybacks, new_buybacks)
-    _write(BUYBACKS_PATH, buybacks)
+    if share_data:
+        buybacks = build_buybacks(repurchases_full, sales_full)
+        _write(BUYBACKS_PATH, buybacks)
 
 
 def main() -> None:
@@ -315,8 +390,15 @@ def main() -> None:
     parser.add_argument("--years", nargs="+", type=int, required=True)
     parser.add_argument("--periods", nargs="+", default=["Q1", "Q2", "Q3", "Q4", "FY"])
     parser.add_argument("--overwrite", action="store_true", help="Overwrite existing generated outputs instead of merging with existing data.")
+    parser.add_argument("--share-data", action="store_true", help="Optionally write full static share repurchase/sale history from manual files (unscoped). If omitted, existing buybacks.json is left unchanged.")
     args = parser.parse_args()
-    build(args.airlines, args.years, args.periods, overwrite=args.overwrite)
+    build(
+        args.airlines,
+        args.years,
+        args.periods,
+        overwrite=args.overwrite,
+        share_data=args.share_data,
+    )
 
 
 if __name__ == "__main__":

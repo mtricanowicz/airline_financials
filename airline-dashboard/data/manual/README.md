@@ -17,6 +17,11 @@ reads the individual CSV files:
    `share_repurchases`, and `share_sales`, or
 2. `manual_metrics.csv`, `share_repurchases.csv`, and `share_sales.csv`.
 
+`manual_metrics.csv` is always considered during the financial build.
+`share_repurchases.csv` and `share_sales.csv` are written to
+`data/generated/buybacks.json` only when `--share-data` is passed to
+`core/scripts/build_data.py`.
+
 ## Schemas
 
 ### manual_metrics.csv
@@ -59,6 +64,6 @@ value remains authoritative.
 
 | Source | Metrics |
 | --- | --- |
-| Auto (XBRL) | Operating Revenue, Operating Expenses, Net Income, Long-Term Debt |
+| Auto (XBRL) | Operating Revenue, Operating Expenses, Net Income, Earnings Per Share, Long-Term Debt, Current Maturities, Cash & Cash Equivalents, Unrestricted Cash, Restricted Cash, Short-Term Investments, Operating Cash Flow, Capital Expenditures |
 | Manual (this folder) | Passenger Revenue, RPM, ASM, Profit Sharing, buybacks, share sales |
-| Derived (build_data) | Operating Income, Operating Margin, Net Margin, Load Factor, Yield, TRASM, PRASM, CASM |
+| Derived (build_data) | Operating Income, Operating Margin, Net Margin, Load Factor, Yield, TRASM, PRASM, CASM, Total Debt, Total Liquidity, Net Debt, Free Cash Flow |

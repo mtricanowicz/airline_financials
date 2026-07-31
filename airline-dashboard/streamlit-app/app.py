@@ -33,6 +33,23 @@ _APP_DIR = Path(__file__).parent
 _ASSETS_DIR = _APP_DIR.parent / "assets"
 _BRANDING_DIR = _ASSETS_DIR / "branding"
 
+
+def _airline_sidebar_line(airline: str) -> str:
+    """Return one formatted airline line for the sidebar list."""
+    if airline in AIRLINE_DEFUNCT_REASONS:
+        text = f"*{AIRLINE_NAMES.get(airline, airline)} ({airline}) - {AIRLINE_DEFUNCT_REASONS[airline]}*"
+    else:
+        text = f"{AIRLINE_NAMES.get(airline, airline)} ([{airline}]({AIRLINE_IR.get(airline, '#')}))"
+    return airline_label_html(
+        airline,
+        text=text,
+        logo_height_em=1.05,
+        logo_before_text=True,
+        gap_rem=0.25,
+        font_size="0.875rem",
+        logo_alignment="flex-start",
+    )
+
 st.set_page_config(
     page_title="Airline Financial Dashboard",
     page_icon=str(_BRANDING_DIR / "site_favicon.png"),
@@ -75,32 +92,7 @@ with st.sidebar:
         for group in (g for g in AIRLINE_GROUPS if g != "Defunct Airlines"):
             st.markdown(f"#### {group}", unsafe_allow_html=True)
             for airline in sorted(AIRLINE_GROUPS[group], key=lambda airline: AIRLINE_NAMES.get(airline, airline)):
-                if airline in AIRLINE_DEFUNCT_REASONS:
-                    st.markdown(
-                        airline_label_html(
-                            airline,
-                            text=f"*{AIRLINE_NAMES.get(airline, airline)} ({airline}) - {AIRLINE_DEFUNCT_REASONS[airline]}*",
-                            logo_height_em=1.05,
-                            logo_before_text=True,
-                            gap_rem=0.25,
-                            font_size="0.875rem",
-                            logo_alignment="flex-start",
-                        ),
-                        unsafe_allow_html=True
-                    )
-                else:
-                    st.markdown(
-                        airline_label_html(
-                            airline,
-                            text=f"{AIRLINE_NAMES.get(airline, airline)} ([{airline}]({AIRLINE_IR.get(airline, '#')}))",
-                            logo_height_em=1.05,
-                            logo_before_text=True,
-                            gap_rem=0.25,
-                            font_size="0.875rem",
-                            logo_alignment="flex-start",
-                        ),
-                        unsafe_allow_html=True
-                    )
+                st.markdown(_airline_sidebar_line(airline), unsafe_allow_html=True)
         st.markdown("<small><br>Active airlines<br>*Defunct airlines*</small>", unsafe_allow_html=True)
     with st.expander("Other Industry Dashboards", expanded=True):
         st.markdown(

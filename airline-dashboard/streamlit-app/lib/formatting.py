@@ -107,17 +107,38 @@ CURRENCY_METRICS = [
     "Operating Income",
     "Net Income",
     "Long-Term Debt",
+    "Current Maturities",
+    "Total Debt",
+    "Cash & Cash Equivalents",
+    "Unrestricted Cash",
+    "Restricted Cash",
+    "Short-Term Investments",
+    "Total Liquidity",
+    "Net Debt",
+    "Operating Cash Flow",
+    "Capital Expenditures",
+    "Free Cash Flow",
     "Profit Sharing",
 ]
 
 # Metrics scaled into millions for display but shown without a currency symbol.
 MILLIONS_METRICS = CURRENCY_METRICS + ["RPM", "ASM"]
 
+# Dollar-denominated per-share metrics (not scaled to millions).
+EPS_DOLLAR_METRICS = ["Earnings Per Share"]
+
 # Unit metrics reported in cents.
 CENTS_METRICS = ["Yield", "TRASM", "PRASM", "CASM"]
 
 # Metrics reported as percentages.
 PERCENT_METRICS = ["Operating Margin", "Net Margin", "Load Factor"]
+
+# Fast membership sets used in hot formatting/render paths.
+_CURRENCY_METRIC_SET = set(CURRENCY_METRICS)
+_MILLIONS_METRIC_SET = set(MILLIONS_METRICS)
+_EPS_DOLLAR_METRIC_SET = set(EPS_DOLLAR_METRICS)
+_CENTS_METRIC_SET = set(CENTS_METRICS)
+_PERCENT_METRIC_SET = set(PERCENT_METRICS)
 
 METRIC_GROUPS = {
     "Earnings": [
@@ -127,11 +148,29 @@ METRIC_GROUPS = {
         "Net Income",
         "Operating Margin",
         "Net Margin",
+        "Earnings Per Share"
     ],
     "Debt & Liquidity": [
         "Long-Term Debt",
+        "Current Maturities",
+        "Total Debt",
+        "Cash & Cash Equivalents",
+        "Short-Term Investments",
+        "Total Liquidity",
+        "Net Debt",
     ],
-    "Unit Performance": ["Yield", "TRASM", "PRASM", "CASM"],
+    "Cash Flow": [
+        "Operating Cash Flow",
+        "Capital Expenditures",
+        "Free Cash Flow",
+    ],
+    "Unit Performance": [
+        "Load Factor",
+        "Yield",
+        "TRASM",
+        "PRASM",
+        "CASM",
+    ],
 }
 
 METRIC_DEFINITIONS: list[tuple[str, str]] = [
@@ -142,7 +181,17 @@ METRIC_DEFINITIONS: list[tuple[str, str]] = [
     ("Net Income", "Profit."),
     ("Operating Margin", "Operating Income divided by Operating Revenue"),
     ("Net Margin", "Percentage of profit earned for each dollar in revenue. Net Income divided by Operating Revenue."),
+    ("Earnings Per Share", "Net income allocated to each basic share outstanding."),
     ("Long-Term Debt", "Total long-term debt net of current maturities."),
+    ("Current Maturities", "Portion of debt due within the next 12 months."),
+    ("Total Debt", "Total debt obligations. Long-Term Debt plus Current Maturities."),
+    ("Cash & Cash Equivalents", "Cash on hand plus highly liquid short-term instruments with original maturities generally under 90 days."),
+    ("Short-Term Investments", "Marketable debt securities and other investments expected to be converted to cash within one year."),
+    ("Total Liquidity", "Cash & Cash Equivalents plus Short-Term Investments."),
+    ("Net Debt", "Total Debt minus Total Liquidity."),
+    ("Operating Cash Flow", "Net cash provided by operating activities during the period."),
+    ("Capital Expenditures", "Cash outflows for property, equipment, and other long-lived assets."),
+    ("Free Cash Flow", "Operating Cash Flow minus Capital Expenditures."),
     ("Profit Sharing*", "Amount of income set aside to fund employee profit sharing programs. NOTE: Quarterly reporting by AAL and UAL of this metric is inconsistent. Data provided may have been obtained from internal sources or estimated by proportioning the annual profit sharing reported by the quarterly operating income reported."),
     ("Revenue Passenger Mile (RPM)*", "A basic measure of sales volume. One RPM represents one passenger flown one mile."),
     ("Available Seat Mile (ASM)*", "A basic measure of production. One ASM represents one seat flown one mile."),
@@ -164,14 +213,29 @@ def format_metric_value(value: float | None, metric: str) -> str | None:
     if value is None or pd.isna(value):
         return None
     base = metric.replace(" (millions)", "")
-    if base in CURRENCY_METRICS:
+    if base in _CURRENCY_METRIC_SET:
         sign = "-$" if value < 0 else "$"
         return f"{sign}{abs(value):,.0f}"
-    if base in CENTS_METRICS:
+    if base in _EPS_DOLLAR_METRIC_SET:
+        sign = "-$" if value < 0 else "$"
+        return f"{sign}{abs(value):,.2f}"
+    if base in _CENTS_METRIC_SET:
         return f"{value:,.2f}\u00A2"
-    if base in PERCENT_METRICS:
+    if base in _PERCENT_METRIC_SET:
         return f"{value:,.2f}%"
     return f"{value:,.0f}"
+
+
+def scale_metric_for_display(df: pd.DataFrame, metric: str) -> tuple[pd.DataFrame, str]:
+    """Scale one metric column for display and return the display column name."""
+    display_col = metric
+    if metric in _MILLIONS_METRIC_SET:
+        df[metric] = pd.to_numeric(df[metric], errors="coerce") / 1_000_000
+        display_col = f"{metric} (millions)"
+        df.rename(columns={metric: display_col}, inplace=True)
+    elif metric in _CENTS_METRIC_SET:
+        df[metric] = pd.to_numeric(df[metric], errors="coerce") * 100
+    return df, display_col
 
 
 def color_positive_negative(value: object) -> str:

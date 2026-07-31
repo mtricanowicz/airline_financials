@@ -19,7 +19,7 @@
       "Cost": 1000000000,
       "Shares (millions)": 23.4,
       "Cost (millions)": 1000.0,
-      "Average Share Price": 42.735042735,
+      "Average Share Price": 42.73504273504273,
       "Period": "2014FY"
     },
     {
@@ -30,7 +30,7 @@
       "Cost": 3600000000,
       "Shares (millions)": 85.1,
       "Cost (millions)": 3600.0,
-      "Average Share Price": 42.303172738,
+      "Average Share Price": 42.30317273795535,
       "Period": "2015FY"
     },
     {
@@ -41,7 +41,7 @@
       "Cost": 4400000000,
       "Shares (millions)": 119.8,
       "Cost (millions)": 4400.0,
-      "Average Share Price": 36.7278797997,
+      "Average Share Price": 36.72787979966611,
       "Period": "2016FY"
     },
     {
@@ -52,7 +52,7 @@
       "Cost": 1600000000,
       "Shares (millions)": 33.9,
       "Cost (millions)": 1600.0,
-      "Average Share Price": 47.197640118,
+      "Average Share Price": 47.1976401179941,
       "Period": "2017FY"
     },
     {
@@ -63,7 +63,7 @@
       "Cost": 800000000,
       "Shares (millions)": 16.6,
       "Cost (millions)": 800.0,
-      "Average Share Price": 48.1927710843,
+      "Average Share Price": 48.19277108433735,
       "Period": "2018FY"
     },
     {
@@ -74,7 +74,7 @@
       "Cost": 1100000000,
       "Shares (millions)": 33.8,
       "Cost (millions)": 1100.0,
-      "Average Share Price": 32.5443786982,
+      "Average Share Price": 32.544378698224854,
       "Period": "2019FY"
     },
     {
@@ -107,7 +107,7 @@
       "Cost": 1100000000,
       "Shares (millions)": 28.6,
       "Cost (millions)": 1100.0,
-      "Average Share Price": 38.4615384615,
+      "Average Share Price": 38.46153846153846,
       "Period": "2014FY"
     },
     {
@@ -118,7 +118,7 @@
       "Cost": 2200000000,
       "Shares (millions)": 48.4,
       "Cost (millions)": 2200.0,
-      "Average Share Price": 45.4545454545,
+      "Average Share Price": 45.45454545454545,
       "Period": "2015FY"
     },
     {
@@ -129,7 +129,7 @@
       "Cost": 2600000000,
       "Shares (millions)": 60.0,
       "Cost (millions)": 2600.0,
-      "Average Share Price": 43.3333333333,
+      "Average Share Price": 43.333333333333336,
       "Period": "2016FY"
     },
     {
@@ -140,7 +140,7 @@
       "Cost": 1700000000,
       "Shares (millions)": 33.0,
       "Cost (millions)": 1700.0,
-      "Average Share Price": 51.5151515152,
+      "Average Share Price": 51.515151515151516,
       "Period": "2017FY"
     },
     {
@@ -151,7 +151,7 @@
       "Cost": 1600000000,
       "Shares (millions)": 29.0,
       "Cost (millions)": 1600.0,
-      "Average Share Price": 55.1724137931,
+      "Average Share Price": 55.172413793103445,
       "Period": "2018FY"
     },
     {
@@ -162,7 +162,7 @@
       "Cost": 2000000000,
       "Shares (millions)": 38.0,
       "Cost (millions)": 2000.0,
-      "Average Share Price": 52.6315789474,
+      "Average Share Price": 52.63157894736842,
       "Period": "2019FY"
     },
     {
@@ -173,7 +173,7 @@
       "Cost": 377620000,
       "Shares (millions)": 6.7,
       "Cost (millions)": 377.62,
-      "Average Share Price": 56.3611940299,
+      "Average Share Price": 56.36119402985074,
       "Period": "2020FY"
     },
     {
@@ -195,7 +195,7 @@
       "Cost": 320000000,
       "Shares (millions)": 6.5,
       "Cost (millions)": 320.0,
-      "Average Share Price": 49.2307692308,
+      "Average Share Price": 49.23076923076923,
       "Period": "2014FY"
     },
     {
@@ -206,7 +206,7 @@
       "Cost": 1200000000,
       "Shares (millions)": 21.0,
       "Cost (millions)": 1200.0,
-      "Average Share Price": 57.1428571429,
+      "Average Share Price": 57.142857142857146,
       "Period": "2015FY"
     },
     {
@@ -228,7 +228,7 @@
       "Cost": 1800000000,
       "Shares (millions)": 28.0,
       "Cost (millions)": 1800.0,
-      "Average Share Price": 64.2857142857,
+      "Average Share Price": 64.28571428571429,
       "Period": "2017FY"
     },
     {
@@ -239,7 +239,7 @@
       "Cost": 1200000000,
       "Shares (millions)": 17.5,
       "Cost (millions)": 1200.0,
-      "Average Share Price": 68.5714285714,
+      "Average Share Price": 68.57142857142857,
       "Period": "2018FY"
     },
     {
@@ -250,7 +250,7 @@
       "Cost": 1600000000,
       "Shares (millions)": 19.2,
       "Cost (millions)": 1600.0,
-      "Average Share Price": 83.3333333333,
+      "Average Share Price": 83.33333333333333,
       "Period": "2019FY"
     },
     {
@@ -261,7 +261,7 @@
       "Cost": 341400000,
       "Shares (millions)": 4.3,
       "Cost (millions)": 341.4,
-      "Average Share Price": 79.3953488372,
+      "Average Share Price": 79.3953488372093,
       "Period": "2020FY"
     }
   ],
@@ -273,8 +273,8 @@
       "Shares Sold": 143597509,
       "Proceeds": 1901355562.59,
       "Shares (millions)": 143.597509,
-      "Proceeds (millions)": 1901.35556259,
-      "Average Share Price": 13.2408673091,
+      "Proceeds (millions)": 1901.3555625899999,
+      "Average Share Price": 13.240867309125814,
       "Period": "2020FY"
     },
     {
@@ -285,7 +285,7 @@
       "Proceeds": 1082205377.28,
       "Shares (millions)": 79.599019,
       "Proceeds (millions)": 1082.20537728,
-      "Average Share Price": 13.5957124959,
+      "Average Share Price": 13.595712495904001,
       "Period": "2021FY"
     },
     {
@@ -318,7 +318,7 @@
       "Proceeds": 2293578491.5,
       "Shares (millions)": 69.338841,
       "Proceeds (millions)": 2293.5784915,
-      "Average Share Price": 33.0778313918,
+      "Average Share Price": 33.077831391788045,
       "Period": "2020FY"
     },
     {
@@ -329,7 +329,7 @@
       "Proceeds": 685282000.0,
       "Shares (millions)": 14.2,
       "Proceeds (millions)": 685.282,
-      "Average Share Price": 48.2592957746,
+      "Average Share Price": 48.25929577464789,
       "Period": "2021FY"
     }
   ]

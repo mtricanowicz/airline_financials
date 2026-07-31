@@ -18,6 +18,7 @@ from lib.formatting import (
     AIRLINE_GROUPS,
     CENTS_METRICS,
     CURRENCY_METRICS,
+    EPS_DOLLAR_METRICS,
     METRIC_DEFINITIONS,
     METRIC_GROUPS,
     MILLIONS_METRICS,
@@ -26,6 +27,7 @@ from lib.formatting import (
     format_metric_value,
     pct_diff,
     airline_label_html,
+    scale_metric_for_display,
 )
 
 st.header(":material/finance_mode: Filtered Comparisons")
@@ -43,18 +45,6 @@ if financials.empty:
     st.stop()
 
 fy_data, q_data = split_by_period(financials)
-
-
-def scale_for_display(df: pd.DataFrame, metric: str) -> tuple[pd.DataFrame, str]:
-    """Scale a metric for display and return the possibly renamed column."""
-    if metric in MILLIONS_METRICS:
-        df[metric] = pd.to_numeric(df[metric], errors="coerce") / 1_000_000
-        new = f"{metric} (millions)"
-        df.rename(columns={metric: new}, inplace=True)
-        return df, new
-    if metric in CENTS_METRICS:
-        df[metric] = pd.to_numeric(df[metric], errors="coerce") * 100
-    return df, metric
 
 
 # ---------------------------------------------------------------------------
@@ -160,6 +150,16 @@ if filtered.empty:
     st.info("No rows match the selected filters.")
     st.stop()
 
+scaled_metrics: dict[str, tuple[pd.DataFrame, str]] = {}
+# Small datasets are faster when scaling from a full-frame copy once per metric.
+_SMALL_DATA_FASTPATH_ROWS = 5000
+for metric in selected_metrics:
+    if len(filtered) <= _SMALL_DATA_FASTPATH_ROWS:
+        metric_df = filtered.copy()
+    else:
+        metric_df = filtered[["Period", "Airline", metric]].copy()
+    scaled_metrics[metric] = scale_metric_for_display(metric_df, metric)
+
 periods = sorted(filtered["Period"].unique())
 airline_order = sorted(selected_airlines)
 show_time = len(selected_years) > 1 or len(selected_quarters) > 1
@@ -170,7 +170,7 @@ tab_time, tab_period = st.tabs(["Metrics Over Time", "Single Period"])
 with tab_time:
     for metric in selected_metrics:
         st.subheader(metric, divider="gray")
-        plot_df, display_col = scale_for_display(filtered.copy(), metric)
+        plot_df, display_col = scaled_metrics[metric]
 
         # Lay the table and charts side by side, matching the original layout:
         # table only, table + line, table + bar, or table + line + bar.
@@ -246,6 +246,8 @@ with tab_time:
                 fig.add_hline(y=0, line_dash="dot", line_color="gray", opacity=0.25)
                 if metric in CURRENCY_METRICS:
                     hover = "%{x}<br>%{y:$,.0f}"
+                elif metric in EPS_DOLLAR_METRICS:
+                    hover = "%{x}<br>%{y:$,.2f}"
                 elif metric in CENTS_METRICS:
                     hover = "%{x}<br>%{y:.2f}\u00A2"
                 elif metric in PERCENT_METRICS:
@@ -293,7 +295,7 @@ with tab_period:
     metric_order: list[str] = []
     summary_rows = []
     for metric in selected_metrics:
-        scaled, display_col = scale_for_display(filtered.copy(), metric)
+        scaled, display_col = scaled_metrics[metric]
         scaled = scaled[scaled["Period"] == latest]
         metric_order.append(display_col)
         base_val = scaled[scaled["Airline"] == base_airline][display_col]

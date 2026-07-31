@@ -13,13 +13,12 @@ from lib.data import load_financials, split_by_period
 from lib.formatting import (
     AIRLINE_NAMES,
     AIRLINE_GROUPS,
-    CENTS_METRICS,
     METRIC_DEFINITIONS,
-    MILLIONS_METRICS,
     airline_label_html,
     color_positive_negative,
     format_metric_value,
     pct_diff,
+    scale_metric_for_display,
 )
 
 st.header(":material/calendar_today: Latest Results")
@@ -68,22 +67,18 @@ def build_summary(data: pd.DataFrame) -> pd.DataFrame:
     """Build a formatted, optionally compared summary of the latest period."""
     latest = max(data["Period"])
     snapshot = data[data["Period"] == latest].copy()
+    _SMALL_DATA_FASTPATH_ROWS = 5000
     metrics = [c for c in snapshot.columns if c not in ("Year", "Quarter", "Airline", "Period")]
     metric_order: list[str] = []
     rows = []
     for metric in metrics:
-        scaled = snapshot.copy()
-        display_col = metric
-        if metric in MILLIONS_METRICS:
-            scaled[metric] = pd.to_numeric(scaled[metric], errors="coerce") / 1_000_000
-            display_col = f"{metric} (millions)"
-        elif metric in CENTS_METRICS:
-            scaled[metric] = pd.to_numeric(scaled[metric], errors="coerce") * 100
+        metric_df = snapshot.copy() if len(snapshot) <= _SMALL_DATA_FASTPATH_ROWS else snapshot[["Airline", metric]].copy()
+        scaled, display_col = scale_metric_for_display(metric_df, metric)
         metric_order.append(display_col)
-        base_cell = scaled[scaled["Airline"] == base_airline][metric]
+        base_cell = scaled[scaled["Airline"] == base_airline][display_col]
         base_val = base_cell.iloc[0] if not base_cell.empty else None
         for airline in scaled["Airline"].unique():
-            cell = scaled[scaled["Airline"] == airline][metric]
+            cell = scaled[scaled["Airline"] == airline][display_col]
             value = cell.iloc[0] if not cell.empty else None
             d = pct_diff(base_val, value)
             rows.append(

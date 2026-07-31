@@ -5,7 +5,7 @@ Live app: https://www.airlinefinancialdashboard.com/
 ## Overview
 This repository now centers on the v2 platform under [airline-dashboard](airline-dashboard), which separates data generation, APIs, and front ends into maintainable components.
 
-Data starts in 2014, which reflects the post-merger modern era for major US carriers. The current v2 dataset and UI support these tickers:
+Financial statement series in the generated dataset starts in 2014, which reflects the post-merger modern era for major US carriers. Share repurchase history can include earlier periods from manual files. The current v2 defaults and UI support these tickers:
 - AAL
 - DAL
 - UAL
@@ -13,6 +13,8 @@ Data starts in 2014, which reflects the post-merger modern era for major US carr
 - ALK
 - JBLU
 - ULCC
+- ALGT
+- SNCY
 
 Unless noted, metrics are sourced or derived from SEC filings (10-Q, 8-K, 10-K), with specific operational metrics maintained in a manual sheet and merged in the core data pipeline.
 
@@ -61,9 +63,9 @@ Outputs are written to generated JSON and served to front ends as precomputed co
 
 ## Metric sourcing model
 v2 uses a hybrid model:
-- Auto (XBRL/company facts): Operating Revenue, Operating Expenses, Net Income, Long-Term Debt
-- Manual sheet: RPM, ASM, Profit Sharing, buybacks, share sales
-- Derived: Operating Income, margins, Load Factor, Yield, TRASM, PRASM, CASM
+- Auto (XBRL/company facts): Operating Revenue, Operating Expenses, Net Income, Earnings Per Share, Long-Term Debt, Current Maturities, Cash & Cash Equivalents, Unrestricted Cash, Restricted Cash, Short-Term Investments, Operating Cash Flow, Capital Expenditures
+- Manual sheet: Passenger Revenue, RPM, ASM, Profit Sharing, buybacks, share sales
+- Derived: Operating Income, margins, Load Factor, Yield, TRASM, PRASM, CASM, Total Debt, Total Liquidity, Net Debt, Free Cash Flow
 
 ## Deployment
 Current production deployment is based on the v2 components:

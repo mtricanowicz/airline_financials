@@ -4,7 +4,8 @@
 legacy scraping notebooks into one tested pipeline. It scrapes SEC EDGAR filings,
 parses and chunks them, builds a local vector index, and generates period
 insights with an LLM. It also extracts the auto-sourceable financial metrics from
-XBRL company facts.
+XBRL company facts, including liquidity and cash flow tags plus an EPS fallback
+for Q4 when needed.
 
 Both front ends (the Streamlit cleanup track and the Next.js track) consume the
 JSON this package writes to `../data/generated/`.
@@ -20,7 +21,7 @@ core/
     chunk.py         text -> overlapping chunks
     embed.py         embeddings + Chroma vector store (no LangChain)
     summarize.py     retrieval + OpenAI summarization of a period
-    xbrl.py          company facts -> four auto-sourced financial metrics
+    xbrl.py          company facts -> auto-sourced financial metrics
     pipeline.py      orchestrator (scrape -> chunk -> embed -> summarize)
   notebooks/
     run_pipeline.ipynb  thin runner for interactive use
@@ -46,13 +47,15 @@ credentials.
 ### Build Data (financials.json & buybacks.json)
 
 ```powershell
-python .\airline-dashboard\core\scripts\build_data.py `
+python .\scripts\build_data.py `
   --airlines AAL DAL UAL LUV ALK JBLU ULCC `
   --years 2014 2015 2016 2017 2018 2019 2020 2021 2022 2023 2024 2025 2026 `
   --periods Q1 Q2 Q3 Q4 FY `
   --overwrite
 ```
-For ```airlines```, ```years```, and ```periods``` choose any set of tickers, years, and periods separated by spaces. The ```--overwrite``` command is optional and if not passed will only fill for data not present.
+For `airlines`, `years`, and `periods` choose any set of tickers, years, and periods separated by spaces.
+`--overwrite` is optional and, if omitted, the build merges only the requested key slice.
+`--share-data` is optional and, if passed, writes the full static buybacks/share-sales history to `../data/generated/buybacks.json`.
 
 ### SEC Pipeline (insights.json)
 
@@ -83,9 +86,9 @@ summarization step always uses OpenAI.
 
 | Source | Metrics |
 | --- | --- |
-| Auto (XBRL company facts) | Operating Revenue, Operating Expenses, Net Income, Long-Term Debt |
-| Manual sheet (`../data/manual/`) | RPM, ASM, Profit Sharing, buybacks and share sales |
-| Derived (build_data) | Operating Income, margins, Load Factor, Yield, TRASM, PRASM, CASM |
+| Auto (XBRL company facts) | Operating Revenue, Operating Expenses, Net Income, Earnings Per Share, Long-Term Debt, Current Maturities, Cash & Cash Equivalents, Unrestricted Cash, Restricted Cash, Short-Term Investments, Operating Cash Flow, Capital Expenditures |
+| Manual sheet (`../data/manual/`) | Passenger Revenue, RPM, ASM, Profit Sharing, buybacks and share sales |
+| Derived (build_data) | Operating Income, margins, Load Factor, Yield, TRASM, PRASM, CASM, Total Debt, Total Liquidity, Net Debt, Free Cash Flow |
 
 RPM, ASM, and Profit Sharing are not part of the us-gaap XBRL taxonomy and must
 be supplied manually.

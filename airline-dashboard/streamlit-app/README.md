@@ -37,6 +37,10 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
+If you want the Share Repurchases page populated, include `--share-data` when
+running `core/scripts/build_data.py` so `../data/generated/buybacks.json` is
+fully written.
+
 ## Configuration
 
 | Variable | Default | Description |

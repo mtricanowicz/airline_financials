@@ -27,8 +27,8 @@ deploy/           Dockerfiles, Firebase config, CI workflows
 1. `core/sec_pipeline` retrieves SEC filings, builds embeddings, runs RAG, and
    writes `data/generated/insights.json`.
 2. `core/scripts/build_data.py` merges auto-sourced XBRL financials with the
-   manual sheet and writes `data/generated/financials.json` and
-   `data/generated/buybacks.json`.
+   manual sheet and writes `data/generated/financials.json`.
+   It writes `data/generated/buybacks.json` only when `--share-data` is passed.
 3. Both front ends read the JSON in `data/generated/`. Live stock closes come
    from `quotes-api`.
 
@@ -36,9 +36,9 @@ deploy/           Dockerfiles, Firebase config, CI workflows
 
 | Source | Metrics |
 |---|---|
-| Auto (SEC XBRL `companyfacts`) | Operating Revenue, Operating Expenses, Net Income, Long-Term Debt |
-| Manual sheet | RPM, ASM, Profit Sharing, share repurchases, share sales |
-| Derived (computed) | Operating Income, Operating/Net Margin, Load Factor, Yield, TRASM, PRASM, CASM |
+| Auto (SEC XBRL `companyfacts`) | Operating Revenue, Operating Expenses, Net Income, Earnings Per Share, Long-Term Debt, Current Maturities, Cash & Cash Equivalents, Unrestricted Cash, Restricted Cash, Short-Term Investments, Operating Cash Flow, Capital Expenditures |
+| Manual sheet | Passenger Revenue, RPM, ASM, Profit Sharing, share repurchases, share sales |
+| Derived (computed) | Operating Income, Operating/Net Margin, Load Factor, Yield, TRASM, PRASM, CASM, Total Debt, Total Liquidity, Net Debt, Free Cash Flow |
 
 RPM, ASM, and Profit Sharing are not available in the XBRL financial taxonomy, so
 they remain manual. The build step cross-checks manual financials against XBRL
