@@ -115,7 +115,7 @@ with st.expander("Set filters", expanded=True):
         c for c in data.columns if c not in ("Year", "Quarter", "Airline", "Period")
     ]
     default_metric_group_index = (
-        0 if airline_group in ("Major Global Airlines", "Large National Airlines")
+        0 if airline_group in AIRLINE_GROUPS
         else 1
     )
     with st.container(border=True):
@@ -132,7 +132,6 @@ with st.expander("Set filters", expanded=True):
             selected_metrics = st.multiselect(
                 "Add or remove Metrics to compare:", metric_options, default=default_metrics
             )
-            selected_metrics = selected_metrics or metric_options[:1]
         with col9:
             if st.button("Show definitions of the available metrics", icon=":material/dictionary:"):
                 show_metric_definitions()
@@ -174,12 +173,43 @@ if not visible_metrics:
         for metric in available_metrics
         if metric in filtered.columns and filtered[metric].notna().any()
     ]
-    if fallback_metrics:
-        visible_metrics = [fallback_metrics[0]]
-        st.info(
-            "None of the selected metrics currently have values for this filter set. "
-            f"Showing {fallback_metrics[0]} instead. Please adjust your filter selection."
-        )
+    preferred_fallback_order = ["Operating Revenue", "Net Income"]
+    preferred_fallback_metrics = [
+        metric for metric in preferred_fallback_order if metric in fallback_metrics
+    ]
+    if not selected_metrics:
+        if preferred_fallback_metrics:
+            visible_metrics = preferred_fallback_metrics
+            if len(preferred_fallback_metrics) == 2:
+                st.info(
+                    "You have no metrics selected. Showing Operating Revenue and Net Income. "
+                    "Please make a selection."
+                )
+            else:
+                st.info(
+                    "You have no metrics selected. "
+                    f"Showing {preferred_fallback_metrics[0]}. Please make a selection."
+                )
+        elif fallback_metrics:
+            visible_metrics = [fallback_metrics[0]]
+            st.info(
+                "You have no metrics selected. "
+                f"Showing {fallback_metrics[0]}. Please make a selection."
+            )
+    elif fallback_metrics:
+        if preferred_fallback_metrics:
+            visible_metrics = preferred_fallback_metrics
+            st.info(
+                "None of the selected metrics currently have values for this filter set. "
+                f"Showing {' and '.join(preferred_fallback_metrics)} instead. "
+                "Please adjust your filter selection."
+            )
+        else:
+            visible_metrics = [fallback_metrics[0]]
+            st.info(
+                "None of the selected metrics currently have values for this filter set. "
+                f"Showing {fallback_metrics[0]} instead. Please adjust your filter selection."
+            )
     else:
         st.info("No metrics have available values for the current filters.")
         st.stop()

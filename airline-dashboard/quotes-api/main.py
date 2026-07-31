@@ -207,6 +207,10 @@ _live_quote_cache: dict[
     str,
     tuple[dt.datetime, LiveQuote],
 ] = {}
+_closed_live_quote_cache: dict[
+    str,
+    tuple[dt.datetime, LiveQuote],
+] = {}
 
 
 def _is_market_open(now: dt.datetime | None = None) -> bool:
@@ -236,12 +240,6 @@ def _next_market_open(now: dt.datetime | None = None) -> dt.datetime:
         )
 
 
-def _closed_cache_ttl_seconds(now: dt.datetime | None = None) -> int:
-    """While closed, keep quotes until the next market open."""
-    current = now.astimezone(MARKET_TZ) if now else dt.datetime.now(MARKET_TZ)
-    return max(int((_next_market_open(current) - current).total_seconds()), 60)
-
-
 class LiveQuote(BaseModel):
     ticker: str
     price: float | None
@@ -256,29 +254,53 @@ class LiveQuotesResponse(BaseModel):
     quotes: list[LiveQuote]
 
 
+def _quote_to_live_quote(quote: Quote, market_state: str) -> LiveQuote:
+    """Adapt a daily quote payload to the live-quote response model."""
+    return LiveQuote(
+        ticker=quote.ticker,
+        price=quote.price,
+        change=quote.change,
+        change_percent=quote.change_percent,
+        as_of=quote.as_of,
+        market_state=market_state,
+        error=quote.error,
+    )
+
+
 # Live quote fetching and caching
 def get_live_quote_cached(ticker: str) -> LiveQuote:
-    """Return an intraday quote cached for a short interval."""
+    """Return market-hours quotes with a 60s TTL and frozen closed-session closes."""
     now = dt.datetime.now(dt.timezone.utc)
     market_open = _is_market_open(now)
-    ttl_seconds = LIVE_QUOTE_CACHE_TTL_SECONDS if market_open else _closed_cache_ttl_seconds(now)
+    if market_open:
+        with _lock:
+            cached = _live_quote_cache.get(ticker)
+            if cached is not None:
+                fetched_at, quote = cached
+                age_seconds = (now - fetched_at).total_seconds()
+                if age_seconds < LIVE_QUOTE_CACHE_TTL_SECONDS:
+                    return quote
 
+        quote = _fetch_live_quote(ticker)
+        # Cache successful responses only, allowing transient failures to retry.
+        if quote.price is not None:
+            with _lock:
+                _live_quote_cache[ticker] = (now, quote)
+        return quote
+
+    next_open_utc = _next_market_open(now).astimezone(dt.timezone.utc)
     with _lock:
-        cached = _live_quote_cache.get(ticker)
-
+        cached = _closed_live_quote_cache.get(ticker)
         if cached is not None:
-            fetched_at, quote = cached
-            age_seconds = (now - fetched_at).total_seconds()
-
-            if age_seconds < ttl_seconds:
+            valid_until, quote = cached
+            if now < valid_until:
                 return quote
 
-    quote = _fetch_live_quote(ticker) if market_open else get_quote_cached(ticker)
-    # Cache successful responses only, allowing transient failures to retry.
+    quote = _quote_to_live_quote(get_quote_cached(ticker), market_state="closed")
+    # Freeze a successful closed-session snapshot until the next market open.
     if quote.price is not None:
         with _lock:
-            _live_quote_cache[ticker] = (now, quote)
-
+            _closed_live_quote_cache[ticker] = (next_open_utc, quote)
     return quote
 
 
@@ -294,6 +316,7 @@ def _fetch_live_quote(ticker: str) -> LiveQuote:
             return LiveQuote(
                 ticker=ticker,
                 price=None,
+                market_state="open",
                 error="no intraday data",
             )
 
@@ -302,6 +325,7 @@ def _fetch_live_quote(ticker: str) -> LiveQuote:
             return LiveQuote(
                 ticker=ticker,
                 price=None,
+                market_state="open",
                 error="no close data",
             )
 
@@ -334,6 +358,7 @@ def _fetch_live_quote(ticker: str) -> LiveQuote:
             change=round(change, 2),
             change_percent=round(change_percent, 2),
             as_of=timestamp.isoformat(),
+            market_state="open",
         )
     except Exception as exc:  # noqa: BLE001
         log.warning("Live quote fetch failed for %s: %s", ticker, exc)
@@ -341,6 +366,7 @@ def _fetch_live_quote(ticker: str) -> LiveQuote:
         return LiveQuote(
             ticker=ticker,
             price=None,
+            market_state="open",
             error="live fetch failed",
         )
 
