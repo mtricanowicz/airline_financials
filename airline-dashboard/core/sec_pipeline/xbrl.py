@@ -16,6 +16,8 @@ from functools import lru_cache
 import logging
 from typing import Any
 
+from . import config
+
 log = logging.getLogger("xbrl")
 
 # Candidate us-gaap tags per metric, tried in priority order.
@@ -25,11 +27,15 @@ DURATION_METRICS: dict[str, list[str]] = {
         "SalesRevenueServicesNet",
         "SalesRevenueNet",
         "Revenues",
+        "RevenueFromContractWithCustomerIncludingAssessedTax",
     ],
     "Operating Expenses": [
         "OperatingExpenses",
         "OperatingCostsAndExpenses",
         "CostsAndExpenses",
+    ],
+    "Operating Income": [
+        "OperatingIncomeLoss",
     ],
     "Net Income": [
         "NetIncomeLoss",
@@ -192,7 +198,28 @@ def _pick_duration_window(
     preferred_val = _latest_value(preferred)
     if preferred_val is not None:
         return preferred_val
-    return _latest_value(fallback)
+    fallback_val = _latest_value(fallback)
+    if fallback_val is not None:
+        return fallback_val
+
+    # Optional fallback: match by SEC fiscal period (fp) for filers whose
+    # quarter-end dates do not align with strict calendar quarter months.
+    if not config.XBRL_ENABLE_FP_FALLBACK or not period:
+        return None
+
+    fp_only: list[dict[str, Any]] = []
+    for f in facts_list:
+        end = _parse(f.get("end"))
+        days = _duration_days(f)
+        if not end or days is None:
+            continue
+        if end.year != year:
+            continue
+        if not (min_days <= days <= max_days):
+            continue
+        if str(f.get("fp", "")) in fp_preferred:
+            fp_only.append(f)
+    return _latest_value(fp_only)
 
 
 def _pick_duration(
@@ -225,7 +252,21 @@ def _pick_instant(
     preferred_val = _latest_value(preferred)
     if preferred_val is not None:
         return preferred_val
-    return _latest_value(fallback)
+    fallback_val = _latest_value(fallback)
+    if fallback_val is not None:
+        return fallback_val
+
+    if not config.XBRL_ENABLE_FP_FALLBACK:
+        return None
+
+    fp_only: list[dict[str, Any]] = []
+    for f in facts_list:
+        end = _parse(f.get("end"))
+        if not end or end.year != year:
+            continue
+        if str(f.get("fp", "")) in fp_preferred:
+            fp_only.append(f)
+    return _latest_value(fp_only)
 
 
 def _extract_ytd_from_tags(

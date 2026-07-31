@@ -140,6 +140,9 @@ with st.expander("Set filters", expanded=True):
 # ---------------------------------------------------------------------------
 # Filter and compute
 # ---------------------------------------------------------------------------
+show_time = False
+show_compare = False
+
 mask = (
     data["Airline"].isin(selected_airlines)
     & data["Year"].isin(selected_years)
@@ -150,10 +153,41 @@ if filtered.empty:
     st.info("No rows match the selected filters.")
     st.stop()
 
+visible_metrics: list[str] = [
+    metric
+    for metric in selected_metrics
+    if metric in filtered.columns and filtered[metric].notna().any()
+]
+hidden_metrics: list[str] = [
+    metric for metric in selected_metrics if metric not in visible_metrics
+]
+
+if hidden_metrics:
+    st.caption(
+        "The following metrics are hidden because there is no data available for the selected airlines/periods: "
+        + ", ".join(hidden_metrics)
+    )
+
+if not visible_metrics:
+    fallback_metrics = [
+        metric
+        for metric in available_metrics
+        if metric in filtered.columns and filtered[metric].notna().any()
+    ]
+    if fallback_metrics:
+        visible_metrics = [fallback_metrics[0]]
+        st.info(
+            "None of the selected metrics currently have values for this filter set. "
+            f"Showing {fallback_metrics[0]} instead. Please adjust your filter selection."
+        )
+    else:
+        st.info("No metrics have available values for the current filters.")
+        st.stop()
+
 scaled_metrics: dict[str, tuple[pd.DataFrame, str]] = {}
 # Small datasets are faster when scaling from a full-frame copy once per metric.
 _SMALL_DATA_FASTPATH_ROWS = 5000
-for metric in selected_metrics:
+for metric in visible_metrics:
     if len(filtered) <= _SMALL_DATA_FASTPATH_ROWS:
         metric_df = filtered.copy()
     else:
@@ -168,7 +202,7 @@ show_compare = len(selected_airlines) > 1 and compare
 tab_time, tab_period = st.tabs(["Metrics Over Time", "Single Period"])
 
 with tab_time:
-    for metric in selected_metrics:
+    for metric in visible_metrics:
         st.subheader(metric, divider="gray")
         plot_df, display_col = scaled_metrics[metric]
 
@@ -294,7 +328,7 @@ with tab_period:
     st.caption("When multiple periods are selected, this shows the latest one in the range.")
     metric_order: list[str] = []
     summary_rows = []
-    for metric in selected_metrics:
+    for metric in visible_metrics:
         scaled, display_col = scaled_metrics[metric]
         scaled = scaled[scaled["Period"] == latest]
         metric_order.append(display_col)

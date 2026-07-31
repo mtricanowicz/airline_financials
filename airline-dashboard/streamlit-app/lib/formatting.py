@@ -24,6 +24,9 @@ AIRLINE_COLORS: dict[str, str] = {
     "SAVE": "#ffec00",
     "ALGT": "#f48220",
     "SNCY": "#f58232",
+    "VA":   "#dc232e",
+    "RJET": "#32373c",
+    "SKYW": "#00529b",
 }
 
 AIRLINE_NAMES: dict[str, str] = {
@@ -38,6 +41,9 @@ AIRLINE_NAMES: dict[str, str] = {
     "SAVE": "Spirit Airlines",
     "ALGT": "Allegiant Air",
     "SNCY": "Sun Country Airlines",
+    "VA":   "Virgin America",
+    "RJET": "Republic Airways",
+    "SKYW": "SkyWest Airlines",
 }
 
 AIRLINE_IR: dict[str, str] = {
@@ -52,6 +58,9 @@ AIRLINE_IR: dict[str, str] = {
     "SAVE": None,
     "ALGT": "https://ir.allegiantair.com/",
     "SNCY": None,
+    "VA":   None,
+    "RJET": "https://investor.rjet.com/",
+    "SKYW": "https://inc.skywest.com/",
 }
 
 AIRLINE_LOGO_FILES: dict[str, str] = {
@@ -66,6 +75,9 @@ AIRLINE_LOGO_FILES: dict[str, str] = {
     "SAVE": "logo_SAVE.png",
     "ALGT": "logo_ALGT.png",
     "SNCY": "logo_SNCY.png",
+    "VA":   "logo_VA.png",
+    "RJET": "logo_RJET.png",
+    "SKYW": "logo_SKYW.png",
 }
 
 AIRLINE_GROUPS = {
@@ -85,11 +97,17 @@ AIRLINE_GROUPS = {
         "SAVE",
         "ALGT",
         "SNCY",
+        "VA",
+    ],
+    "Regional Airlines": [
+        "RJET",
+        "SKYW",
     ],
     "Defunct Airlines": [
         "HA",
         "SAVE",
         "SNCY",
+        "VA",
     ],
 }
 
@@ -97,6 +115,7 @@ AIRLINE_DEFUNCT_REASONS: dict[str, str] = {
     "HA":   "Merged with Alaska Airlines on September 18, 2024.",
     "SAVE": "Ceased operations on May 2, 2026.",
     "SNCY": "Merged with Allegiant Air on May 13, 2026.",
+    "VA":   "Merged with Alaska Airlines on December 14, 2016.",
 }
 
 # Metrics reported in dollars; displayed in millions with a currency prefix.

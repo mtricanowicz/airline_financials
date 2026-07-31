@@ -6,7 +6,7 @@ Combines three sources:
   Net Income, Long-Term Debt.
 * Manual sheet (``data/manual/``): Passenger Revenue, RPM, ASM, Profit Sharing,
   and the share repurchase / share sale history.
-* Derived (here): Operating Income, margins, Load Factor, Yield, TRASM, PRASM,
+* Derived (here): margins, Load Factor, Yield, TRASM, PRASM,
   CASM.
 
 Outputs to ``data/generated/``:
@@ -38,6 +38,7 @@ log = logging.getLogger("build_data")
 AUTO_METRICS = [
     "Operating Revenue",
     "Operating Expenses",
+    "Operating Income",
     "Net Income",
     "Long-Term Debt",
     "Operating Cash Flow",
@@ -48,6 +49,10 @@ MISMATCH_TOLERANCE = 0.02  # 2% relative difference
 
 FINANCIALS_PATH = config.GENERATED_DIR / "financials.json"
 BUYBACKS_PATH = config.GENERATED_DIR / "buybacks.json"
+DIAGNOSTICS_DIR = config.GENERATED_DIR / "diagnostics"
+DIAGNOSTICS_SUMMARY_CSV = DIAGNOSTICS_DIR / "coverage_summary.csv"
+DIAGNOSTICS_DETAIL_CSV = DIAGNOSTICS_DIR / "coverage_detail.csv"
+DIAGNOSTICS_REPORT_JSON = DIAGNOSTICS_DIR / "coverage_report.json"
 
 MANUAL_XLSX = config.MANUAL_DIR / "airline_financial_data.xlsx"
 MANUAL_METRICS_CSV = config.MANUAL_DIR / "manual_metrics.csv"
@@ -180,13 +185,13 @@ def add_derived(df: pd.DataFrame) -> pd.DataFrame:
         return pd.to_numeric(df[name], errors="coerce") if name in df.columns else pd.Series(pd.NA, index=df.index)
 
     op_rev, op_exp = col("Operating Revenue"), col("Operating Expenses")
+    op_inc = col("Operating Income")
     net_inc, pax_rev = col("Net Income"), col("Passenger Revenue")
     rpm, asm = col("RPM"), col("ASM")
     ltd, curr_mat, cash_eq, unr_cash, r_cash, st_inv = col("Long-Term Debt"), col("Current Maturities"), col("Cash & Cash Equivalents"), col("Unrestricted Cash"), col("Restricted Cash"), col("Short-Term Investments")
     ocf, capex = col("Operating Cash Flow"), col("Capital Expenditures").abs()
 
-    df["Operating Income"] = op_rev - op_exp
-    df["Operating Margin"] = ((df["Operating Income"] / op_rev) * 100).round(2)
+    df["Operating Margin"] = ((op_inc / op_rev) * 100).round(2)
     df["Net Margin"] = ((net_inc / op_rev) * 100).round(2)
     df["Load Factor"] = ((rpm / asm) * 100).round(2)
     df["Yield"] = pax_rev / rpm
@@ -293,6 +298,192 @@ def _write(path: Path, payload: Any) -> None:
     log.info("Wrote %s", path)
 
 
+def _build_coverage_diagnostics(
+    merged: pd.DataFrame,
+    auto: pd.DataFrame,
+    manual: pd.DataFrame,
+    airlines: list[str],
+    years: list[int],
+    periods: list[str],
+) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any]]:
+    """Build coverage diagnostics for requested airline/year/period slice."""
+    key_cols = ["Airline", "Year", "Quarter"]
+    metric_sources: dict[str, str] = {
+        **{metric: "auto_xbrl" for metric in AUTO_METRICS},
+        **{metric: "manual_only" for metric in MANUAL_METRICS},
+    }
+    # Include additional XBRL metrics extracted by the pipeline.
+    for metric in (
+        "Earnings Per Share",
+        "Current Maturities",
+        "Cash & Cash Equivalents",
+        "Short-Term Investments",
+    ):
+        metric_sources.setdefault(metric, "auto_xbrl")
+
+    metrics = [m for m in metric_sources if m in merged.columns]
+    expected_keys = [
+        (airline, year, period)
+        for airline in airlines
+        for year in years
+        for period in periods
+    ]
+
+    merged_idx = merged.set_index(key_cols) if not merged.empty else pd.DataFrame(columns=metrics)
+    auto_keys = set(auto[key_cols].itertuples(index=False, name=None)) if not auto.empty else set()
+    manual_keys = set(manual[key_cols].itertuples(index=False, name=None)) if not manual.empty else set()
+
+    if config.DIAGNOSTICS_EXCLUDE_FUTURE_PERIODS:
+        quarter_rank = {q: i for i, q in enumerate(config.QUARTERS)}
+
+        def _sort_key(key: tuple[str, int, str]) -> tuple[int, int]:
+            return (key[1], quarter_rank.get(key[2], 99))
+
+        available_keys = set(auto_keys) | set(manual_keys)
+        if not merged.empty:
+            available_keys |= set(merged[key_cols].itertuples(index=False, name=None))
+
+        latest_by_airline: dict[str, tuple[int, int]] = {}
+        for airline, year, quarter in available_keys:
+            if airline not in airlines or year not in years or quarter not in periods:
+                continue
+            key_rank = _sort_key((airline, year, quarter))
+            if key_rank > latest_by_airline.get(airline, (-1, -1)):
+                latest_by_airline[airline] = key_rank
+
+        expected_keys = [
+            key
+            for key in expected_keys
+            if key[0] not in latest_by_airline or _sort_key(key) <= latest_by_airline[key[0]]
+        ]
+
+    detail_rows: list[dict[str, Any]] = []
+    summary_rows: list[dict[str, Any]] = []
+
+    for airline in airlines:
+        airline_expected = [key for key in expected_keys if key[0] == airline]
+        expected_count = len(airline_expected)
+
+        for metric in metrics:
+            source_type = metric_sources.get(metric, "unknown")
+            populated = 0
+            missing = 0
+
+            for key in airline_expected:
+                value = pd.NA
+                if key in merged_idx.index and metric in merged_idx.columns:
+                    value = merged_idx.at[key, metric]
+
+                if pd.notna(value):
+                    populated += 1
+                    continue
+
+                missing += 1
+                if source_type == "manual_only":
+                    reason = "NO_MANUAL_ROW" if key not in manual_keys else "NO_MANUAL_VALUE"
+                elif source_type == "auto_xbrl":
+                    reason = "NO_AUTO_ROW" if key not in auto_keys else "NO_AUTO_VALUE"
+                else:
+                    reason = "MISSING_VALUE"
+
+                detail_rows.append(
+                    {
+                        "airline": key[0],
+                        "year": key[1],
+                        "quarter": key[2],
+                        "metric": metric,
+                        "source_type": source_type,
+                        "reason_code": reason,
+                    }
+                )
+
+            coverage_pct = round((populated / expected_count) * 100, 1) if expected_count else 0.0
+            summary_rows.append(
+                {
+                    "airline": airline,
+                    "metric": metric,
+                    "source_type": source_type,
+                    "expected_periods": expected_count,
+                    "populated_periods": populated,
+                    "missing_periods": missing,
+                    "coverage_pct": coverage_pct,
+                }
+            )
+
+    summary_df = pd.DataFrame(
+        summary_rows,
+        columns=[
+            "airline",
+            "metric",
+            "source_type",
+            "expected_periods",
+            "populated_periods",
+            "missing_periods",
+            "coverage_pct",
+        ],
+    )
+    detail_df = pd.DataFrame(
+        detail_rows,
+        columns=[
+            "airline",
+            "year",
+            "quarter",
+            "metric",
+            "source_type",
+            "reason_code",
+        ],
+    )
+    if not summary_df.empty:
+        summary_df = summary_df.sort_values(["airline", "source_type", "metric"])
+    if not detail_df.empty:
+        detail_df = detail_df.sort_values(["airline", "metric", "year", "quarter"])
+
+    reason_counts = (
+        detail_df["reason_code"].value_counts().to_dict()
+        if not detail_df.empty
+        else {}
+    )
+    report = {
+        "requested_airlines": airlines,
+        "requested_years": years,
+        "requested_periods": periods,
+        "exclude_future_periods": config.DIAGNOSTICS_EXCLUDE_FUTURE_PERIODS,
+        "summary_rows": int(len(summary_df)),
+        "detail_rows": int(len(detail_df)),
+        "reason_counts": reason_counts,
+    }
+    return summary_df, detail_df, report
+
+
+def _write_coverage_diagnostics(
+    merged: pd.DataFrame,
+    auto: pd.DataFrame,
+    manual: pd.DataFrame,
+    airlines: list[str],
+    years: list[int],
+    periods: list[str],
+) -> None:
+    """Write diagnostics tables and report under data/generated/diagnostics."""
+    DIAGNOSTICS_DIR.mkdir(parents=True, exist_ok=True)
+    summary_df, detail_df, report = _build_coverage_diagnostics(
+        merged=merged,
+        auto=auto,
+        manual=manual,
+        airlines=airlines,
+        years=years,
+        periods=periods,
+    )
+    summary_df.to_csv(DIAGNOSTICS_SUMMARY_CSV, index=False)
+    detail_df.to_csv(DIAGNOSTICS_DETAIL_CSV, index=False)
+    DIAGNOSTICS_REPORT_JSON.write_text(
+        json.dumps(report, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    log.info("Wrote %s", DIAGNOSTICS_SUMMARY_CSV)
+    log.info("Wrote %s", DIAGNOSTICS_DETAIL_CSV)
+    log.info("Wrote %s", DIAGNOSTICS_REPORT_JSON)
+
+
 def _load_existing_financials() -> pd.DataFrame:
     if not FINANCIALS_PATH.exists():
         return pd.DataFrame()
@@ -372,6 +563,16 @@ def build(
 
     # Final guard: only requested keys are eligible to update persisted financials.
     merged = _scope_frame(merged, airlines, years, periods)
+
+    # Diagnostics are always produced for the requested slice.
+    _write_coverage_diagnostics(
+        merged=merged,
+        auto=auto,
+        manual=manual_metrics,
+        airlines=airlines,
+        years=years,
+        periods=periods,
+    )
 
     if not overwrite:
         existing_financials = _load_existing_financials()

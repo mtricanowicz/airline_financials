@@ -19,6 +19,14 @@ from dotenv import load_dotenv
 # Load core/.env if present. Never commit that file.
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
+
+def _env_flag(name: str, default: bool) -> bool:
+    """Return a boolean environment flag with common truthy/falsey parsing."""
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
@@ -47,6 +55,11 @@ OPENAI_EMBEDDING_MODEL = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-s
 LOCAL_EMBEDDING_MODEL = os.getenv(
     "LOCAL_EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"
 )
+XBRL_ENABLE_FP_FALLBACK = _env_flag("XBRL_ENABLE_FP_FALLBACK", True)
+DIAGNOSTICS_EXCLUDE_FUTURE_PERIODS = _env_flag(
+    "DIAGNOSTICS_EXCLUDE_FUTURE_PERIODS",
+    True,
+)
 
 # SEC rate limit: no more than 10 requests per second.
 SEC_MAX_REQUESTS_PER_SECOND = 8.0
@@ -68,6 +81,9 @@ AIRLINE_CIK_FALLBACK: dict[str, str] = {
     "SAVE": "0001498710",   # Spirit Aviation Holdings
     "ALGT": "0001362468",   # Allegiant Travel Company
     "SNCY": "0001743907",   # Sun Country Airlines Holdings LLC
+    "VA":   "0001614436",   # Virgin America Inc
+    "RJET": "0000810332",   # Republic Airways Holdings Inc (renamed from Mesa Air Group Inc after merger)
+    "SKYW": "0000793733",   # SkyWest Inc
 }
 
 AIRLINE_NAMES: dict[str, str] = {
@@ -82,6 +98,9 @@ AIRLINE_NAMES: dict[str, str] = {
     "SAVE": "Spirit Airlines",
     "ALGT": "Allegiant Air",
     "SNCY": "Sun Country Airlines",
+    "VA":   "Virgin America",
+    "RJET": "Republic Airways",
+    "SKYW": "SkyWest Airlines",
 }
 
 # Filing forms relevant to a reporting period.

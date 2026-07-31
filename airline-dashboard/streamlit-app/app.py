@@ -10,7 +10,9 @@ cached loaders.
 
 from __future__ import annotations
 
+import datetime as dt
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import streamlit as st
 
@@ -32,6 +34,45 @@ from lib.formatting import (
 _APP_DIR = Path(__file__).parent
 _ASSETS_DIR = _APP_DIR.parent / "assets"
 _BRANDING_DIR = _ASSETS_DIR / "branding"
+_MARKET_TZ = ZoneInfo("America/New_York")
+
+
+def _is_market_open(now: dt.datetime | None = None) -> bool:
+    """Return True when US equities regular session is open (Mon-Fri, 9:30-16:00 ET)."""
+    current = now.astimezone(_MARKET_TZ) if now else dt.datetime.now(_MARKET_TZ)
+    if current.weekday() >= 5:
+        return False
+    session_open = current.replace(hour=9, minute=30, second=0, microsecond=0)
+    session_close = current.replace(hour=16, minute=0, second=0, microsecond=0)
+    return session_open <= current < session_close
+
+
+def _next_market_open(now: dt.datetime | None = None) -> dt.datetime:
+    """Return the next market-open timestamp in ET."""
+    current = now.astimezone(_MARKET_TZ) if now else dt.datetime.now(_MARKET_TZ)
+    probe = current
+    while True:
+        if probe.weekday() < 5:
+            open_at = probe.replace(hour=9, minute=30, second=0, microsecond=0)
+            if probe < open_at:
+                return open_at
+        probe = (probe + dt.timedelta(days=1)).replace(
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0,
+        )
+
+
+def _ticker_run_every() -> str:
+    """Use 60s during market hours; otherwise wait until next market open."""
+    now = dt.datetime.now(_MARKET_TZ)
+    if _is_market_open(now):
+        return "60s"
+
+    seconds = int((_next_market_open(now) - now).total_seconds())
+    # Keep a small floor to avoid zero/negative values on boundary transitions.
+    return f"{max(seconds, 60)}s"
 
 
 def _airline_sidebar_line(airline: str) -> str:
@@ -138,12 +179,11 @@ STOCK_TICKERS = tuple(
     if ticker not in AIRLINE_GROUPS.get("Defunct Airlines", [])
 )
 # Define the stock ticker rendering function and schedule it to run every 60 seconds.
-ticker_placeholder = st.empty()
-@st.fragment(run_every="60s")
+@st.fragment(run_every=_ticker_run_every())
 def render_stock_ticker() -> None:
     activated = st.session_state.get("activate_stock_ticker", True)
     quotes = fetch_live_quotes(STOCK_TICKERS) if activated else {}
-    ticker_placeholder.html(
+    st.html(
         fixed_stock_ticker_html(
             quotes,
             activated=activated,

@@ -13,6 +13,7 @@ import datetime as dt
 import logging
 import os
 from threading import Lock
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 import yfinance as yf
@@ -25,6 +26,7 @@ log = logging.getLogger("quotes-api")
 
 DEFAULT_TICKERS = ["AAL", "DAL", "UAL", "LUV", "ALK", "JBLU", "ULCC", "ALGT"]
 ALLOWED_ORIGINS = [o for o in os.getenv("ALLOWED_ORIGINS", "*").split(",") if o]
+MARKET_TZ = ZoneInfo("America/New_York")
 
 app = FastAPI(title="Airline Dashboard Quotes API", version="0.1.0")
 app.add_middleware(
@@ -207,6 +209,39 @@ _live_quote_cache: dict[
 ] = {}
 
 
+def _is_market_open(now: dt.datetime | None = None) -> bool:
+    """Return True during US equities regular session (Mon-Fri, 9:30-16:00 ET)."""
+    current = now.astimezone(MARKET_TZ) if now else dt.datetime.now(MARKET_TZ)
+    if current.weekday() >= 5:
+        return False
+    session_open = current.replace(hour=9, minute=30, second=0, microsecond=0)
+    session_close = current.replace(hour=16, minute=0, second=0, microsecond=0)
+    return session_open <= current < session_close
+
+
+def _next_market_open(now: dt.datetime | None = None) -> dt.datetime:
+    """Return next market-open timestamp in ET."""
+    current = now.astimezone(MARKET_TZ) if now else dt.datetime.now(MARKET_TZ)
+    probe = current
+    while True:
+        if probe.weekday() < 5:
+            open_at = probe.replace(hour=9, minute=30, second=0, microsecond=0)
+            if probe < open_at:
+                return open_at
+        probe = (probe + dt.timedelta(days=1)).replace(
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0,
+        )
+
+
+def _closed_cache_ttl_seconds(now: dt.datetime | None = None) -> int:
+    """While closed, keep quotes until the next market open."""
+    current = now.astimezone(MARKET_TZ) if now else dt.datetime.now(MARKET_TZ)
+    return max(int((_next_market_open(current) - current).total_seconds()), 60)
+
+
 class LiveQuote(BaseModel):
     ticker: str
     price: float | None
@@ -225,6 +260,8 @@ class LiveQuotesResponse(BaseModel):
 def get_live_quote_cached(ticker: str) -> LiveQuote:
     """Return an intraday quote cached for a short interval."""
     now = dt.datetime.now(dt.timezone.utc)
+    market_open = _is_market_open(now)
+    ttl_seconds = LIVE_QUOTE_CACHE_TTL_SECONDS if market_open else _closed_cache_ttl_seconds(now)
 
     with _lock:
         cached = _live_quote_cache.get(ticker)
@@ -233,9 +270,10 @@ def get_live_quote_cached(ticker: str) -> LiveQuote:
             fetched_at, quote = cached
             age_seconds = (now - fetched_at).total_seconds()
 
-            if age_seconds < LIVE_QUOTE_CACHE_TTL_SECONDS:
+            if age_seconds < ttl_seconds:
                 return quote
-    quote = _fetch_live_quote(ticker)
+
+    quote = _fetch_live_quote(ticker) if market_open else get_quote_cached(ticker)
     # Cache successful responses only, allowing transient failures to retry.
     if quote.price is not None:
         with _lock:

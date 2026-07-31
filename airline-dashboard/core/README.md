@@ -82,6 +82,22 @@ periods are skipped unless `--overwrite` is passed.
 API calls. `EMBEDDING_BACKEND=openai` uses the OpenAI embeddings API. The chat
 summarization step always uses OpenAI.
 
+## XBRL period matching behavior
+
+Auto-metric extraction uses a two-stage period matcher:
+
+1. Calendar window matching (existing behavior): select facts by expected year/end-month and duration window.
+2. FP fallback matching (default on): if no value is found in stage 1, retry using SEC fiscal-period labels (`fp`) for the requested period in the same year.
+
+This improves coverage for filers whose quarter boundaries do not align cleanly to calendar quarter months.
+
+Environment switches:
+
+| Variable | Default | Effect |
+| --- | --- | --- |
+| `XBRL_ENABLE_FP_FALLBACK` | `true` | Enables the stage-2 `fp` fallback when calendar matching misses. Set to `false` to preserve strict calendar-only extraction. |
+| `DIAGNOSTICS_EXCLUDE_FUTURE_PERIODS` | `true` | In coverage diagnostics, excludes tail periods beyond the latest available row per airline (reduces not-yet-filed noise). Set to `false` to score every requested period strictly. |
+
 ## Metric sourcing
 
 | Source | Metrics |
@@ -92,6 +108,16 @@ summarization step always uses OpenAI.
 
 RPM, ASM, and Profit Sharing are not part of the us-gaap XBRL taxonomy and must
 be supplied manually.
+
+## Diagnostics output
+
+Each `build_data.py` run writes coverage diagnostics for the requested run slice to:
+
+- `../data/generated/diagnostics/coverage_summary.csv`
+- `../data/generated/diagnostics/coverage_detail.csv`
+- `../data/generated/diagnostics/coverage_report.json`
+
+By default, diagnostics suppress future not-yet-filed tail periods per airline. Disable that with `DIAGNOSTICS_EXCLUDE_FUTURE_PERIODS=false`.
 
 ## Tests
 
