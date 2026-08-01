@@ -74,16 +74,24 @@ with st.expander("Set filters", expanded=True):
     with st.container(border=True):
         col4, col5, col6 = st.columns([1, 3, 1])
         with col4:
-            airline_group = st.radio("Select Airlines for comparison:", ["All", *[group for group in AIRLINE_GROUPS if group != "Defunct Airlines"], "Choose from active and defunct airlines"], horizontal=False, index=1)
+            airline_group = st.radio(
+                "Select Airlines for comparison:",
+                [
+                    "All",
+                    *[group for group in AIRLINE_GROUPS if group != "Defunct Airlines"],
+                ],
+                horizontal=False,
+                index=1,
+            )
         if airline_group == "All":
-            airline_options = [a for a in airlines if a not in AIRLINE_GROUPS["Defunct Airlines"]]
-            default_airlines = airline_options
+            airline_options = airlines
+            default_airlines = [a for a in airline_options if a not in AIRLINE_GROUPS["Defunct Airlines"]]
         elif airline_group in AIRLINE_GROUPS:
-            airline_options = [a for a in AIRLINE_GROUPS[airline_group] if a in airlines and a not in AIRLINE_GROUPS["Defunct Airlines"]]
-            default_airlines = airline_options
+            airline_options = [a for a in AIRLINE_GROUPS[airline_group]]
+            default_airlines = [a for a in airline_options if a not in AIRLINE_GROUPS["Defunct Airlines"]]
         else:
             airline_options = airlines
-            default_airlines = airlines   
+            default_airlines = airline_options
         with col5:
             selected_airlines = st.multiselect("Add or remove Airlines to compare:", airline_options, default=default_airlines)
             selected_airlines = selected_airlines or airline_options[:1]
