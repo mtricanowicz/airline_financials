@@ -139,8 +139,8 @@ with st.sidebar:
         st.markdown(
             get_other_dashboard_link(
                 icon_path=_BRANDING_DIR / "site_favicon_steel.png",
-                name="Steel Dashboard (Coming Soon)",
-                link=None
+                name="Steel Financial Dashboard",
+                link="https://steel.industryfinancials.com"
             ),
             unsafe_allow_html=True
         )
