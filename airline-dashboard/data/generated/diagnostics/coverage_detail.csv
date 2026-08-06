@@ -325,6 +325,7 @@ ALK,2025,Q2,ASM,manual_only,NO_MANUAL_ROW
 ALK,2025,Q3,ASM,manual_only,NO_MANUAL_ROW
 ALK,2025,Q4,ASM,manual_only,NO_MANUAL_ROW
 ALK,2026,Q1,ASM,manual_only,NO_MANUAL_ROW
+ALK,2026,Q2,ASM,manual_only,NO_MANUAL_ROW
 ALK,2014,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ALK,2014,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ALK,2014,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
@@ -386,6 +387,7 @@ ALK,2025,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ALK,2025,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ALK,2025,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ALK,2026,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
+ALK,2026,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ALK,2014,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALK,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALK,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
@@ -447,6 +449,7 @@ ALK,2025,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALK,2025,Q3,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALK,2025,Q4,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALK,2026,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
+ALK,2026,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALK,2014,FY,RPM,manual_only,NO_MANUAL_ROW
 ALK,2014,Q1,RPM,manual_only,NO_MANUAL_ROW
 ALK,2014,Q2,RPM,manual_only,NO_MANUAL_ROW
@@ -508,6 +511,7 @@ ALK,2025,Q2,RPM,manual_only,NO_MANUAL_ROW
 ALK,2025,Q3,RPM,manual_only,NO_MANUAL_ROW
 ALK,2025,Q4,RPM,manual_only,NO_MANUAL_ROW
 ALK,2026,Q1,RPM,manual_only,NO_MANUAL_ROW
+ALK,2026,Q2,RPM,manual_only,NO_MANUAL_ROW
 DAL,2019,Q1,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 DAL,2025,FY,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 DAL,2025,Q1,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
@@ -1035,6 +1039,7 @@ RJET,2025,Q2,ASM,manual_only,NO_MANUAL_ROW
 RJET,2025,Q3,ASM,manual_only,NO_MANUAL_ROW
 RJET,2025,Q4,ASM,manual_only,NO_MANUAL_ROW
 RJET,2026,Q1,ASM,manual_only,NO_MANUAL_ROW
+RJET,2026,Q2,ASM,manual_only,NO_MANUAL_ROW
 RJET,2014,FY,Capital Expenditures,auto_xbrl,NO_AUTO_ROW
 RJET,2014,Q1,Capital Expenditures,auto_xbrl,NO_AUTO_ROW
 RJET,2014,Q2,Capital Expenditures,auto_xbrl,NO_AUTO_ROW
@@ -1051,8 +1056,6 @@ RJET,2016,Q3,Capital Expenditures,auto_xbrl,NO_AUTO_VALUE
 RJET,2016,Q4,Capital Expenditures,auto_xbrl,NO_AUTO_VALUE
 RJET,2017,Q2,Capital Expenditures,auto_xbrl,NO_AUTO_VALUE
 RJET,2017,Q3,Capital Expenditures,auto_xbrl,NO_AUTO_VALUE
-RJET,2025,Q2,Capital Expenditures,auto_xbrl,NO_AUTO_VALUE
-RJET,2025,Q4,Capital Expenditures,auto_xbrl,NO_AUTO_VALUE
 RJET,2014,FY,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
 RJET,2014,Q1,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
 RJET,2014,Q2,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
@@ -1242,6 +1245,7 @@ RJET,2025,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
 RJET,2025,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
 RJET,2025,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
 RJET,2026,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
+RJET,2026,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
 RJET,2014,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
 RJET,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 RJET,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
@@ -1303,6 +1307,7 @@ RJET,2025,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
 RJET,2025,Q3,Profit Sharing,manual_only,NO_MANUAL_ROW
 RJET,2025,Q4,Profit Sharing,manual_only,NO_MANUAL_ROW
 RJET,2026,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
+RJET,2026,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
 RJET,2014,FY,RPM,manual_only,NO_MANUAL_ROW
 RJET,2014,Q1,RPM,manual_only,NO_MANUAL_ROW
 RJET,2014,Q2,RPM,manual_only,NO_MANUAL_ROW
@@ -1364,6 +1369,7 @@ RJET,2025,Q2,RPM,manual_only,NO_MANUAL_ROW
 RJET,2025,Q3,RPM,manual_only,NO_MANUAL_ROW
 RJET,2025,Q4,RPM,manual_only,NO_MANUAL_ROW
 RJET,2026,Q1,RPM,manual_only,NO_MANUAL_ROW
+RJET,2026,Q2,RPM,manual_only,NO_MANUAL_ROW
 RJET,2014,FY,Short-Term Investments,auto_xbrl,NO_AUTO_ROW
 RJET,2014,Q1,Short-Term Investments,auto_xbrl,NO_AUTO_ROW
 RJET,2014,Q2,Short-Term Investments,auto_xbrl,NO_AUTO_ROW
@@ -1406,7 +1412,6 @@ RJET,2023,Q4,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 RJET,2024,Q1,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 RJET,2024,Q2,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 RJET,2024,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
-RJET,2025,Q2,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 RJET,2025,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 SAVE,2014,FY,ASM,manual_only,NO_MANUAL_ROW
 SAVE,2014,Q1,ASM,manual_only,NO_MANUAL_ROW

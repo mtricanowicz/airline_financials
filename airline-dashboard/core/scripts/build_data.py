@@ -236,6 +236,7 @@ def add_derived(df: pd.DataFrame) -> pd.DataFrame:
                 "Short-Term Investments",
                 "Total Liquidity",
                 "Net Debt",
+                "Interest Expense",
                 "Operating Cash Flow",
                 "Capital Expenditures",
                 "Free Cash Flow",
@@ -587,7 +588,7 @@ def build(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build the dashboard datasets.")
-    parser.add_argument("--airlines", nargs="+", default=["AAL", "DAL", "UAL", "LUV", "ALK", "JBLU", "ULCC", "ALGT", "SNCY"])
+    parser.add_argument("--airlines", nargs="+", default=["AAL", "DAL", "UAL", "LUV", "ALK", "JBLU", "ULCC", "ALGT", "RJET", "SKYW"])
     parser.add_argument("--years", nargs="+", type=int, required=True)
     parser.add_argument("--periods", nargs="+", default=["Q1", "Q2", "Q3", "Q4", "FY"])
     parser.add_argument("--overwrite", action="store_true", help="Overwrite existing generated outputs instead of merging with existing data.")

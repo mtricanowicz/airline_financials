@@ -29,21 +29,21 @@ ALGT,ASM,manual_only,61,0,61,0.0
 ALGT,Passenger Revenue,manual_only,61,0,61,0.0
 ALGT,Profit Sharing,manual_only,61,0,61,0.0
 ALGT,RPM,manual_only,61,0,61,0.0
-ALK,Capital Expenditures,auto_xbrl,61,61,0,100.0
-ALK,Cash & Cash Equivalents,auto_xbrl,61,61,0,100.0
-ALK,Current Maturities,auto_xbrl,61,61,0,100.0
-ALK,Earnings Per Share,auto_xbrl,61,61,0,100.0
-ALK,Long-Term Debt,auto_xbrl,61,61,0,100.0
-ALK,Net Income,auto_xbrl,61,61,0,100.0
-ALK,Operating Cash Flow,auto_xbrl,61,61,0,100.0
-ALK,Operating Expenses,auto_xbrl,61,61,0,100.0
-ALK,Operating Income,auto_xbrl,61,61,0,100.0
-ALK,Operating Revenue,auto_xbrl,61,61,0,100.0
-ALK,Short-Term Investments,auto_xbrl,61,61,0,100.0
-ALK,ASM,manual_only,61,0,61,0.0
-ALK,Passenger Revenue,manual_only,61,0,61,0.0
-ALK,Profit Sharing,manual_only,61,0,61,0.0
-ALK,RPM,manual_only,61,0,61,0.0
+ALK,Capital Expenditures,auto_xbrl,62,62,0,100.0
+ALK,Cash & Cash Equivalents,auto_xbrl,62,62,0,100.0
+ALK,Current Maturities,auto_xbrl,62,62,0,100.0
+ALK,Earnings Per Share,auto_xbrl,62,62,0,100.0
+ALK,Long-Term Debt,auto_xbrl,62,62,0,100.0
+ALK,Net Income,auto_xbrl,62,62,0,100.0
+ALK,Operating Cash Flow,auto_xbrl,62,62,0,100.0
+ALK,Operating Expenses,auto_xbrl,62,62,0,100.0
+ALK,Operating Income,auto_xbrl,62,62,0,100.0
+ALK,Operating Revenue,auto_xbrl,62,62,0,100.0
+ALK,Short-Term Investments,auto_xbrl,62,62,0,100.0
+ALK,ASM,manual_only,62,0,62,0.0
+ALK,Passenger Revenue,manual_only,62,0,62,0.0
+ALK,Profit Sharing,manual_only,62,0,62,0.0
+ALK,RPM,manual_only,62,0,62,0.0
 DAL,Capital Expenditures,auto_xbrl,62,62,0,100.0
 DAL,Cash & Cash Equivalents,auto_xbrl,62,62,0,100.0
 DAL,Current Maturities,auto_xbrl,62,62,0,100.0
@@ -104,21 +104,21 @@ LUV,ASM,manual_only,62,62,0,100.0
 LUV,Passenger Revenue,manual_only,62,62,0,100.0
 LUV,Profit Sharing,manual_only,62,62,0,100.0
 LUV,RPM,manual_only,62,62,0,100.0
-RJET,Capital Expenditures,auto_xbrl,61,43,18,70.5
-RJET,Cash & Cash Equivalents,auto_xbrl,61,52,9,85.2
-RJET,Current Maturities,auto_xbrl,61,44,17,72.1
-RJET,Earnings Per Share,auto_xbrl,61,48,13,78.7
-RJET,Long-Term Debt,auto_xbrl,61,44,17,72.1
-RJET,Net Income,auto_xbrl,61,47,14,77.0
-RJET,Operating Cash Flow,auto_xbrl,61,45,16,73.8
-RJET,Operating Expenses,auto_xbrl,61,47,14,77.0
-RJET,Operating Income,auto_xbrl,61,47,14,77.0
-RJET,Operating Revenue,auto_xbrl,61,47,14,77.0
-RJET,Short-Term Investments,auto_xbrl,61,17,44,27.9
-RJET,ASM,manual_only,61,0,61,0.0
-RJET,Passenger Revenue,manual_only,61,0,61,0.0
-RJET,Profit Sharing,manual_only,61,0,61,0.0
-RJET,RPM,manual_only,61,0,61,0.0
+RJET,Capital Expenditures,auto_xbrl,62,46,16,74.2
+RJET,Cash & Cash Equivalents,auto_xbrl,62,53,9,85.5
+RJET,Current Maturities,auto_xbrl,62,45,17,72.6
+RJET,Earnings Per Share,auto_xbrl,62,49,13,79.0
+RJET,Long-Term Debt,auto_xbrl,62,45,17,72.6
+RJET,Net Income,auto_xbrl,62,48,14,77.4
+RJET,Operating Cash Flow,auto_xbrl,62,46,16,74.2
+RJET,Operating Expenses,auto_xbrl,62,48,14,77.4
+RJET,Operating Income,auto_xbrl,62,48,14,77.4
+RJET,Operating Revenue,auto_xbrl,62,48,14,77.4
+RJET,Short-Term Investments,auto_xbrl,62,19,43,30.6
+RJET,ASM,manual_only,62,0,62,0.0
+RJET,Passenger Revenue,manual_only,62,0,62,0.0
+RJET,Profit Sharing,manual_only,62,0,62,0.0
+RJET,RPM,manual_only,62,0,62,0.0
 SAVE,Capital Expenditures,auto_xbrl,60,30,30,50.0
 SAVE,Cash & Cash Equivalents,auto_xbrl,60,60,0,100.0
 SAVE,Current Maturities,auto_xbrl,60,60,0,100.0

@@ -1,20 +1,29 @@
 # Airline Financial Dashboard (v2)
 Compare financial and operating metrics for major US airlines.
-Live app: https://www.airlinefinancialdashboard.com/
+Live app: https://airline.industryfinancials.com/
 
 ## Overview
 This repository now centers on the v2 platform under [airline-dashboard](airline-dashboard), which separates data generation, APIs, and front ends into maintainable components.
 
-Financial statement series in the generated dataset starts in 2014, which reflects the post-merger modern era for major US carriers. Share repurchase history can include earlier periods from manual files. The current v2 defaults and UI support these tickers:
-- AAL
-- DAL
-- UAL
-- LUV
-- ALK
-- JBLU
-- ULCC
-- ALGT
-- SNCY
+Financial statement series in the generated dataset starts in 2014, which reflects the post legacy airline consolidation era for major US carriers. Share repurchase history can include earlier periods from manual files to fully cover the 2010s share buyback programs. The current v2 supports the tickers for all of the publicly traded US passenger airlines that were active since 2014, whether currently active or defunct, separated by scale:
+- Major Global Airlines
+    - AAL
+    - DAL
+    - UAL
+- Large National Airlines
+    - LUV
+- Small and Midsize Airlines
+    - ALGT
+    - ALK
+    - _HA (defunct)_
+    - JBLU
+    - _SAVE (defunct)_
+    - _SNCY (defunct)_
+    - ULCC
+    - _VA (defunct)_
+- Regional Airlines
+    - RJET
+    - SKYW
 
 Unless noted, metrics are sourced or derived from SEC filings (10-Q, 8-K, 10-K), with specific operational metrics maintained in a manual sheet and merged in the core data pipeline.
 
@@ -22,9 +31,9 @@ Unless noted, metrics are sourced or derived from SEC filings (10-Q, 8-K, 10-K),
 The v2 stack is organized as:
 - [airline-dashboard/core](airline-dashboard/core): shared Python data and insights pipeline
 - [airline-dashboard/quotes-api](airline-dashboard/quotes-api): FastAPI service for live quote data
-- [airline-dashboard/streamlit-app](airline-dashboard/streamlit-app): Streamlit fallback/reference UI
-- [airline-dashboard/web](airline-dashboard/web): Next.js web front end (target replacement UI)
-- [airline-dashboard/data](airline-dashboard/data): manual and generated data
+- [airline-dashboard/streamlit-app](airline-dashboard/streamlit-app): Primary app entry point Streamlit front end UI
+- [airline-dashboard/web](airline-dashboard/web): Next.js web front end (in development target end state UI)
+- [airline-dashboard/data](airline-dashboard/data): shared manual and generated data
 - [airline-dashboard/deploy](airline-dashboard/deploy): deployment configs and runbooks
 
 Data flow summary:
@@ -89,12 +98,17 @@ Start here for component-level documentation:
 - [airline-dashboard/deploy/README.md](airline-dashboard/deploy/README.md)
 
 ## Sources
-- AAL: https://americanairlines.gcs-web.com/
-- DAL: https://ir.delta.com/
-- UAL: https://ir.united.com/
-- LUV: https://www.southwestairlinesinvestorrelations.com/
-- ALK: https://investor.alaskaair.com/
-- JBLU: https://investor.jetblue.com/
+- SEC EDGAR: https://www.sec.gov/search-filings/
+- AAL:  https://americanairlines.gcs-web.com/
+- DAL:  https://ir.delta.com/
+- UAL:  https://ir.united.com/
+- LUV:  https://www.southwestairlinesinvestorrelations.com/
+- ALGT: https://ir.allegiantair.com/
+- ALK:  https://investor.alaskaair.com/
+- JBLU: https://www.investor.jetblue.com/
 - ULCC: https://ir.flyfrontier.com/
+- RJET: https://investor.rjet.com/
+- SKYW: https://inc.skywest.com/
 
-Created by Michael Tricanowicz.
+
+<br>**Created by Michael Tricanowicz**
