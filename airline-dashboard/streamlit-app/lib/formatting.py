@@ -134,6 +134,7 @@ CURRENCY_METRICS = [
     "Short-Term Investments",
     "Total Liquidity",
     "Net Debt",
+    "Interest Expense",
     "Operating Cash Flow",
     "Capital Expenditures",
     "Free Cash Flow",
@@ -177,6 +178,7 @@ METRIC_GROUPS = {
         "Short-Term Investments",
         "Total Liquidity",
         "Net Debt",
+        "Interest Expense",
     ],
     "Cash Flow": [
         "Operating Cash Flow",
@@ -560,7 +562,7 @@ def stock_ticker_html(
         .stock-ticker-track {{
             display: flex;
             width: max-content;
-            animation: stock-ticker-scroll 40s linear infinite;
+            animation: stock-ticker-scroll {4 * len(items)}s linear infinite;
         }}
         .stock-ticker-shell:hover .stock-ticker-track {{
             animation-play-state: paused;
