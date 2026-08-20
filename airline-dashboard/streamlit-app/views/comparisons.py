@@ -28,6 +28,7 @@ from lib.formatting import (
     pct_diff,
     airline_label_html,
     scale_metric_for_display,
+    airline_header_html,
 )
 
 st.header(":material/finance_mode: Filtered Comparisons")
@@ -87,7 +88,7 @@ with st.expander("Set filters", expanded=True):
             airline_options = airlines
             default_airlines = [a for a in airline_options if a not in AIRLINE_GROUPS["Defunct Airlines"]]
         elif airline_group in AIRLINE_GROUPS:
-            airline_options = [a for a in AIRLINE_GROUPS[airline_group]]
+            airline_options = [a for a in sorted(AIRLINE_GROUPS[airline_group])]
             default_airlines = [a for a in airline_options if a not in AIRLINE_GROUPS["Defunct Airlines"]]
         else:
             airline_options = airlines
@@ -223,13 +224,12 @@ if not visible_metrics:
         st.stop()
 
 scaled_metrics: dict[str, tuple[pd.DataFrame, str]] = {}
-# Small datasets are faster when scaling from a full-frame copy once per metric.
-_SMALL_DATA_FASTPATH_ROWS = 5000
+# Slice to only the columns each metric needs; a full-frame copy per metric
+# scales with total column count and dominates cost when many metrics are
+# selected, which is why year/quarter/airline filter changes (which don't
+# reduce the metric count) felt slower than narrowing the metric selection.
 for metric in visible_metrics:
-    if len(filtered) <= _SMALL_DATA_FASTPATH_ROWS:
-        metric_df = filtered.copy()
-    else:
-        metric_df = filtered[["Period", "Airline", metric]].copy()
+    metric_df = filtered[["Period", "Airline", metric]].copy()
     scaled_metrics[metric] = scale_metric_for_display(metric_df, metric)
 
 periods = sorted(filtered["Period"].unique())
@@ -237,9 +237,13 @@ airline_order = sorted(selected_airlines)
 show_time = len(selected_years) > 1 or len(selected_quarters) > 1
 show_compare = len(selected_airlines) > 1 and compare
 
-tab_time, tab_period = st.tabs(["Metrics Over Time", "Single Period"])
+tab_time, tab_period, tab_airline, tab_raw = st.tabs(
+    ["Metrics Over Time", "Single Period", "Single Airline", "Raw Data"]
+)
 
-with tab_time:
+# Tab bodies are plain functions (Streamlit still runs every tab's code on
+# every script rerun.
+def _render_tab_time() -> None:
     for metric in visible_metrics:
         st.subheader(metric, divider="gray")
         plot_df, display_col = scaled_metrics[metric]
@@ -360,10 +364,11 @@ with tab_time:
                 fig_bar.update_traces(hovertemplate="%{x}<br>%{y:.2f}%")
                 st.plotly_chart(fig_bar, width="stretch")
 
-with tab_period:
+
+def _render_tab_period() -> None:
     latest = max(periods)
     st.subheader(f"Summary of {latest}", divider="gray")
-    st.caption("When multiple periods are selected, this shows the latest one in the range.")
+    st.caption("When multiple periods are selected, this shows the latest one from the selection.")
     metric_order: list[str] = []
     summary_rows = []
     for metric in visible_metrics:
@@ -401,3 +406,66 @@ with tab_period:
         st.dataframe(summary.style.map(color_positive_negative, subset=color_cols), width="stretch")
     else:
         st.dataframe(summary, width="stretch")
+
+
+def _render_tab_airline() -> None:
+    # Single Airline: a comprehensive summary of all selected metrics across all
+    # selected periods for one airline, useful for viewing everything at once.
+    summary_airline = selected_airlines[0]
+    name = AIRLINE_NAMES.get(summary_airline, summary_airline)
+    st.markdown(
+        airline_header_html(
+            summary_airline,
+            text=f"Summary of {name} ({summary_airline})",
+            heading_level=3,
+            logo_height_em=1.75,
+            logo_before_text=False,
+            gap_rem=0,
+        ),
+        unsafe_allow_html=True
+    )
+    st.markdown("<hr style='border:1px solid #808080; margin:0.5rem 0 1rem 0;'>", unsafe_allow_html=True)
+    st.caption("When multiple airlines are selected, this shows the first one in the selection.")
+    metric_order: list[str] = []
+    summary_rows = []
+    for metric in visible_metrics:
+        scaled, display_col = scaled_metrics[metric]
+        scaled = scaled[scaled["Airline"] == summary_airline]
+        metric_order.append(display_col)
+        for period in periods:
+            cell = scaled[scaled["Period"] == period][display_col]
+            value = cell.iloc[0] if not cell.empty else None
+            summary_rows.append(
+                {
+                    "Period": period,
+                    "Metric": display_col,
+                    summary_airline: format_metric_value(value, metric),
+                }
+            )
+    summary = pd.DataFrame(summary_rows).set_index(["Metric", "Period"])
+    summary = summary.unstack("Metric")
+    summary = summary.reindex(metric_order, axis=1, level=1)
+    st.dataframe(summary, width="stretch")
+
+
+def _render_tab_raw() -> None:
+    st.subheader("Raw Data", divider="gray")
+    st.caption(
+        "This is the raw data after applying the selected filters and is provided for "
+        "export or further analysis. It is not scaled or formatted for display."
+    )
+    st.dataframe(filtered.sort_values(by=["Airline", "Period"]).reset_index(drop=True), width="stretch")
+
+
+with tab_time:
+    _render_tab_time()
+
+with tab_period:
+    _render_tab_period()
+
+with tab_airline:
+    _render_tab_airline()
+
+with tab_raw:
+    _render_tab_raw()
+
