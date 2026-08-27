@@ -411,7 +411,7 @@ def _render_tab_period() -> None:
 def _render_tab_airline() -> None:
     # Single Airline: a comprehensive summary of all selected metrics across all
     # selected periods for one airline, useful for viewing everything at once.
-    summary_airline = selected_airlines[0]
+    summary_airline = base_airline
     name = AIRLINE_NAMES.get(summary_airline, summary_airline)
     st.markdown(
         airline_header_html(
@@ -425,7 +425,10 @@ def _render_tab_airline() -> None:
         unsafe_allow_html=True
     )
     st.markdown("<hr style='border:1px solid #808080; margin:0.5rem 0 1rem 0;'>", unsafe_allow_html=True)
-    st.caption("When multiple airlines are selected, this shows the first one in the selection.")
+    st.caption(
+        "When multiple airlines are selected, the summary is provided for the comparison airline if one was chosen. "
+        "Otherwise, it is shown for the first airline in the selection."
+    )
     metric_order: list[str] = []
     summary_rows = []
     for metric in visible_metrics:
