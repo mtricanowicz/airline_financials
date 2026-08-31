@@ -226,11 +226,11 @@ ALK,2017,Q1,ASM,manual_only,NO_MANUAL_ROW
 ALK,2017,Q2,ASM,manual_only,NO_MANUAL_ROW
 ALK,2017,Q3,ASM,manual_only,NO_MANUAL_ROW
 ALK,2017,Q4,ASM,manual_only,NO_MANUAL_ROW
-ALK,2018,FY,ASM,manual_only,NO_MANUAL_ROW
-ALK,2018,Q1,ASM,manual_only,NO_MANUAL_ROW
-ALK,2018,Q2,ASM,manual_only,NO_MANUAL_ROW
-ALK,2018,Q3,ASM,manual_only,NO_MANUAL_ROW
-ALK,2018,Q4,ASM,manual_only,NO_MANUAL_ROW
+ALK,2018,FY,ASM,manual_only,NO_MANUAL_VALUE
+ALK,2018,Q1,ASM,manual_only,NO_MANUAL_VALUE
+ALK,2018,Q2,ASM,manual_only,NO_MANUAL_VALUE
+ALK,2018,Q3,ASM,manual_only,NO_MANUAL_VALUE
+ALK,2018,Q4,ASM,manual_only,NO_MANUAL_VALUE
 ALK,2019,FY,ASM,manual_only,NO_MANUAL_ROW
 ALK,2019,Q1,ASM,manual_only,NO_MANUAL_ROW
 ALK,2019,Q2,ASM,manual_only,NO_MANUAL_ROW
@@ -268,8 +268,6 @@ ALK,2025,Q3,ASM,manual_only,NO_MANUAL_ROW
 ALK,2025,Q4,ASM,manual_only,NO_MANUAL_ROW
 ALK,2026,Q1,ASM,manual_only,NO_MANUAL_ROW
 ALK,2026,Q2,ASM,manual_only,NO_MANUAL_ROW
-ALK,2018,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2018,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ALK,2014,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALK,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALK,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
@@ -290,11 +288,11 @@ ALK,2017,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALK,2017,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALK,2017,Q3,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALK,2017,Q4,Profit Sharing,manual_only,NO_MANUAL_ROW
-ALK,2018,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
-ALK,2018,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
-ALK,2018,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
-ALK,2018,Q3,Profit Sharing,manual_only,NO_MANUAL_ROW
-ALK,2018,Q4,Profit Sharing,manual_only,NO_MANUAL_ROW
+ALK,2018,FY,Profit Sharing,manual_only,NO_MANUAL_VALUE
+ALK,2018,Q1,Profit Sharing,manual_only,NO_MANUAL_VALUE
+ALK,2018,Q2,Profit Sharing,manual_only,NO_MANUAL_VALUE
+ALK,2018,Q3,Profit Sharing,manual_only,NO_MANUAL_VALUE
+ALK,2018,Q4,Profit Sharing,manual_only,NO_MANUAL_VALUE
 ALK,2019,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALK,2019,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALK,2019,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
@@ -352,11 +350,11 @@ ALK,2017,Q1,RPM,manual_only,NO_MANUAL_ROW
 ALK,2017,Q2,RPM,manual_only,NO_MANUAL_ROW
 ALK,2017,Q3,RPM,manual_only,NO_MANUAL_ROW
 ALK,2017,Q4,RPM,manual_only,NO_MANUAL_ROW
-ALK,2018,FY,RPM,manual_only,NO_MANUAL_ROW
-ALK,2018,Q1,RPM,manual_only,NO_MANUAL_ROW
-ALK,2018,Q2,RPM,manual_only,NO_MANUAL_ROW
-ALK,2018,Q3,RPM,manual_only,NO_MANUAL_ROW
-ALK,2018,Q4,RPM,manual_only,NO_MANUAL_ROW
+ALK,2018,FY,RPM,manual_only,NO_MANUAL_VALUE
+ALK,2018,Q1,RPM,manual_only,NO_MANUAL_VALUE
+ALK,2018,Q2,RPM,manual_only,NO_MANUAL_VALUE
+ALK,2018,Q3,RPM,manual_only,NO_MANUAL_VALUE
+ALK,2018,Q4,RPM,manual_only,NO_MANUAL_VALUE
 ALK,2019,FY,RPM,manual_only,NO_MANUAL_ROW
 ALK,2019,Q1,RPM,manual_only,NO_MANUAL_ROW
 ALK,2019,Q2,RPM,manual_only,NO_MANUAL_ROW
@@ -422,11 +420,11 @@ HA,2017,Q1,ASM,manual_only,NO_MANUAL_ROW
 HA,2017,Q2,ASM,manual_only,NO_MANUAL_ROW
 HA,2017,Q3,ASM,manual_only,NO_MANUAL_ROW
 HA,2017,Q4,ASM,manual_only,NO_MANUAL_ROW
-HA,2018,FY,ASM,manual_only,NO_MANUAL_ROW
-HA,2018,Q1,ASM,manual_only,NO_MANUAL_ROW
-HA,2018,Q2,ASM,manual_only,NO_MANUAL_ROW
-HA,2018,Q3,ASM,manual_only,NO_MANUAL_ROW
-HA,2018,Q4,ASM,manual_only,NO_MANUAL_ROW
+HA,2018,FY,ASM,manual_only,NO_MANUAL_VALUE
+HA,2018,Q1,ASM,manual_only,NO_MANUAL_VALUE
+HA,2018,Q2,ASM,manual_only,NO_MANUAL_VALUE
+HA,2018,Q3,ASM,manual_only,NO_MANUAL_VALUE
+HA,2018,Q4,ASM,manual_only,NO_MANUAL_VALUE
 HA,2019,FY,ASM,manual_only,NO_MANUAL_ROW
 HA,2019,Q1,ASM,manual_only,NO_MANUAL_ROW
 HA,2019,Q2,ASM,manual_only,NO_MANUAL_ROW
@@ -454,8 +452,6 @@ HA,2023,Q3,ASM,manual_only,NO_MANUAL_ROW
 HA,2023,Q4,ASM,manual_only,NO_MANUAL_ROW
 HA,2024,Q1,ASM,manual_only,NO_MANUAL_ROW
 HA,2024,Q2,ASM,manual_only,NO_MANUAL_ROW
-HA,2018,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2018,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
 HA,2014,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
 HA,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 HA,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
@@ -476,11 +472,11 @@ HA,2017,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 HA,2017,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
 HA,2017,Q3,Profit Sharing,manual_only,NO_MANUAL_ROW
 HA,2017,Q4,Profit Sharing,manual_only,NO_MANUAL_ROW
-HA,2018,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
-HA,2018,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
-HA,2018,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
-HA,2018,Q3,Profit Sharing,manual_only,NO_MANUAL_ROW
-HA,2018,Q4,Profit Sharing,manual_only,NO_MANUAL_ROW
+HA,2018,FY,Profit Sharing,manual_only,NO_MANUAL_VALUE
+HA,2018,Q1,Profit Sharing,manual_only,NO_MANUAL_VALUE
+HA,2018,Q2,Profit Sharing,manual_only,NO_MANUAL_VALUE
+HA,2018,Q3,Profit Sharing,manual_only,NO_MANUAL_VALUE
+HA,2018,Q4,Profit Sharing,manual_only,NO_MANUAL_VALUE
 HA,2019,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
 HA,2019,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 HA,2019,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
@@ -528,11 +524,11 @@ HA,2017,Q1,RPM,manual_only,NO_MANUAL_ROW
 HA,2017,Q2,RPM,manual_only,NO_MANUAL_ROW
 HA,2017,Q3,RPM,manual_only,NO_MANUAL_ROW
 HA,2017,Q4,RPM,manual_only,NO_MANUAL_ROW
-HA,2018,FY,RPM,manual_only,NO_MANUAL_ROW
-HA,2018,Q1,RPM,manual_only,NO_MANUAL_ROW
-HA,2018,Q2,RPM,manual_only,NO_MANUAL_ROW
-HA,2018,Q3,RPM,manual_only,NO_MANUAL_ROW
-HA,2018,Q4,RPM,manual_only,NO_MANUAL_ROW
+HA,2018,FY,RPM,manual_only,NO_MANUAL_VALUE
+HA,2018,Q1,RPM,manual_only,NO_MANUAL_VALUE
+HA,2018,Q2,RPM,manual_only,NO_MANUAL_VALUE
+HA,2018,Q3,RPM,manual_only,NO_MANUAL_VALUE
+HA,2018,Q4,RPM,manual_only,NO_MANUAL_VALUE
 HA,2019,FY,RPM,manual_only,NO_MANUAL_ROW
 HA,2019,Q1,RPM,manual_only,NO_MANUAL_ROW
 HA,2019,Q2,RPM,manual_only,NO_MANUAL_ROW
@@ -580,11 +576,11 @@ JBLU,2017,Q1,ASM,manual_only,NO_MANUAL_ROW
 JBLU,2017,Q2,ASM,manual_only,NO_MANUAL_ROW
 JBLU,2017,Q3,ASM,manual_only,NO_MANUAL_ROW
 JBLU,2017,Q4,ASM,manual_only,NO_MANUAL_ROW
-JBLU,2018,FY,ASM,manual_only,NO_MANUAL_ROW
-JBLU,2018,Q1,ASM,manual_only,NO_MANUAL_ROW
-JBLU,2018,Q2,ASM,manual_only,NO_MANUAL_ROW
-JBLU,2018,Q3,ASM,manual_only,NO_MANUAL_ROW
-JBLU,2018,Q4,ASM,manual_only,NO_MANUAL_ROW
+JBLU,2018,FY,ASM,manual_only,NO_MANUAL_VALUE
+JBLU,2018,Q1,ASM,manual_only,NO_MANUAL_VALUE
+JBLU,2018,Q2,ASM,manual_only,NO_MANUAL_VALUE
+JBLU,2018,Q3,ASM,manual_only,NO_MANUAL_VALUE
+JBLU,2018,Q4,ASM,manual_only,NO_MANUAL_VALUE
 JBLU,2019,FY,ASM,manual_only,NO_MANUAL_ROW
 JBLU,2019,Q1,ASM,manual_only,NO_MANUAL_ROW
 JBLU,2019,Q2,ASM,manual_only,NO_MANUAL_ROW
@@ -622,8 +618,6 @@ JBLU,2025,Q3,ASM,manual_only,NO_MANUAL_ROW
 JBLU,2025,Q4,ASM,manual_only,NO_MANUAL_ROW
 JBLU,2026,Q1,ASM,manual_only,NO_MANUAL_ROW
 JBLU,2026,Q2,ASM,manual_only,NO_MANUAL_ROW
-JBLU,2018,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2018,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
 JBLU,2014,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
 JBLU,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 JBLU,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
@@ -644,11 +638,11 @@ JBLU,2017,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 JBLU,2017,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
 JBLU,2017,Q3,Profit Sharing,manual_only,NO_MANUAL_ROW
 JBLU,2017,Q4,Profit Sharing,manual_only,NO_MANUAL_ROW
-JBLU,2018,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
-JBLU,2018,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
-JBLU,2018,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
-JBLU,2018,Q3,Profit Sharing,manual_only,NO_MANUAL_ROW
-JBLU,2018,Q4,Profit Sharing,manual_only,NO_MANUAL_ROW
+JBLU,2018,FY,Profit Sharing,manual_only,NO_MANUAL_VALUE
+JBLU,2018,Q1,Profit Sharing,manual_only,NO_MANUAL_VALUE
+JBLU,2018,Q2,Profit Sharing,manual_only,NO_MANUAL_VALUE
+JBLU,2018,Q3,Profit Sharing,manual_only,NO_MANUAL_VALUE
+JBLU,2018,Q4,Profit Sharing,manual_only,NO_MANUAL_VALUE
 JBLU,2019,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
 JBLU,2019,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 JBLU,2019,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
@@ -706,11 +700,11 @@ JBLU,2017,Q1,RPM,manual_only,NO_MANUAL_ROW
 JBLU,2017,Q2,RPM,manual_only,NO_MANUAL_ROW
 JBLU,2017,Q3,RPM,manual_only,NO_MANUAL_ROW
 JBLU,2017,Q4,RPM,manual_only,NO_MANUAL_ROW
-JBLU,2018,FY,RPM,manual_only,NO_MANUAL_ROW
-JBLU,2018,Q1,RPM,manual_only,NO_MANUAL_ROW
-JBLU,2018,Q2,RPM,manual_only,NO_MANUAL_ROW
-JBLU,2018,Q3,RPM,manual_only,NO_MANUAL_ROW
-JBLU,2018,Q4,RPM,manual_only,NO_MANUAL_ROW
+JBLU,2018,FY,RPM,manual_only,NO_MANUAL_VALUE
+JBLU,2018,Q1,RPM,manual_only,NO_MANUAL_VALUE
+JBLU,2018,Q2,RPM,manual_only,NO_MANUAL_VALUE
+JBLU,2018,Q3,RPM,manual_only,NO_MANUAL_VALUE
+JBLU,2018,Q4,RPM,manual_only,NO_MANUAL_VALUE
 JBLU,2019,FY,RPM,manual_only,NO_MANUAL_ROW
 JBLU,2019,Q1,RPM,manual_only,NO_MANUAL_ROW
 JBLU,2019,Q2,RPM,manual_only,NO_MANUAL_ROW

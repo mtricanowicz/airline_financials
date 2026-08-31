@@ -198,7 +198,7 @@ METRIC_GROUPS = {
 
 METRIC_DEFINITIONS: list[tuple[str, str]] = [
     ("Operating Revenue", "Total amount earned from operations."),
-    ("Passenger Revenue*", "Revenue primarily composed of passenger ticket sales, loyalty travel awards, and travel-related services performed in conjunction with a passenger's flight."),
+    ("Passenger Revenue", "Revenue primarily composed of passenger ticket sales, loyalty travel awards, and travel-related services performed in conjunction with a passenger's flight."),
     ("Cargo Revenue", "Revenue earned from transporting freight and mail, reported separately from passenger revenue."),
     ("Operating Expenses", "Total amount of costs incurred from operations."),
     ("Operating Income", "Income from operations. Operating Revenue minus Operating Expenses."),
@@ -213,7 +213,8 @@ METRIC_DEFINITIONS: list[tuple[str, str]] = [
     ("Short-Term Investments", "Marketable debt securities and other investments expected to be converted to cash within one year."),
     ("Total Liquidity", "Cash & Cash Equivalents plus Short-Term Investments."),
     ("Net Debt", "Total Debt minus Total Liquidity."),
-    ("Operating Cash Flow", "Net cash provided by operating activities during the period."),
+    ("Interest Expense", "Total interest paid on debt obligations."),
+    ("Operating Cash Flow", "Net cash provided by operating activities."),
     ("Capital Expenditures", "Cash outflows for property, equipment, and other long-lived assets."),
     ("Free Cash Flow", "Operating Cash Flow minus Capital Expenditures."),
     ("Profit Sharing*", "Amount of income set aside to fund employee profit sharing programs. NOTE: Quarterly reporting by AAL and UAL of this metric is inconsistent. Data provided may have been obtained from internal sources or estimated by proportioning the annual profit sharing reported by the quarterly operating income reported."),

@@ -44,7 +44,7 @@ ALK,Operating Income,auto_xbrl,62,62,0,100.0
 ALK,Operating Revenue,auto_xbrl,62,62,0,100.0
 ALK,Short-Term Investments,auto_xbrl,62,62,0,100.0
 ALK,ASM,manual_only,62,0,62,0.0
-ALK,Passenger Revenue,manual_only,62,60,2,96.8
+ALK,Passenger Revenue,manual_only,62,62,0,100.0
 ALK,Profit Sharing,manual_only,62,0,62,0.0
 ALK,RPM,manual_only,62,0,62,0.0
 DAL,Capital Expenditures,auto_xbrl,62,62,0,100.0
@@ -76,7 +76,7 @@ HA,Operating Income,auto_xbrl,52,52,0,100.0
 HA,Operating Revenue,auto_xbrl,52,52,0,100.0
 HA,Short-Term Investments,auto_xbrl,52,52,0,100.0
 HA,ASM,manual_only,52,0,52,0.0
-HA,Passenger Revenue,manual_only,52,50,2,96.2
+HA,Passenger Revenue,manual_only,52,52,0,100.0
 HA,Profit Sharing,manual_only,52,0,52,0.0
 HA,RPM,manual_only,52,0,52,0.0
 JBLU,Capital Expenditures,auto_xbrl,62,62,0,100.0
@@ -92,7 +92,7 @@ JBLU,Operating Income,auto_xbrl,62,62,0,100.0
 JBLU,Operating Revenue,auto_xbrl,62,62,0,100.0
 JBLU,Short-Term Investments,auto_xbrl,62,62,0,100.0
 JBLU,ASM,manual_only,62,0,62,0.0
-JBLU,Passenger Revenue,manual_only,62,60,2,96.8
+JBLU,Passenger Revenue,manual_only,62,62,0,100.0
 JBLU,Profit Sharing,manual_only,62,0,62,0.0
 JBLU,RPM,manual_only,62,0,62,0.0
 LUV,Capital Expenditures,auto_xbrl,62,62,0,100.0

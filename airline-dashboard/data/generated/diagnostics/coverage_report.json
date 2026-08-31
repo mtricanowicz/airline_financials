@@ -7,13 +7,13 @@
     "ALK",
     "JBLU",
     "ULCC",
+    "ALGT",
+    "RJET",
+    "SKYW",
+    "VA",
     "HA",
     "SAVE",
-    "ALGT",
-    "SNCY",
-    "VA",
-    "RJET",
-    "SKYW"
+    "SNCY"
   ],
   "requested_years": [
     2014,
@@ -39,10 +39,11 @@
   ],
   "exclude_future_periods": true,
   "summary_rows": 224,
-  "detail_rows": 2970,
+  "detail_rows": 2964,
   "reason_counts": {
-    "NO_MANUAL_ROW": 1915,
+    "NO_MANUAL_ROW": 1864,
     "NO_AUTO_ROW": 660,
-    "NO_AUTO_VALUE": 395
+    "NO_AUTO_VALUE": 395,
+    "NO_MANUAL_VALUE": 45
   }
 }
