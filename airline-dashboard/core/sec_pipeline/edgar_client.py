@@ -7,6 +7,7 @@ not re-download unchanged data and never exceed the SEC rate limit.
 
 from __future__ import annotations
 
+import re
 import threading
 import time
 from dataclasses import dataclass
@@ -158,6 +159,60 @@ class EdgarClient:
     def fetch_document(self, cik: str, filing: Filing) -> bytes:
         """Download the primary document bytes for a filing."""
         return self._get(self.document_url(cik, filing)).content
+
+    def instance_document_url(self, cik: str, filing: Filing) -> str:
+        """URL of the filing's XBRL instance document.
+
+        Derived deterministically from the primary document name ("<name>.htm"
+        -> "<name>_htm.xml"). Only valid for Inline XBRL filings (large
+        accelerated filers, fiscal periods ending on/after 2019-06-15); older
+        filings use an unrelated instance filename and need
+        ``resolve_instance_document_url`` instead.
+        """
+        cik_int = int(self.normalize_cik(cik))
+        instance_doc = filing.primary_document.removesuffix(".htm") + "_htm.xml"
+        return self.ARCHIVE_URL.format(
+            cik_int=cik_int, acc=filing.accession_nodashes, doc=instance_doc
+        )
+
+    def filing_index_url(self, cik: str, filing: Filing) -> str:
+        cik_int = int(self.normalize_cik(cik))
+        return f"https://www.sec.gov/Archives/edgar/data/{cik_int}/{filing.accession_nodashes}/{filing.accession}-index.htm"
+
+    def resolve_instance_document_url(self, cik: str, filing: Filing) -> str | None:
+        """Find the filing's XBRL instance document by inspecting its index page.
+
+        Robust across both filing eras: Inline XBRL filings name it
+        "<primary>_htm.xml"; pre-2019 filings name it independently of the
+        primary document (e.g. "aal-20180930.xml"). Returns the first ".xml"
+        link that isn't a linkbase (_cal/_def/_lab/_pre) file, or None if no
+        such file is listed.
+        """
+        cik_int = int(self.normalize_cik(cik))
+        index_html = self._get(self.filing_index_url(cik, filing)).text
+        candidates = re.findall(r'href="([^"]+\.xml)"', index_html)
+        linkbase_suffixes = ("_cal.xml", "_def.xml", "_lab.xml", "_pre.xml")
+        for href in candidates:
+            name = href.rsplit("/", 1)[-1]
+            if name.endswith(linkbase_suffixes):
+                continue
+            return self.ARCHIVE_URL.format(cik_int=cik_int, acc=filing.accession_nodashes, doc=name)
+        return None
+
+    def fetch_instance_document(self, cik: str, filing: Filing) -> str:
+        """Download the filing's XBRL instance document as text.
+
+        Tries the cheap deterministic URL first (correct for Inline XBRL
+        filings, the common case); falls back to resolving it from the
+        filing's index page for older filings with an unrelated name.
+        """
+        try:
+            return self._get(self.instance_document_url(cik, filing)).text
+        except Exception:  # noqa: BLE001
+            resolved_url = self.resolve_instance_document_url(cik, filing)
+            if not resolved_url:
+                raise
+            return self._get(resolved_url).text
 
     def company_facts(self, cik: str) -> dict[str, Any]:
         """Return the XBRL companyfacts payload for a CIK."""

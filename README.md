@@ -25,7 +25,7 @@ Financial statement series in the generated dataset starts in 2014, which reflec
     - RJET
     - SKYW
 
-Unless noted, metrics are sourced or derived from SEC filings (10-Q, 8-K, 10-K), with specific operational metrics maintained in a manual sheet and merged in the core data pipeline.
+Unless noted, metrics are sourced or derived from SEC filings (10-Q, 8-K, 10-K), with specific operating metrics maintained in a manual sheet and merged in the core data pipeline. Passenger and Cargo Revenue can be optionally automatically retrieved from filing-level XBRL when a verified carrier mapping is available; RPM, ASM, and Profit Sharing remain manual.
 
 ## Architecture
 The v2 stack is organized as:
@@ -72,8 +72,9 @@ Outputs are written to generated JSON and served to front ends as precomputed co
 
 ## Metric sourcing model
 v2 uses a hybrid model:
-- Auto (XBRL/company facts): Operating Revenue, Operating Expenses, Net Income, Earnings Per Share, Long-Term Debt, Current Maturities, Cash & Cash Equivalents, Unrestricted Cash, Restricted Cash, Short-Term Investments, Operating Cash Flow, Capital Expenditures
-- Manual sheet: Passenger Revenue, RPM, ASM, Profit Sharing, buybacks, share sales
+- Auto (XBRL company facts): Operating Revenue, Operating Expenses, Net Income, Earnings Per Share, Long-Term Debt, Current Maturities, Cash & Cash Equivalents, Unrestricted Cash, Restricted Cash, Short-Term Investments, Operating Cash Flow, Capital Expenditures
+- Auto (filing-level XBRL, opt-in): Passenger Revenue and Cargo Revenue where a verified dimensional or historical mapping exists
+- Manual sheet: Passenger Revenue fallback, RPM, ASM, Profit Sharing, buybacks, share sales
 - Derived: Operating Income, margins, Load Factor, Yield, TRASM, PRASM, CASM, Total Debt, Total Liquidity, Net Debt, Free Cash Flow
 
 ## Deployment

@@ -37,11 +37,13 @@ deploy/           Dockerfiles, Firebase config, CI workflows
 | Source | Metrics |
 |---|---|
 | Auto (SEC XBRL `companyfacts`) | Operating Revenue, Operating Expenses, Net Income, Earnings Per Share, Long-Term Debt, Current Maturities, Cash & Cash Equivalents, Unrestricted Cash, Restricted Cash, Short-Term Investments, Operating Cash Flow, Capital Expenditures |
-| Manual sheet | Passenger Revenue, RPM, ASM, Profit Sharing, share repurchases, share sales |
+| Auto (filing-level XBRL, opt-in) | Passenger Revenue and Cargo Revenue where a verified dimensional or historical mapping exists |
+| Manual sheet | Passenger Revenue fallback, RPM, ASM, Profit Sharing, share repurchases, share sales |
 | Derived (computed) | Operating Income, Operating/Net Margin, Load Factor, Yield, TRASM, PRASM, CASM, Total Debt, Total Liquidity, Net Debt, Free Cash Flow |
 
 RPM, ASM, and Profit Sharing are not available in the XBRL financial taxonomy, so
-they remain manual. The build step cross-checks manual financials against XBRL
+they remain manual. Passenger and Cargo Revenue enrichment is enabled with
+`--use-filing-parser`; the build step cross-checks manual financials against XBRL
 and reports mismatches.
 
 ## Getting started

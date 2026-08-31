@@ -4,6 +4,10 @@ Combines three sources:
 
 * Auto (SEC XBRL company facts): Operating Revenue, Operating Expenses,
   Net Income, Long-Term Debt.
+* Filing parser (SEC XBRL instance documents, opt-in via --use-filing-parser):
+  Passenger Revenue and Cargo Revenue for tickers with a verified dimensional
+  mapping (see sec_pipeline.filing_parser). Expensive -- one filing fetch per
+  ticker per quarter/year -- so it is not run by default.
 * Manual sheet (``data/manual/``): Passenger Revenue, RPM, ASM, Profit Sharing,
   and the share repurchase / share sale history.
 * Derived (here): margins, Load Factor, Yield, TRASM, PRASM,
@@ -28,9 +32,9 @@ from typing import Any
 
 import pandas as pd
 
-from sec_pipeline import config
+from sec_pipeline import config, filing_parser
 from sec_pipeline.edgar_client import EdgarClient
-from sec_pipeline.xbrl import extract_financials
+from sec_pipeline.xbrl import PASSENGER_REVENUE_LEGACY_CUTOFF_YEAR, extract_financials
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("build_data")
@@ -40,11 +44,20 @@ AUTO_METRICS = [
     "Operating Expenses",
     "Operating Income",
     "Net Income",
+    "Earnings Per Share",
     "Long-Term Debt",
+    "Current Maturities",
+    "Cash & Cash Equivalents",
+    "Short-Term Investments",
+    "Interest Expense",
     "Operating Cash Flow",
     "Capital Expenditures",
 ]
 MANUAL_METRICS = ["Passenger Revenue", "RPM", "ASM", "Profit Sharing"]
+# Sourced by sec_pipeline.filing_parser (opt-in, see --use-filing-parser).
+# Passenger Revenue overlaps with MANUAL_METRICS as a gap-filler; Cargo
+# Revenue has no manual fallback at all.
+FILING_PARSER_METRICS = ["Passenger Revenue", "Cargo Revenue"]
 MISMATCH_TOLERANCE = 0.02  # 2% relative difference
 
 FINANCIALS_PATH = config.GENERATED_DIR / "financials.json"
@@ -94,7 +107,7 @@ def load_manual() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
 
 
 def load_auto(airlines: list[str], years: list[int], periods: list[str]) -> pd.DataFrame:
-    """Fetch XBRL company facts and extract the four auto metrics per airline."""
+    """Fetch XBRL company facts and extract the auto metrics per airline."""
     client = EdgarClient()
     ciks = client.resolve_ciks(airlines)
     rows: list[dict[str, Any]] = []
@@ -104,10 +117,86 @@ def load_auto(airlines: list[str], years: list[int], periods: list[str]) -> pd.D
         except Exception as exc:  # noqa: BLE001
             log.error("Could not fetch company facts for %s: %s", airline, exc)
             continue
-        for rec in extract_financials(facts, years, periods):
+        for rec in extract_financials(facts, years, periods, ticker=airline):
             rec["Airline"] = airline
             rows.append(rec)
     return pd.DataFrame(rows)
+
+
+def load_filing_parser(airlines: list[str], years: list[int], periods: list[str]) -> pd.DataFrame:
+    """Passenger/Cargo Revenue via per-filing dimensional XBRL parsing.
+
+    Expensive (one filing fetch per ticker per quarter/year) -- only called
+    when --use-filing-parser is passed. Only covers tickers with a verified
+    dimensional mapping and years after the legacy-tag cutoff; everything
+    else is left for load_auto/manual to fill as before.
+    """
+    applicable = [
+        a
+        for a in airlines
+        if a in filing_parser.PASSENGER_REVENUE_DIMENSIONAL_MAP
+        or a in filing_parser.CARGO_REVENUE_DIMENSIONAL_MAP
+    ]
+    eligible_years = [y for y in years if y >= 2018]
+    if not applicable or not eligible_years:
+        return pd.DataFrame()
+
+    client = EdgarClient()
+    ciks = client.resolve_ciks(applicable)
+    rows: list[dict[str, Any]] = []
+    for airline in applicable:
+        for year in eligible_years:
+            try:
+                year_metrics = filing_parser.extract_year_metrics(client, ciks[airline], airline, year)
+            except Exception as exc:  # noqa: BLE001
+                log.error("Filing-parser extraction failed for %s %s: %s", airline, year, exc)
+                continue
+            for period in periods:
+                vals = year_metrics.get(period)
+                if not vals or all(v is None for v in vals.values()):
+                    continue
+                rows.append({"Airline": airline, "Year": year, "Quarter": period, **vals})
+    return pd.DataFrame(rows)
+
+
+def _overlay_filing_parser(auto: pd.DataFrame, filing_parser_df: pd.DataFrame) -> pd.DataFrame:
+    """Fill Passenger/Cargo Revenue gaps from filing-parser results.
+
+    Both metrics can now come from either source: xbrl.py's legacy tags
+    (years <= 2017) or the filing-parser dimensional tier (years >= 2018),
+    so both need the same fillna-merge treatment.
+    """
+    if filing_parser_df.empty:
+        return auto
+    if auto.empty:
+        return filing_parser_df
+
+    keys = ["Airline", "Year", "Quarter"]
+    merged = auto.merge(filing_parser_df, on=keys, how="outer", suffixes=("", "_fp"))
+    for metric in FILING_PARSER_METRICS:
+        fp_col = f"{metric}_fp"
+        if fp_col in merged.columns:
+            merged[metric] = merged[metric].fillna(merged[fp_col])
+            merged = merged.drop(columns=[fp_col])
+
+    for _, rows in merged.groupby(["Airline", "Year"]):
+        by_quarter = {merged.at[index, "Quarter"]: index for index in rows.index}
+        q4_index = by_quarter.get("Q4")
+        if q4_index is None or pd.notna(merged.at[q4_index, "Cargo Revenue"]):
+            continue
+        component_indexes = [by_quarter.get(period) for period in ("FY", "Q1", "Q2", "Q3")]
+        if any(index is None for index in component_indexes):
+            continue
+        fy_index, q1_index, q2_index, q3_index = component_indexes
+        values = [merged.at[index, "Cargo Revenue"] for index in component_indexes]
+        if all(pd.notna(value) for value in values):
+            merged.at[q4_index, "Cargo Revenue"] = (
+                merged.at[fy_index, "Cargo Revenue"]
+                - merged.at[q1_index, "Cargo Revenue"]
+                - merged.at[q2_index, "Cargo Revenue"]
+                - merged.at[q3_index, "Cargo Revenue"]
+            )
+    return merged
 
 
 def _scope_frame(
@@ -133,7 +222,10 @@ def _scope_frame(
 # Merge and derive
 # ---------------------------------------------------------------------------
 def _report_mismatches(merged: pd.DataFrame) -> None:
-    for metric in AUTO_METRICS:
+    # Passenger Revenue is auto-sourced (legacy tag, ALGT's live tag, or the
+    # filing-parser dimensional tier) but still carried in the manual sheet
+    # for some airlines, so reconcile it too.
+    for metric in AUTO_METRICS + ["Passenger Revenue"]:
         manual_col = f"{metric}_manual"
         if manual_col not in merged.columns:
             continue
@@ -162,19 +254,21 @@ def merge_sources(auto: pd.DataFrame, manual: pd.DataFrame) -> pd.DataFrame:
     if manual.empty:
         merged = auto.copy()
         for m in MANUAL_METRICS:
-            merged[m] = pd.NA
+            if m not in merged.columns:
+                merged[m] = pd.NA
         return merged
 
     # Rename any auto-metric columns the manual sheet also provides so we can
     # compare rather than silently overwrite.
-    overlap = [m for m in AUTO_METRICS if m in manual.columns]
+    overlap = [m for m in (AUTO_METRICS + ["Passenger Revenue"]) if m in manual.columns]
     manual = manual.rename(columns={m: f"{m}_manual" for m in overlap})
     merged = auto.merge(manual, on=keys, how="outer", suffixes=("", "_manual"))
     _report_mismatches(merged)
 
     # Prefer the auto value; fall back to the manual value where auto is absent.
     for metric in overlap:
-        merged[metric] = merged[metric].fillna(merged[f"{metric}_manual"])
+        if metric in merged.columns and f"{metric}_manual" in merged.columns:
+            merged[metric] = merged[metric].fillna(merged[f"{metric}_manual"])
 
     return merged
 
@@ -205,58 +299,54 @@ def add_derived(df: pd.DataFrame) -> pd.DataFrame:
     df["Net Debt"] = col("Total Debt") - col("Total Liquidity")
     df["Free Cash Flow"] = ocf - capex
 
-    # Reorder columns into preferred order of metrics
-    preferred_column_order = list(
-        dict.fromkeys(
-            column for column in [
-                "Airline",
-                "Year",
-                "Quarter",
-                "Period",
-                "Operating Revenue",
-                "Passenger Revenue",
-                "Operating Expenses",
-                "Operating Income",
-                "Net Income",
-                "Operating Margin",
-                "Net Margin",
-                "Earnings Per Share",
-                "RPM",
-                "ASM",
-                "Load Factor",
-                "Yield",
-                "TRASM",
-                "PRASM",
-                "CASM",
-                "Profit Sharing",
-                "Long-Term Debt",
-                "Current Maturities",
-                "Total Debt",
-                "Cash & Cash Equivalents",
-                "Short-Term Investments",
-                "Total Liquidity",
-                "Net Debt",
-                "Interest Expense",
-                "Operating Cash Flow",
-                "Capital Expenditures",
-                "Free Cash Flow",
-            ]
-        )
-    )
-    columns_to_drop = list(
-            dict.fromkeys(
-                column for column in [
-                    "Unrestricted Cash",
-                    "Restricted Cash",
-                ]
-            )
-    )
-    # Redefine the preferred column list to ensure it only contains columns that exist in the merged DataFrame.
-    preferred_column_order = [column for column in preferred_column_order if column in df.columns]
-    # Define the remaining columns that are not in the preferred order.
-    remaining_column_order = [column for column in df.columns if column not in preferred_column_order]
-    # Reorder the merged DataFrame columns to have preferred columns first, followed by the remaining columns.
-    df = df[preferred_column_order + remaining_column_order].drop(columns=columns_to_drop, errors='ignore')
+    return _reorder_columns(df)
+
+
+# Preferred metric order for the final JSON output. Reapplied after merging
+# with existing financials.json, since pd.concat otherwise appends any column
+# missing from the existing data (e.g. a newly added metric) to the very end.
+_PREFERRED_COLUMN_ORDER = [
+    "Airline",
+    "Year",
+    "Quarter",
+    "Period",
+    "Operating Revenue",
+    "Passenger Revenue",
+    "Cargo Revenue",
+    "Operating Expenses",
+    "Operating Income",
+    "Net Income",
+    "Operating Margin",
+    "Net Margin",
+    "Earnings Per Share",
+    "RPM",
+    "ASM",
+    "Load Factor",
+    "Yield",
+    "TRASM",
+    "PRASM",
+    "CASM",
+    "Profit Sharing",
+    "Long-Term Debt",
+    "Current Maturities",
+    "Total Debt",
+    "Cash & Cash Equivalents",
+    "Short-Term Investments",
+    "Total Liquidity",
+    "Net Debt",
+    "Interest Expense",
+    "Operating Cash Flow",
+    "Capital Expenditures",
+    "Free Cash Flow",
+]
+_COLUMNS_TO_DROP = ["Unrestricted Cash", "Restricted Cash"]
+
+
+def _reorder_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Reorder columns into the preferred metric order, dropping raw cash parts."""
+    preferred = [c for c in _PREFERRED_COLUMN_ORDER if c in df.columns]
+    remaining = [c for c in df.columns if c not in preferred]
+    return df[preferred + remaining].drop(columns=_COLUMNS_TO_DROP, errors="ignore")
 
     return df
 
@@ -313,14 +403,6 @@ def _build_coverage_diagnostics(
         **{metric: "auto_xbrl" for metric in AUTO_METRICS},
         **{metric: "manual_only" for metric in MANUAL_METRICS},
     }
-    # Include additional XBRL metrics extracted by the pipeline.
-    for metric in (
-        "Earnings Per Share",
-        "Current Maturities",
-        "Cash & Cash Equivalents",
-        "Short-Term Investments",
-    ):
-        metric_sources.setdefault(metric, "auto_xbrl")
 
     metrics = [m for m in metric_sources if m in merged.columns]
     expected_keys = [
@@ -547,8 +629,12 @@ def build(
     periods: list[str],
     overwrite: bool = False,
     share_data: bool = False,
+    use_filing_parser: bool = False,
 ) -> None:
     auto = load_auto(airlines, years, periods)
+    if use_filing_parser:
+        filing_parser_df = load_filing_parser(airlines, years, periods)
+        auto = _overlay_filing_parser(auto, filing_parser_df)
     manual_metrics, repurchases, sales = load_manual()
     repurchases_full = repurchases.copy()
     sales_full = sales.copy()
@@ -578,6 +664,7 @@ def build(
     if not overwrite:
         existing_financials = _load_existing_financials()
         merged = _merge_financials(existing_financials, merged)
+        merged = _reorder_columns(merged)
 
     _write(FINANCIALS_PATH, _records(merged))
 
@@ -593,6 +680,7 @@ def main() -> None:
     parser.add_argument("--periods", nargs="+", default=["Q1", "Q2", "Q3", "Q4", "FY"])
     parser.add_argument("--overwrite", action="store_true", help="Overwrite existing generated outputs instead of merging with existing data.")
     parser.add_argument("--share-data", action="store_true", help="Optionally write full static share repurchase/sale history from manual files (unscoped). If omitted, existing buybacks.json is left unchanged.")
+    parser.add_argument("--use-filing-parser", action="store_true", help="Fetch Passenger Revenue and Cargo Revenue via per-filing dimensional XBRL parsing (sec_pipeline.filing_parser). Expensive -- one filing fetch per ticker per quarter/year -- and only covers tickers with a verified dimensional mapping. Off by default.")
     args = parser.parse_args()
     build(
         args.airlines,
@@ -600,6 +688,7 @@ def main() -> None:
         args.periods,
         overwrite=args.overwrite,
         share_data=args.share_data,
+        use_filing_parser=args.use_filing_parser,
     )
 
 

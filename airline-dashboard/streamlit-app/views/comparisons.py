@@ -457,7 +457,7 @@ def _render_tab_raw() -> None:
         "This is the raw data after applying the selected filters and is provided for "
         "export or further analysis. It is not scaled or formatted for display."
     )
-    st.dataframe(filtered.sort_values(by=["Airline", "Period"]).reset_index(drop=True), width="stretch")
+    st.dataframe(filtered[["Airline", "Year", "Quarter", "Period"] + selected_metrics].sort_values(by=["Airline", "Period"]).reset_index(drop=True), width="stretch")
 
 
 with tab_time:

@@ -48,14 +48,18 @@ credentials.
 
 ```powershell
 python .\scripts\build_data.py `
-  --airlines AAL DAL UAL LUV ALK JBLU ULCC `
+  --airlines AAL DAL UAL LUV ALK JBLU ULCC ALGT RJET SKYW `
   --years 2014 2015 2016 2017 2018 2019 2020 2021 2022 2023 2024 2025 2026 `
   --periods Q1 Q2 Q3 Q4 FY `
+  --use-filing-parser `
   --overwrite
 ```
 For `airlines`, `years`, and `periods` choose any set of tickers, years, and periods separated by spaces.
 `--overwrite` is optional and, if omitted, the build merges only the requested key slice.
 `--share-data` is optional and, if passed, writes the full static buybacks/share-sales history to `../data/generated/buybacks.json`.
+`--use-filing-parser` is optional and, if passed, additionally fetches Passenger Revenue and Cargo Revenue via per-filing XBRL parsing (`sec_pipeline/filing_parser.py`) for tickers with a verified current or historical mapping. This is expensive (one filing fetch per ticker per quarter/year, versus one company-facts call per ticker without it) and is off by default. Passenger Revenue remains eligible to fall back to the manual sheet; Cargo Revenue has no manual fallback.
+
+The default airline list is the current refresh set. For a development historical backfill, explicitly include former issuers such as `HA`, `SAVE`, `SNCY`, and `VA` in `--airlines`; their absence from the default does not remove existing generated records.
 
 ### SEC Pipeline (insights.json)
 
@@ -103,7 +107,8 @@ Environment switches:
 | Source | Metrics |
 | --- | --- |
 | Auto (XBRL company facts) | Operating Revenue, Operating Expenses, Net Income, Earnings Per Share, Long-Term Debt, Current Maturities, Cash & Cash Equivalents, Unrestricted Cash, Restricted Cash, Short-Term Investments, Operating Cash Flow, Capital Expenditures |
-| Manual sheet (`../data/manual/`) | Passenger Revenue, RPM, ASM, Profit Sharing, buybacks and share sales |
+| Filing-level XBRL (`--use-filing-parser`) | Passenger Revenue and Cargo Revenue where a verified current or historical mapping exists |
+| Manual sheet (`../data/manual/`) | Passenger Revenue fallback, RPM, ASM, Profit Sharing, buybacks and share sales |
 | Derived (build_data) | Operating Income, margins, Load Factor, Yield, TRASM, PRASM, CASM, Total Debt, Total Liquidity, Net Debt, Free Cash Flow |
 
 RPM, ASM, and Profit Sharing are not part of the us-gaap XBRL taxonomy and must

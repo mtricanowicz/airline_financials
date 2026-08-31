@@ -29,6 +29,12 @@ DURATION_METRICS: dict[str, list[str]] = {
         "Revenues",
         "RevenueFromContractWithCustomerIncludingAssessedTax",
     ],
+    "Passenger Revenue": [
+        "RevenueFromContractWithCustomerExcludingAssessedTax",
+    ],
+    "Cargo Revenue": [
+        "CargoAndFreightRevenue",
+    ],
     "Operating Expenses": [
         "OperatingExpenses",
         "OperatingCostsAndExpenses",
@@ -54,6 +60,19 @@ DURATION_METRICS: dict[str, list[str]] = {
         "PaymentsForAdditionsToPropertyPlantAndEquipment",
         "PaymentsToAcquireProductiveAssets",
         "PaymentsToAcquirePropertyPlantAndEquipmentAndIntangibleAssets",
+    ],
+    "Interest Expense": [
+        "InterestExpenseNonoperating",
+        "InterestExpense",
+        "InterestCostsIncurred",
+        "InterestExpenseDebt",
+        "InterestIncomeExpenseNonoperatingNet",
+        "InterestIncomeExpenseNet",
+        "InterestAndOtherFinancingCosts",
+        "InterestAndOtherFinancingCostsNonOperating",
+        "InterestCosts",
+        "InterestExpenseNonOperatingNet",
+        "InterestExpenseDebtNonOperating",
     ],
 }
 
@@ -96,6 +115,18 @@ INSTANT_METRICS: dict[str, list[str]] = {
 }
 
 ALL_METRICS = tuple(DURATION_METRICS) + tuple(INSTANT_METRICS)
+
+# us-gaap:PassengerRevenue was deprecated 2018-01-31; still valid for FY2017 and earlier.
+# AAL's combined tag is absent for most of 2009-2016; Mainline+Regional sums to it exactly
+# whenever both are present, so keep that as a fallback for filers that only tag components.
+PASSENGER_REVENUE_LEGACY_TAG = "PassengerRevenue"
+PASSENGER_REVENUE_LEGACY_COMPONENT_TAGS = ["PassengerRevenueMainline", "PassengerRevenueRegional"]
+PASSENGER_REVENUE_LEGACY_CUTOFF_YEAR = 2017
+
+# us-gaap:CargoAndFreightRevenue was deprecated on the same date but likewise
+# remains reported through the pre-Inline filing transition period.
+CARGO_REVENUE_LEGACY_TAG = "CargoAndFreightRevenue"
+CARGO_REVENUE_LEGACY_CUTOFF_YEAR = 2019
 
 _QUARTER_END_MONTH = {"Q1": 3, "Q2": 6, "Q3": 9, "Q4": 12, "FY": 12}
 YTD_DERIVED_METRICS = {"Operating Cash Flow", "Capital Expenditures"}
@@ -279,7 +310,7 @@ def _extract_ytd_from_tags(
     """Extract duration metric values when Q2/Q3 may be filed as YTD."""
 
     # Prefer direct quarter fact (~90 days) where present.
-    if period in {"Q1", "Q2", "Q3"}:
+    if period in {"Q1", "Q2", "Q3", "Q4"}:
         for tag in tags:
             direct = _pick_duration(_facts_for_tag(facts, tag, unit_candidates), year, period)
             if direct is not None:
@@ -354,6 +385,23 @@ def _extract_ytd_metric(
         period,
         unit_candidates=METRIC_UNIT_CANDIDATES.get(metric),
     )
+
+
+def _extract_legacy_passenger_revenue(
+    facts: dict[str, Any], year: int, period: str
+) -> float | None:
+    """Deprecated PassengerRevenue tag, falling back to Mainline+Regional parts."""
+    direct = _pick_duration(_facts_for_tag(facts, PASSENGER_REVENUE_LEGACY_TAG), year, period)
+    if direct is not None and direct > 0:
+        return direct
+    components = [
+        _pick_duration(_facts_for_tag(facts, tag), year, period)
+        for tag in PASSENGER_REVENUE_LEGACY_COMPONENT_TAGS
+    ]
+    if any(c is None for c in components):
+        return None
+    total = sum(components)  # type: ignore[arg-type]
+    return total if total > 0 else None
 
 
 def _extract_capex_metric(
@@ -477,7 +525,13 @@ def _extract_eps_q4_fallback(facts: dict[str, Any], year: int) -> float | None:
     return round(eps_q4, 2)
 
 
-def extract_metric(facts: dict[str, Any], metric: str, year: int, period: str) -> float | None:
+def extract_metric(
+    facts: dict[str, Any],
+    metric: str,
+    year: int,
+    period: str,
+    ticker: str | None = None,
+) -> float | None:
     """Extract one metric for one year/period, deriving Q4 when needed."""
     if metric in INSTANT_METRICS:
         if metric == "Restricted Cash":
@@ -488,53 +542,97 @@ def extract_metric(facts: dict[str, Any], metric: str, year: int, period: str) -
                 return val
         return None
 
+    if metric == "Passenger Revenue":
+        # ALGT reports Passenger Revenue under the us-gaap taxonomy.
+        if ticker == "ALGT":
+            tags = [
+                *DURATION_METRICS["Passenger Revenue"],
+                PASSENGER_REVENUE_LEGACY_TAG,
+            ]
+        # RJET and SKYW are capacity purchase agreement carriers and derive all flight revenue from
+        # contractual fee revenue from major-airline partners -- neither is passenger fare revenue,
+        # so both are excluded from every Passenger Revenue path, legacy or current.
+        elif ticker in {"RJET", "SKYW"}:
+            return None
+        # Legacy Passenger Revenue tag is valid for FY2017 and earlier.
+        elif year <= PASSENGER_REVENUE_LEGACY_CUTOFF_YEAR:
+            val = _extract_legacy_passenger_revenue(facts, year, period)
+            if val is not None and val > 0:
+                return val
+            tags = []
+        else:
+            return None
+    elif metric == "Cargo Revenue":
+        # Legacy cargo tags remain available through the transition period;
+        # later coverage comes from the filing-parser dimensional tier.
+        if year <= CARGO_REVENUE_LEGACY_CUTOFF_YEAR:
+            tags = DURATION_METRICS["Cargo Revenue"]
+        else:
+            return None
+    elif metric == "Operating Revenue" and ticker in {"ALGT", "RJET"}:
+        tags = [
+            "Revenues",
+            "SalesRevenueServicesNet",
+            "SalesRevenueNet",
+            "RevenueFromContractWithCustomerIncludingAssessedTax",
+            "RevenueFromContractWithCustomerExcludingAssessedTax",
+        ]
+    elif metric in DURATION_METRICS:
+        tags = DURATION_METRICS[metric]
+    else:
+        return None
+
     if metric in YTD_DERIVED_METRICS:
         if metric == "Capital Expenditures":
             return _extract_capex_metric(facts, year, period)
         return _extract_ytd_metric(facts, metric, year, period)
 
-    tags = DURATION_METRICS[metric]
     unit_candidates = METRIC_UNIT_CANDIDATES.get(metric)
-    if period != "Q4":
-        for tag in tags:
-            val = _pick_duration(_facts_for_tag(facts, tag, unit_candidates), year, period)
-            # Revenue and expenses should not be zero for an active airline
-            if metric in {"Operating Revenue", "Operating Expenses"}:
-                if val is not None and val > 0:
-                    return val
-            elif val is not None:
+
+    # First attempt direct duration lookup for all periods (including Q4 if directly filed)
+    for tag in tags:
+        val = _pick_duration(_facts_for_tag(facts, tag, unit_candidates), year, period)
+        # Revenue and expenses should not be zero for an active airline
+        if metric in {"Operating Revenue", "Operating Expenses", "Passenger Revenue"}:
+            if val is not None and val > 0:
                 return val
+        elif metric == "Interest Expense":
+            if val is not None:
+                return abs(val)
+        elif val is not None:
+            return val
+
+    if period != "Q4":
         return None
 
     if metric in NON_ADDITIVE_DURATION_METRICS:
         # Do not derive non-additive metrics from FY minus quarters.
-        for tag in tags:
-            val = _pick_duration(_facts_for_tag(facts, tag, unit_candidates), year, period)
-            if val is not None:
-                return val
         if metric == "Earnings Per Share" and period == "Q4":
             return _extract_eps_q4_fallback(facts, year)
         return None
 
     # Q4 is not filed separately: derive from FY minus the first three quarters.
-    fy = extract_metric(facts, metric, year, "FY")
-    parts = [extract_metric(facts, metric, year, q) for q in ("Q1", "Q2", "Q3")]
+    fy = extract_metric(facts, metric, year, "FY", ticker=ticker)
+    parts = [extract_metric(facts, metric, year, q, ticker=ticker) for q in ("Q1", "Q2", "Q3")]
     if fy is None or any(p is None for p in parts):
         return None
     return fy - sum(parts)  # type: ignore[arg-type]
 
 
 def extract_financials(
-    facts: dict[str, Any], years: list[int], periods: list[str]
+    facts: dict[str, Any],
+    years: list[int],
+    periods: list[str],
+    ticker: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Return one record per year/period with the four auto-sourced metrics."""
+    """Return one record per year/period with the auto-sourced metrics."""
     records: list[dict[str, Any]] = []
     for year in years:
         for period in periods:
             row: dict[str, Any] = {"Year": year, "Quarter": period}
             has_any = False
             for metric in ALL_METRICS:
-                val = extract_metric(facts, metric, year, period)
+                val = extract_metric(facts, metric, year, period, ticker=ticker)
                 row[metric] = val
                 has_any = has_any or val is not None
             if has_any:

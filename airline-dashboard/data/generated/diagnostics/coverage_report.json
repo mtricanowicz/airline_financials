@@ -38,11 +38,11 @@
     "FY"
   ],
   "exclude_future_periods": true,
-  "summary_rows": 210,
-  "detail_rows": 3195,
+  "summary_rows": 224,
+  "detail_rows": 2970,
   "reason_counts": {
-    "NO_MANUAL_ROW": 2224,
-    "NO_AUTO_ROW": 605,
-    "NO_AUTO_VALUE": 366
+    "NO_MANUAL_ROW": 1915,
+    "NO_AUTO_ROW": 660,
+    "NO_AUTO_VALUE": 395
   }
 }

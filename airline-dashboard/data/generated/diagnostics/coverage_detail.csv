@@ -60,67 +60,7 @@ ALGT,2025,Q2,ASM,manual_only,NO_MANUAL_ROW
 ALGT,2025,Q3,ASM,manual_only,NO_MANUAL_ROW
 ALGT,2025,Q4,ASM,manual_only,NO_MANUAL_ROW
 ALGT,2026,Q1,ASM,manual_only,NO_MANUAL_ROW
-ALGT,2014,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2014,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2014,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2014,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2014,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2015,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2015,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2015,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2015,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2015,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2016,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2016,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2016,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2016,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2016,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2017,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2017,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2017,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2017,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2017,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2018,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2018,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2018,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2018,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2018,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2019,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2019,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2019,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2019,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2019,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2020,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2020,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2020,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2020,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2020,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2021,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2021,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2021,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2021,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2021,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2022,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2022,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2022,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2022,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2022,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2023,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2023,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2023,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2023,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2023,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2024,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2024,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2024,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2024,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2024,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2025,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2025,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2025,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2025,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2025,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALGT,2026,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
+ALGT,2026,Q2,ASM,manual_only,NO_MANUAL_ROW
 ALGT,2014,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALGT,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALGT,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
@@ -182,6 +122,7 @@ ALGT,2025,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALGT,2025,Q3,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALGT,2025,Q4,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALGT,2026,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
+ALGT,2026,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALGT,2014,FY,RPM,manual_only,NO_MANUAL_ROW
 ALGT,2014,Q1,RPM,manual_only,NO_MANUAL_ROW
 ALGT,2014,Q2,RPM,manual_only,NO_MANUAL_ROW
@@ -243,6 +184,7 @@ ALGT,2025,Q2,RPM,manual_only,NO_MANUAL_ROW
 ALGT,2025,Q3,RPM,manual_only,NO_MANUAL_ROW
 ALGT,2025,Q4,RPM,manual_only,NO_MANUAL_ROW
 ALGT,2026,Q1,RPM,manual_only,NO_MANUAL_ROW
+ALGT,2026,Q2,RPM,manual_only,NO_MANUAL_ROW
 ALGT,2014,FY,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 ALGT,2014,Q1,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 ALGT,2014,Q2,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
@@ -326,68 +268,8 @@ ALK,2025,Q3,ASM,manual_only,NO_MANUAL_ROW
 ALK,2025,Q4,ASM,manual_only,NO_MANUAL_ROW
 ALK,2026,Q1,ASM,manual_only,NO_MANUAL_ROW
 ALK,2026,Q2,ASM,manual_only,NO_MANUAL_ROW
-ALK,2014,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2014,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2014,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2014,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2014,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2015,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2015,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2015,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2015,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2015,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2016,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2016,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2016,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2016,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2016,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2017,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2017,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2017,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2017,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2017,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2018,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ALK,2018,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2018,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2018,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ALK,2018,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2019,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2019,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2019,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2019,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2019,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2020,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2020,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2020,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2020,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2020,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2021,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2021,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2021,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2021,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2021,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2022,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2022,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2022,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2022,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2022,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2023,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2023,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2023,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2023,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2023,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2024,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2024,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2024,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2024,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2024,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2025,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2025,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2025,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2025,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2025,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2026,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ALK,2026,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ALK,2014,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALK,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 ALK,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
@@ -572,58 +454,8 @@ HA,2023,Q3,ASM,manual_only,NO_MANUAL_ROW
 HA,2023,Q4,ASM,manual_only,NO_MANUAL_ROW
 HA,2024,Q1,ASM,manual_only,NO_MANUAL_ROW
 HA,2024,Q2,ASM,manual_only,NO_MANUAL_ROW
-HA,2014,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2014,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2014,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2014,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2014,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2015,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2015,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2015,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2015,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2015,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2016,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2016,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2016,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2016,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2016,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2017,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2017,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2017,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2017,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2017,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2018,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
 HA,2018,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2018,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2018,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
 HA,2018,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2019,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2019,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2019,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2019,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2019,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2020,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2020,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2020,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2020,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2020,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2021,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2021,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2021,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2021,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2021,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2022,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2022,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2022,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2022,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2022,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2023,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2023,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2023,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2023,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2023,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2024,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-HA,2024,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
 HA,2014,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
 HA,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 HA,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
@@ -790,68 +622,8 @@ JBLU,2025,Q3,ASM,manual_only,NO_MANUAL_ROW
 JBLU,2025,Q4,ASM,manual_only,NO_MANUAL_ROW
 JBLU,2026,Q1,ASM,manual_only,NO_MANUAL_ROW
 JBLU,2026,Q2,ASM,manual_only,NO_MANUAL_ROW
-JBLU,2014,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2014,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2014,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2014,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2014,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2015,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2015,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2015,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2015,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2015,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2016,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2016,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2016,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2016,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2016,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2017,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2017,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2017,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2017,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2017,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2018,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
 JBLU,2018,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2018,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2018,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
 JBLU,2018,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2019,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2019,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2019,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2019,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2019,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2020,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2020,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2020,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2020,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2020,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2021,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2021,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2021,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2021,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2021,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2022,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2022,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2022,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2022,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2022,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2023,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2023,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2023,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2023,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2023,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2024,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2024,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2024,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2024,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2024,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2025,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2025,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2025,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2025,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2025,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2026,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-JBLU,2026,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
 JBLU,2014,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
 JBLU,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 JBLU,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
@@ -1095,6 +867,20 @@ RJET,2015,Q4,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
 RJET,2016,Q1,Earnings Per Share,auto_xbrl,NO_AUTO_ROW
 RJET,2016,Q2,Earnings Per Share,auto_xbrl,NO_AUTO_ROW
 RJET,2016,Q3,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
+RJET,2014,FY,Interest Expense,auto_xbrl,NO_AUTO_ROW
+RJET,2014,Q1,Interest Expense,auto_xbrl,NO_AUTO_ROW
+RJET,2014,Q2,Interest Expense,auto_xbrl,NO_AUTO_ROW
+RJET,2014,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
+RJET,2014,Q4,Interest Expense,auto_xbrl,NO_AUTO_ROW
+RJET,2015,FY,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+RJET,2015,Q1,Interest Expense,auto_xbrl,NO_AUTO_ROW
+RJET,2015,Q2,Interest Expense,auto_xbrl,NO_AUTO_ROW
+RJET,2015,Q3,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+RJET,2015,Q4,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+RJET,2016,Q1,Interest Expense,auto_xbrl,NO_AUTO_ROW
+RJET,2016,Q2,Interest Expense,auto_xbrl,NO_AUTO_ROW
+RJET,2016,Q3,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+RJET,2016,Q4,Interest Expense,auto_xbrl,NO_AUTO_VALUE
 RJET,2014,FY,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
 RJET,2014,Q1,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
 RJET,2014,Q2,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
@@ -1125,7 +911,6 @@ RJET,2015,Q4,Net Income,auto_xbrl,NO_AUTO_VALUE
 RJET,2016,Q1,Net Income,auto_xbrl,NO_AUTO_ROW
 RJET,2016,Q2,Net Income,auto_xbrl,NO_AUTO_ROW
 RJET,2016,Q3,Net Income,auto_xbrl,NO_AUTO_VALUE
-RJET,2016,Q4,Net Income,auto_xbrl,NO_AUTO_VALUE
 RJET,2014,FY,Operating Cash Flow,auto_xbrl,NO_AUTO_ROW
 RJET,2014,Q1,Operating Cash Flow,auto_xbrl,NO_AUTO_ROW
 RJET,2014,Q2,Operating Cash Flow,auto_xbrl,NO_AUTO_ROW
@@ -1169,7 +954,6 @@ RJET,2015,Q4,Operating Income,auto_xbrl,NO_AUTO_VALUE
 RJET,2016,Q1,Operating Income,auto_xbrl,NO_AUTO_ROW
 RJET,2016,Q2,Operating Income,auto_xbrl,NO_AUTO_ROW
 RJET,2016,Q3,Operating Income,auto_xbrl,NO_AUTO_VALUE
-RJET,2016,Q4,Operating Income,auto_xbrl,NO_AUTO_VALUE
 RJET,2014,FY,Operating Revenue,auto_xbrl,NO_AUTO_ROW
 RJET,2014,Q1,Operating Revenue,auto_xbrl,NO_AUTO_ROW
 RJET,2014,Q2,Operating Revenue,auto_xbrl,NO_AUTO_ROW
@@ -1183,7 +967,6 @@ RJET,2015,Q4,Operating Revenue,auto_xbrl,NO_AUTO_VALUE
 RJET,2016,Q1,Operating Revenue,auto_xbrl,NO_AUTO_ROW
 RJET,2016,Q2,Operating Revenue,auto_xbrl,NO_AUTO_ROW
 RJET,2016,Q3,Operating Revenue,auto_xbrl,NO_AUTO_VALUE
-RJET,2016,Q4,Operating Revenue,auto_xbrl,NO_AUTO_VALUE
 RJET,2014,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
 RJET,2014,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
 RJET,2014,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
@@ -1506,6 +1289,9 @@ SAVE,2025,Q4,Capital Expenditures,auto_xbrl,NO_AUTO_VALUE
 SAVE,2025,FY,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
 SAVE,2025,Q1,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
 SAVE,2025,Q4,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
+SAVE,2025,FY,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+SAVE,2025,Q1,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+SAVE,2025,Q4,Interest Expense,auto_xbrl,NO_AUTO_VALUE
 SAVE,2025,Q1,Net Income,auto_xbrl,NO_AUTO_VALUE
 SAVE,2025,Q4,Net Income,auto_xbrl,NO_AUTO_VALUE
 SAVE,2025,FY,Operating Cash Flow,auto_xbrl,NO_AUTO_VALUE
@@ -1522,26 +1308,6 @@ SAVE,2025,Q4,Operating Income,auto_xbrl,NO_AUTO_VALUE
 SAVE,2025,FY,Operating Revenue,auto_xbrl,NO_AUTO_VALUE
 SAVE,2025,Q1,Operating Revenue,auto_xbrl,NO_AUTO_VALUE
 SAVE,2025,Q4,Operating Revenue,auto_xbrl,NO_AUTO_VALUE
-SAVE,2014,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2014,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2014,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2014,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2014,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2015,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2015,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2015,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2015,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2015,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2016,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2016,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2016,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2016,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2016,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2017,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2017,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2017,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2017,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2017,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
 SAVE,2018,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
 SAVE,2018,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
 SAVE,2018,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
@@ -1577,7 +1343,6 @@ SAVE,2024,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
 SAVE,2024,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
 SAVE,2024,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
 SAVE,2024,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SAVE,2025,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
 SAVE,2025,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
 SAVE,2025,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
 SAVE,2025,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
@@ -2150,6 +1915,35 @@ SNCY,2019,Q1,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
 SNCY,2019,Q2,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
 SNCY,2019,Q3,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
 SNCY,2019,Q4,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
+SNCY,2014,FY,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2014,Q1,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2014,Q2,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2014,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2014,Q4,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2015,FY,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2015,Q1,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2015,Q2,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2015,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2015,Q4,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2016,FY,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2016,Q1,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2016,Q2,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2016,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2016,Q4,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2017,FY,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2017,Q1,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2017,Q2,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2017,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2017,Q4,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2018,FY,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+SNCY,2018,Q1,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2018,Q2,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2018,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
+SNCY,2018,Q4,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+SNCY,2019,Q1,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+SNCY,2019,Q2,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+SNCY,2019,Q3,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+SNCY,2019,Q4,Interest Expense,auto_xbrl,NO_AUTO_VALUE
 SNCY,2014,FY,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
 SNCY,2014,Q1,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
 SNCY,2014,Q2,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
@@ -2360,32 +2154,8 @@ SNCY,2020,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
 SNCY,2020,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
 SNCY,2020,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
 SNCY,2020,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2021,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
 SNCY,2021,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2021,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2021,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
 SNCY,2021,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2022,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2022,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2022,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2022,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2022,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2023,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2023,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2023,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2023,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2023,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2024,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2024,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2024,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2024,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2024,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2025,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2025,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2025,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2025,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2025,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-SNCY,2026,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
 SNCY,2014,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
 SNCY,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 SNCY,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
@@ -2599,6 +2369,7 @@ ULCC,2025,Q2,ASM,manual_only,NO_MANUAL_ROW
 ULCC,2025,Q3,ASM,manual_only,NO_MANUAL_ROW
 ULCC,2025,Q4,ASM,manual_only,NO_MANUAL_ROW
 ULCC,2026,Q1,ASM,manual_only,NO_MANUAL_ROW
+ULCC,2026,Q2,ASM,manual_only,NO_MANUAL_ROW
 ULCC,2014,FY,Capital Expenditures,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Capital Expenditures,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Capital Expenditures,auto_xbrl,NO_AUTO_ROW
@@ -2628,6 +2399,7 @@ ULCC,2019,Q1,Capital Expenditures,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q2,Capital Expenditures,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Capital Expenditures,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Capital Expenditures,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q2,Capital Expenditures,auto_xbrl,NO_AUTO_VALUE
 ULCC,2014,FY,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
@@ -2651,6 +2423,7 @@ ULCC,2017,Q4,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
 ULCC,2018,Q1,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
 ULCC,2018,Q2,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
 ULCC,2018,Q3,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
+ULCC,2026,Q2,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_VALUE
 ULCC,2014,FY,Current Maturities,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Current Maturities,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Current Maturities,auto_xbrl,NO_AUTO_ROW
@@ -2681,6 +2454,7 @@ ULCC,2019,Q1,Current Maturities,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q2,Current Maturities,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Current Maturities,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Current Maturities,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q2,Current Maturities,auto_xbrl,NO_AUTO_VALUE
 ULCC,2014,FY,Earnings Per Share,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Earnings Per Share,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Earnings Per Share,auto_xbrl,NO_AUTO_ROW
@@ -2710,6 +2484,37 @@ ULCC,2019,Q1,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q2,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q2,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
+ULCC,2014,FY,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2014,Q1,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2014,Q2,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2014,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2014,Q4,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2015,FY,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2015,Q1,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2015,Q2,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2015,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2015,Q4,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2016,FY,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2016,Q1,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2016,Q2,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2016,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2016,Q4,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2017,FY,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2017,Q1,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2017,Q2,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2017,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2017,Q4,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2018,FY,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+ULCC,2018,Q1,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2018,Q2,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2018,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ULCC,2018,Q4,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+ULCC,2019,Q1,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+ULCC,2019,Q2,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+ULCC,2019,Q3,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+ULCC,2019,Q4,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q2,Interest Expense,auto_xbrl,NO_AUTO_VALUE
 ULCC,2014,FY,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
@@ -2740,6 +2545,7 @@ ULCC,2019,Q1,Long-Term Debt,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q2,Long-Term Debt,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Long-Term Debt,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Long-Term Debt,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q2,Long-Term Debt,auto_xbrl,NO_AUTO_VALUE
 ULCC,2014,FY,Net Income,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Net Income,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Net Income,auto_xbrl,NO_AUTO_ROW
@@ -2769,6 +2575,7 @@ ULCC,2019,Q1,Net Income,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q2,Net Income,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Net Income,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Net Income,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q2,Net Income,auto_xbrl,NO_AUTO_VALUE
 ULCC,2014,FY,Operating Cash Flow,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Operating Cash Flow,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Operating Cash Flow,auto_xbrl,NO_AUTO_ROW
@@ -2798,6 +2605,7 @@ ULCC,2019,Q1,Operating Cash Flow,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q2,Operating Cash Flow,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Operating Cash Flow,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Operating Cash Flow,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q2,Operating Cash Flow,auto_xbrl,NO_AUTO_VALUE
 ULCC,2014,FY,Operating Expenses,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Operating Expenses,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Operating Expenses,auto_xbrl,NO_AUTO_ROW
@@ -2827,6 +2635,7 @@ ULCC,2019,Q1,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q2,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q2,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
 ULCC,2014,FY,Operating Income,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Operating Income,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Operating Income,auto_xbrl,NO_AUTO_ROW
@@ -2856,6 +2665,7 @@ ULCC,2019,Q1,Operating Income,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q2,Operating Income,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Operating Income,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Operating Income,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q2,Operating Income,auto_xbrl,NO_AUTO_VALUE
 ULCC,2014,FY,Operating Revenue,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Operating Revenue,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Operating Revenue,auto_xbrl,NO_AUTO_ROW
@@ -2885,6 +2695,7 @@ ULCC,2019,Q1,Operating Revenue,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q2,Operating Revenue,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Operating Revenue,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Operating Revenue,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q2,Operating Revenue,auto_xbrl,NO_AUTO_VALUE
 ULCC,2014,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ULCC,2014,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ULCC,2014,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
@@ -2920,32 +2731,6 @@ ULCC,2020,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ULCC,2020,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ULCC,2020,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ULCC,2020,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2021,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2021,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2021,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2021,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2021,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2022,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2022,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2022,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2022,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2022,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2023,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2023,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2023,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2023,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2023,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2024,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2024,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2024,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2024,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2024,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2025,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2025,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2025,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2025,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2025,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-ULCC,2026,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ULCC,2014,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
 ULCC,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 ULCC,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
@@ -3007,6 +2792,7 @@ ULCC,2025,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
 ULCC,2025,Q3,Profit Sharing,manual_only,NO_MANUAL_ROW
 ULCC,2025,Q4,Profit Sharing,manual_only,NO_MANUAL_ROW
 ULCC,2026,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
+ULCC,2026,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
 ULCC,2014,FY,RPM,manual_only,NO_MANUAL_ROW
 ULCC,2014,Q1,RPM,manual_only,NO_MANUAL_ROW
 ULCC,2014,Q2,RPM,manual_only,NO_MANUAL_ROW
@@ -3068,6 +2854,7 @@ ULCC,2025,Q2,RPM,manual_only,NO_MANUAL_ROW
 ULCC,2025,Q3,RPM,manual_only,NO_MANUAL_ROW
 ULCC,2025,Q4,RPM,manual_only,NO_MANUAL_ROW
 ULCC,2026,Q1,RPM,manual_only,NO_MANUAL_ROW
+ULCC,2026,Q2,RPM,manual_only,NO_MANUAL_ROW
 ULCC,2014,FY,Short-Term Investments,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Short-Term Investments,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Short-Term Investments,auto_xbrl,NO_AUTO_ROW
@@ -3129,6 +2916,7 @@ ULCC,2025,Q2,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 ULCC,2025,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 ULCC,2025,Q4,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 ULCC,2026,Q1,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q2,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 VA,2014,FY,ASM,manual_only,NO_MANUAL_ROW
 VA,2014,Q1,ASM,manual_only,NO_MANUAL_ROW
 VA,2014,Q2,ASM,manual_only,NO_MANUAL_ROW
@@ -3142,19 +2930,6 @@ VA,2015,Q4,ASM,manual_only,NO_MANUAL_ROW
 VA,2016,Q1,ASM,manual_only,NO_MANUAL_ROW
 VA,2016,Q2,ASM,manual_only,NO_MANUAL_ROW
 VA,2016,Q3,ASM,manual_only,NO_MANUAL_ROW
-VA,2014,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-VA,2014,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-VA,2014,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-VA,2014,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-VA,2014,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-VA,2015,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
-VA,2015,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-VA,2015,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-VA,2015,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
-VA,2015,Q4,Passenger Revenue,manual_only,NO_MANUAL_ROW
-VA,2016,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
-VA,2016,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
-VA,2016,Q3,Passenger Revenue,manual_only,NO_MANUAL_ROW
 VA,2014,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
 VA,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 VA,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
