@@ -119,7 +119,7 @@ RJET,Interest Expense,auto_xbrl,62,48,14,77.4
 RJET,Long-Term Debt,auto_xbrl,62,45,17,72.6
 RJET,Net Income,auto_xbrl,62,49,13,79.0
 RJET,Operating Cash Flow,auto_xbrl,62,46,16,74.2
-RJET,Operating Expenses,auto_xbrl,62,48,14,77.4
+RJET,Operating Expenses,auto_xbrl,62,49,13,79.0
 RJET,Operating Income,auto_xbrl,62,49,13,79.0
 RJET,Operating Revenue,auto_xbrl,62,49,13,79.0
 RJET,Short-Term Investments,auto_xbrl,62,19,43,30.6
@@ -151,7 +151,7 @@ SKYW,Interest Expense,auto_xbrl,62,62,0,100.0
 SKYW,Long-Term Debt,auto_xbrl,62,62,0,100.0
 SKYW,Net Income,auto_xbrl,62,62,0,100.0
 SKYW,Operating Cash Flow,auto_xbrl,62,62,0,100.0
-SKYW,Operating Expenses,auto_xbrl,62,50,12,80.6
+SKYW,Operating Expenses,auto_xbrl,62,62,0,100.0
 SKYW,Operating Income,auto_xbrl,62,62,0,100.0
 SKYW,Operating Revenue,auto_xbrl,62,62,0,100.0
 SKYW,Short-Term Investments,auto_xbrl,62,60,2,96.8

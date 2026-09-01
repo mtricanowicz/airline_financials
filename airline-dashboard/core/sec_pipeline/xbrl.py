@@ -471,6 +471,24 @@ def _extract_restricted_cash_metric(
     return (current_val or 0.0) + (noncurrent_val or 0.0)
 
 
+def _extract_operating_expenses_derived(
+    facts: dict[str, Any], year: int, period: str, ticker: str | None
+) -> float | None:
+    """Derive Operating Expenses = Operating Revenue - Operating Income.
+
+    Covers filers who tag both revenue and the operating-income subtotal but,
+    for some periods, never tag a total operating-expenses line item at all
+    (e.g. SKYW 2018-2020, where the income statement subtotal exists but has
+    no us-gaap concept of its own).
+    """
+    revenue = extract_metric(facts, "Operating Revenue", year, period, ticker=ticker)
+    operating_income = extract_metric(facts, "Operating Income", year, period, ticker=ticker)
+    if revenue is None or operating_income is None:
+        return None
+    expenses = revenue - operating_income
+    return expenses if expenses > 0 else None
+
+
 def _extract_eps_q4_fallback(facts: dict[str, Any], year: int) -> float | None:
     """Derive Q4 basic EPS if direct Q4 value is not present.
 
@@ -603,6 +621,10 @@ def extract_metric(
             return val
 
     if period != "Q4":
+        if metric == "Operating Expenses":
+            derived = _extract_operating_expenses_derived(facts, year, period, ticker)
+            if derived is not None:
+                return derived
         return None
 
     if metric in NON_ADDITIVE_DURATION_METRICS:
@@ -614,9 +636,15 @@ def extract_metric(
     # Q4 is not filed separately: derive from FY minus the first three quarters.
     fy = extract_metric(facts, metric, year, "FY", ticker=ticker)
     parts = [extract_metric(facts, metric, year, q, ticker=ticker) for q in ("Q1", "Q2", "Q3")]
-    if fy is None or any(p is None for p in parts):
-        return None
-    return fy - sum(parts)  # type: ignore[arg-type]
+    if fy is not None and all(p is not None for p in parts):
+        return fy - sum(parts)  # type: ignore[arg-type]
+
+    # Prefer the FY-minus-quarters derivation above; only fall back to the
+    # revenue-minus-income derivation when that path is also unavailable
+    # (e.g. quarters where no expense total was ever tagged, like SKYW).
+    if metric == "Operating Expenses":
+        return _extract_operating_expenses_derived(facts, year, period, ticker)
+    return None
 
 
 def extract_financials(

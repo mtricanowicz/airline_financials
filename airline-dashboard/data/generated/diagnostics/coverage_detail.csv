@@ -934,7 +934,6 @@ RJET,2015,Q4,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
 RJET,2016,Q1,Operating Expenses,auto_xbrl,NO_AUTO_ROW
 RJET,2016,Q2,Operating Expenses,auto_xbrl,NO_AUTO_ROW
 RJET,2016,Q3,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
-RJET,2016,Q4,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
 RJET,2014,FY,Operating Income,auto_xbrl,NO_AUTO_ROW
 RJET,2014,Q1,Operating Income,auto_xbrl,NO_AUTO_ROW
 RJET,2014,Q2,Operating Income,auto_xbrl,NO_AUTO_ROW
@@ -1537,18 +1536,6 @@ SKYW,2025,Q3,ASM,manual_only,NO_MANUAL_ROW
 SKYW,2025,Q4,ASM,manual_only,NO_MANUAL_ROW
 SKYW,2026,Q1,ASM,manual_only,NO_MANUAL_ROW
 SKYW,2026,Q2,ASM,manual_only,NO_MANUAL_ROW
-SKYW,2018,FY,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
-SKYW,2018,Q1,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
-SKYW,2018,Q2,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
-SKYW,2018,Q3,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
-SKYW,2018,Q4,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
-SKYW,2019,Q1,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
-SKYW,2019,Q2,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
-SKYW,2019,Q3,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
-SKYW,2019,Q4,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
-SKYW,2020,Q1,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
-SKYW,2020,Q2,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
-SKYW,2020,Q4,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
 SKYW,2014,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
 SKYW,2014,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
 SKYW,2014,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
