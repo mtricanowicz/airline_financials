@@ -9,7 +9,7 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
-from lib.data import load_financials, split_by_period
+from lib.data import load_financials, split_by_period, load_insights
 from lib.formatting import (
     AIRLINE_NAMES,
     AIRLINE_GROUPS,
@@ -19,6 +19,7 @@ from lib.formatting import (
     format_metric_value,
     pct_diff,
     scale_metric_for_display,
+    airline_header_html,
 )
 
 st.header(":material/calendar_today: Latest Results")
@@ -28,6 +29,9 @@ st.header(":material/calendar_today: Latest Results")
 def show_metric_definitions() -> None:
     for metric, definition in METRIC_DEFINITIONS:
         st.markdown(f"**{metric}** - {definition}")
+
+
+insights = load_insights()
 
 
 financials = load_financials()
@@ -106,6 +110,8 @@ def render(data: pd.DataFrame, title: str) -> None:
         st.info(f"No data available for {title}.")
         return
     latest = max(data["Period"])
+    latest_year = latest[:4]
+    latest_quarter = latest[4:]
     st.subheader(f"{title}: {latest}", divider="gray")
     summary = build_summary(data)
     if compare:
@@ -117,6 +123,34 @@ def render(data: pd.DataFrame, title: str) -> None:
         st.dataframe(summary.style.map(color_positive_negative, subset=color_cols), width="stretch")
     else:
         st.dataframe(summary, width="stretch")
+    with st.expander(f"Review {latest} insights", expanded=False, icon=":material/emoji_objects:"):
+        insight_airline = st.pills(
+            label = None,
+            options = selected_airlines,
+            default = selected_airlines[0],
+            selection_mode = "single",
+            required = True,
+            width="stretch",
+            key=f"latest_insights_{title}"
+        )
+        name = AIRLINE_NAMES.get(insight_airline, insight_airline)
+        st.markdown(
+            airline_header_html(
+                insight_airline,
+                f"{name} ({insight_airline}) | {latest_year}{latest_quarter}",
+                heading_level=3,
+                logo_height_em=2.00,
+                logo_before_text=True,
+                gap_rem=0.55,
+            ),
+            unsafe_allow_html=True,
+        )
+        st.markdown("<div style='border-bottom:1px solid rgba(49, 51, 63, 0.2); margin:0 0 1rem 0;'></div>", unsafe_allow_html=True)
+        summary = insights.get(insight_airline, {}).get(latest_year, {}).get(latest_quarter)
+        if summary:
+            st.markdown(summary)
+        else:
+            st.error("No summary is available for the selected period.", icon=":material/report:")
 
 
 with col_a:
