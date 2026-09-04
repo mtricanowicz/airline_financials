@@ -14,6 +14,7 @@ from lib.formatting import (
     AIRLINE_NAMES,
     AIRLINE_GROUPS,
     METRIC_DEFINITIONS,
+    STREAMLIT_WIDGET_WRAP,
     airline_label_html,
     color_positive_negative,
     format_metric_value,
@@ -54,7 +55,12 @@ with col_b:
     else:
         airline_options = airlines
         default_airlines = airlines
-    selected_airlines = st.multiselect("Add or remove Airlines to compare:", airline_options, default=default_airlines)
+    selected_airlines = st.multiselect(
+        "Add or remove Airlines to compare:",
+        airline_options,
+        default=default_airlines,
+        wrap=STREAMLIT_WIDGET_WRAP,
+    )
     selected_airlines = selected_airlines or airline_options[:1]
     st.markdown("<br>".join([airline_label_html(airline, text=f"{AIRLINE_NAMES.get(airline, airline)} ({airline})", logo_height_em=0.95, logo_before_text=True, gap_rem=0.25) for airline in selected_airlines]), unsafe_allow_html=True)
     compare = (
@@ -131,7 +137,7 @@ def render(data: pd.DataFrame, title: str) -> None:
             selection_mode = "single",
             required = True,
             width="stretch",
-            key=f"latest_insights_{title}"
+            key=f"latest_insights_{title}",
         )
         name = AIRLINE_NAMES.get(insight_airline, insight_airline)
         st.markdown(

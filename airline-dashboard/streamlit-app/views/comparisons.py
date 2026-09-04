@@ -23,6 +23,7 @@ from lib.formatting import (
     METRIC_GROUPS,
     MILLIONS_METRICS,
     PERCENT_METRICS,
+    STREAMLIT_WIDGET_WRAP,
     color_positive_negative,
     format_metric_value,
     pct_diff,
@@ -31,7 +32,7 @@ from lib.formatting import (
     airline_header_html,
 )
 
-st.header(":material/finance_mode: Filtered Comparisons")
+st.header(":material/finance_mode: Financial Metrics")
 
 
 @st.dialog("Metric Definitions", width="large")
@@ -55,18 +56,32 @@ with st.expander("Set filters", expanded=True):
     with st.container(border=True):
         col1, col2, col3 = st.columns([1, 3, 1])
         with col1:
-            data_type = st.radio("View Full Year or Quarterly data?", ["Full Year", "Quarterly"], horizontal=True)
+            data_type = st.radio(
+                "View Full Year or Quarterly data?",
+                ["Full Year", "Quarterly"],
+                horizontal=True,
+            )
         data = fy_data if data_type == "Full Year" else q_data
 
         years = sorted(data["Year"].unique())
         with col2:
-            selected_years = st.multiselect("Select Years for comparison:", years, default=years)
+            selected_years = st.multiselect(
+                "Select Years for comparison:",
+                years,
+                default=years,
+                wrap=STREAMLIT_WIDGET_WRAP,
+            )
         selected_years = selected_years or years
 
         with col3:
             if data_type == "Quarterly":
                 quarters = sorted(data["Quarter"].unique())
-                selected_quarters = st.multiselect("Select Quarters for comparison:", quarters, default=quarters)
+                selected_quarters = st.multiselect(
+                    "Select Quarters for comparison:",
+                    quarters,
+                    default=quarters,
+                    wrap=STREAMLIT_WIDGET_WRAP,
+                )
                 selected_quarters = selected_quarters or quarters
             else:
                 selected_quarters = ["FY"]
@@ -94,7 +109,12 @@ with st.expander("Set filters", expanded=True):
             airline_options = airlines
             default_airlines = airline_options
         with col5:
-            selected_airlines = st.multiselect("Add or remove Airlines to compare:", airline_options, default=default_airlines)
+            selected_airlines = st.multiselect(
+                "Add or remove Airlines to compare:",
+                airline_options,
+                default=default_airlines,
+                wrap=STREAMLIT_WIDGET_WRAP,
+            )
             selected_airlines = selected_airlines or airline_options[:1]
             st.markdown(
                 " | ".join([
@@ -124,13 +144,18 @@ with st.expander("Set filters", expanded=True):
         c for c in data.columns if c not in ("Year", "Quarter", "Airline", "Period")
     ]
     default_metric_group_index = (
-        0 if airline_group in AIRLINE_GROUPS
+        0 if airline_group in AIRLINE_GROUPS or airline_group == "All"
         else 1
     )
     with st.container(border=True):
         col7, col8, col9 = st.columns([1, 3, 1])
         with col7:
-            metric_group = st.radio("Select Metrics for Comparison:", ["All", *METRIC_GROUPS.keys()], horizontal=False, index=default_metric_group_index)
+            metric_group = st.radio(
+                "Select Metrics for Comparison:",
+                ["All", *METRIC_GROUPS.keys()],
+                horizontal=False,
+                index=default_metric_group_index,
+            )
         if metric_group == "All":
             metric_options = available_metrics
             default_metrics = metric_options
@@ -139,7 +164,10 @@ with st.expander("Set filters", expanded=True):
             default_metrics = metric_options
         with col8:
             selected_metrics = st.multiselect(
-                "Add or remove Metrics to compare:", metric_options, default=default_metrics
+                "Add or remove Metrics to compare:",
+                metric_options,
+                default=default_metrics,
+                wrap=STREAMLIT_WIDGET_WRAP,
             )
         with col9:
             if st.button("Show definitions of the available metrics", icon=":material/dictionary:"):

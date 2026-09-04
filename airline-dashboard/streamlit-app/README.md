@@ -20,10 +20,10 @@ the reference and fallback front end. The primary front end is the Next.js app i
 
 | Page | Source | Description |
 | --- | --- | --- |
-| Filtered Comparisons | `views/comparisons.py` | Compare metrics across airlines and periods with tables and charts. |
+| Financial Metrics | `views/comparisons.py` | Compare metrics across airlines and periods with tables and charts. |
+| Insights | `views/insights.py` | Precomputed LLM insights per airline, year, and period. |
 | Latest Results | `views/latest_results.py` | Most recent full-year and quarterly figures. |
 | Share Repurchases | `views/share_repurchases.py` | Buyback and share-sale history with net value at the latest close. |
-| Insights | `views/insights.py` | Precomputed LLM insights per airline, year, and period. |
 
 ## Run locally
 

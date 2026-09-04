@@ -41,14 +41,23 @@ Data flow summary:
 2. Both front ends read the generated JSON.
 3. Live quote views call `quotes-api`.
 
-## Filtered Comparisons
-Filtered Comparisons remains a core feature in v2 and supports:
+## Financial Metrics
+Financial Metrics remains a core feature in v2 and supports:
 - selecting airlines
 - selecting year/period windows
 - selecting metric groups or custom metric sets
 - viewing tables and trend charts
 
 The v2 implementation moves data prep out of UI runtime and relies on precomputed datasets, which improves performance and reduces rerun overhead.
+
+## Insights
+Insights in v2 are generated through the consolidated SEC pipeline package in [airline-dashboard/core/sec_pipeline](airline-dashboard/core/sec_pipeline):
+- SEC EDGAR retrieval
+- filing parsing/chunking
+- embedding and retrieval
+- LLM summarization by airline/year/period
+
+Outputs are written to generated JSON and served to front ends as precomputed content.
 
 ## Latest Results
 Latest Results continues to provide period snapshots for annual and quarterly views, with optional airline-to-airline comparison. In v2 this view is backed by generated JSON rather than in-app spreadsheet transformations.
@@ -60,15 +69,6 @@ Share Repurchases is preserved in v2 with the same intent:
 - running net gain/loss views based on market prices
 
 Source data remains curated from filings and merged into generated outputs by the core build process.
-
-## Insights
-Insights in v2 are generated through the consolidated SEC pipeline package in [airline-dashboard/core/sec_pipeline](airline-dashboard/core/sec_pipeline):
-- SEC EDGAR retrieval
-- filing parsing/chunking
-- embedding and retrieval
-- LLM summarization by airline/year/period
-
-Outputs are written to generated JSON and served to front ends as precomputed content.
 
 ## Metric sourcing model
 v2 uses a hybrid model:
