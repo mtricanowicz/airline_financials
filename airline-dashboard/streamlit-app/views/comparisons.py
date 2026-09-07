@@ -147,20 +147,31 @@ with st.expander("Set filters", expanded=True):
         0 if airline_group in AIRLINE_GROUPS or airline_group == "All"
         else 1
     )
+    # Only offer metrics/groups with at least one non-null value for the available airline options.
+    airline_rows = data[data["Airline"].isin(airline_options)]
+    metrics_with_data = [m for m in available_metrics if airline_rows[m].notna().any()]
+    available_metric_groups = [
+        group
+        for group, metrics in METRIC_GROUPS.items()
+        if any(metric in metrics_with_data for metric in metrics)
+    ]
+    metric_group_options = ["All", *available_metric_groups]
+    if default_metric_group_index >= len(metric_group_options):
+        default_metric_group_index = 0
     with st.container(border=True):
         col7, col8, col9 = st.columns([1, 3, 1])
         with col7:
             metric_group = st.radio(
                 "Select Metrics for Comparison:",
-                ["All", *METRIC_GROUPS.keys()],
+                metric_group_options,
                 horizontal=False,
                 index=default_metric_group_index,
             )
         if metric_group == "All":
-            metric_options = available_metrics
+            metric_options = metrics_with_data
             default_metrics = metric_options
         else:  # metric_group in METRIC_GROUPS:
-            metric_options = [m for m in METRIC_GROUPS[metric_group] if m in available_metrics]
+            metric_options = [m for m in METRIC_GROUPS[metric_group] if m in metrics_with_data]
             default_metrics = metric_options
         with col8:
             selected_metrics = st.multiselect(
