@@ -52,10 +52,10 @@ The v2 implementation moves data prep out of UI runtime and relies on precompute
 
 ## Insights
 Insights in v2 are generated through the consolidated SEC pipeline package in [airline-dashboard/core/sec_pipeline](airline-dashboard/core/sec_pipeline):
-- SEC EDGAR retrieval
-- filing parsing/chunking
-- embedding and retrieval
-- LLM summarization by airline/year/period
+- SEC EDGAR periodic filings plus material 8-K exhibit retrieval
+- filing and exhibit parsing/chunking with source provenance
+- weighted multi-query embedding retrieval, including forward-guidance recall
+- evidence-grounded LLM summarization by airline/year/period
 
 Outputs are written to generated JSON and served to front ends as precomputed content.
 

@@ -8,8 +8,9 @@ The embedding backend is selectable via ``EMBEDDING_BACKEND`` (``openai`` or
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
-from typing import Protocol, Sequence
+from typing import Mapping, Protocol, Sequence
 
 import chromadb
 from chromadb.api.models.Collection import Collection
@@ -26,7 +27,7 @@ class Chunk:
     """A unit of text plus its provenance metadata."""
 
     text: str
-    metadata: dict[str, str | int]
+    metadata: dict[str, str | int | float | bool]
 
 
 def _openai_embedder() -> EmbeddingFn:
@@ -114,40 +115,118 @@ def _dedup_key(text: str) -> str:
     return " ".join(text.split()).lower()
 
 
+def _shingles(text: str, size: int = 5) -> set[tuple[str, ...]]:
+    words = re.findall(r"\w+", text.lower())
+    return {tuple(words[index : index + size]) for index in range(len(words) - size + 1)}
+
+
+def _near_duplicate(text: str, existing: Sequence[set[tuple[str, ...]]]) -> bool:
+    shingles = _shingles(text)
+    if not shingles:
+        return False
+    return any(
+        len(shingles & other) / min(len(shingles), len(other)) >= 0.85
+        for other in existing
+        if other
+    )
+
+
 def retrieve_passages(
     collection_name: str,
     queries: Sequence[str],
     embedder: EmbeddingFn,
     k: int,
+    query_weights: Mapping[int, float] | None = None,
 ) -> list[tuple[str, dict]]:
-    """Retrieve unique ``(text, metadata)`` passages across one or more queries.
+    """Retrieve ranked, unique passages across one or more queries.
 
-    All queries are embedded and searched in a single call. Results are merged by
-    interleaving each query's ranked hits (so every query contributes coverage
-    before any one query dominates) and de-duplicated by normalized text.
+    Results are fused across queries before duplicate suppression so repeated
+    retrieval of the same evidence increases its relevance instead of being
+    discarded as soon as it is first encountered.
     """
     collection = _client().get_collection(collection_name)
     embeddings = embedder(list(queries))
     result = collection.query(
         query_embeddings=embeddings,
         n_results=k,
-        include=["documents", "metadatas"],
+        include=["documents", "metadatas", "distances"],
     )
     docs_per_query = result.get("documents") or []
     metas_per_query = result.get("metadatas") or []
-    seen: set[str] = set()
-    passages: list[tuple[str, dict]] = []
+    distances_per_query = result.get("distances") or []
+    # Aggregate all query hits before deduplication so repeated discovery of a
+    # passage becomes a relevance signal rather than an accidental discard.
+    candidates: list[dict] = []
+    exact_matches: dict[tuple[str | None, str], dict] = {}
+
+    def find_near_match(text: str) -> dict | None:
+        shingles = _shingles(text)
+        if not shingles:
+            return None
+        for candidate in candidates:
+            candidate_metadata = candidate["metadata"]
+            if candidate_metadata.get("source_id") != current_metadata.get("source_id"):
+                continue
+            candidate_index = candidate_metadata.get("chunk_index")
+            current_index = current_metadata.get("chunk_index")
+            if isinstance(candidate_index, int) and isinstance(current_index, int):
+                if abs(candidate_index - current_index) > 1:
+                    continue
+            if _near_duplicate(text, [candidate["shingles"]]):
+                return candidate
+        return None
+
     max_len = max((len(d) for d in docs_per_query), default=0)
     for rank in range(max_len):
-        for qi, docs in enumerate(docs_per_query):
+        for query_index, docs in enumerate(docs_per_query):
             if rank >= len(docs):
                 continue
             text = docs[rank]
-            key = _dedup_key(text)
-            if key in seen:
-                continue
-            seen.add(key)
-            metas = metas_per_query[qi] if qi < len(metas_per_query) else []
+            metas = metas_per_query[query_index] if query_index < len(metas_per_query) else []
             meta = metas[rank] if rank < len(metas) else {}
-            passages.append((text, meta or {}))
+            distances = distances_per_query[query_index] if query_index < len(distances_per_query) else []
+            distance = distances[rank] if rank < len(distances) else None
+            occurrence = {
+                "query_index": query_index,
+                "query_rank": rank,
+                "distance": distance,
+            }
+            current_metadata = dict(meta or {})
+            key = (current_metadata.get("source_id"), _dedup_key(text))
+            # Exact matches are source-scoped; near-duplicates are merged only
+            # for adjacent chunks from the same filing.
+            candidate = exact_matches.get(key) or find_near_match(text)
+            if candidate is None:
+                candidate = {
+                    "text": text,
+                    "metadata": current_metadata,
+                    "shingles": _shingles(text),
+                    "occurrences": [],
+                }
+                candidates.append(candidate)
+                exact_matches[key] = candidate
+            candidate["occurrences"].append(occurrence)
+
+    passages: list[tuple[str, dict]] = []
+    for candidate in candidates:
+        occurrences = candidate["occurrences"]
+        # Reciprocal-rank fusion rewards both high rank and cross-query support;
+        # callers that omit weights retain the original equal-weight behavior.
+        weights = query_weights or {}
+        score = sum(
+            weights.get(occurrence["query_index"], 1.0)
+            / (60 + occurrence["query_rank"])
+            for occurrence in occurrences
+        )
+        best = min(occurrences, key=lambda occurrence: occurrence["query_rank"])
+        metadata = candidate["metadata"]
+        metadata["query_index"] = best["query_index"]
+        metadata["query_rank"] = best["query_rank"]
+        metadata["query_support"] = len(occurrences)
+        metadata["query_indices"] = sorted({occurrence["query_index"] for occurrence in occurrences})
+        metadata["retrieval_score"] = round(score, 6)
+        if best["distance"] is not None:
+            metadata["retrieval_distance"] = best["distance"]
+        passages.append((candidate["text"], metadata))
+    passages.sort(key=lambda passage: passage[1]["retrieval_score"], reverse=True)
     return passages

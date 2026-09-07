@@ -52,14 +52,16 @@ def build_period_chunks(
     start, end = spec.date_window()
     filings = client.filings_in_window(cik, start, end, config.RELEVANT_FORMS)
     chunks: list[Chunk] = []
-    for filing in filings:
-        try:
-            content = client.fetch_document(cik, filing)
-            text = document_to_text(content, filing.primary_document)
-        except Exception as exc:  # noqa: BLE001 - log and continue on a bad doc
-            log.warning("Skipping %s %s: %s", filing.form, filing.accession, exc)
-            continue
-        for piece in chunk_text(text):
+
+    def add_document(
+        content: bytes, filing: object, document_name: str, exhibit_type: str | None = None
+    ) -> None:
+        text = document_to_text(content, document_name)
+        pieces = chunk_text(text)
+        source_suffix = f":{exhibit_type}" if exhibit_type else ""
+        # Keep exhibit-level provenance: a release must remain distinguishable
+        # from its short 8-K cover filing during retrieval and deduplication.
+        for chunk_index, piece in enumerate(pieces):
             chunks.append(
                 Chunk(
                     text=piece,
@@ -67,9 +69,48 @@ def build_period_chunks(
                         "form": filing.form,
                         "accession": filing.accession,
                         "filing_date": filing.filing_date.strftime("%Y-%m-%d"),
+                        "source_id": f"{filing.form}:{filing.accession}{source_suffix}",
+                        "document_name": document_name,
+                        "exhibit_type": exhibit_type or "",
+                        "reporting_period": spec.label,
+                        "chunk_index": chunk_index,
+                        "chunk_count": len(pieces),
                     },
                 )
             )
+
+    for filing in filings:
+        try:
+            add_document(client.fetch_document(cik, filing), filing, filing.primary_document)
+        except Exception as exc:  # noqa: BLE001 - log and continue on a bad doc
+            log.warning("Skipping %s %s: %s", filing.form, filing.accession, exc)
+            continue
+        try:
+            exhibits = client.list_exhibits(cik, filing)
+        except Exception as exc:  # noqa: BLE001 - retain the primary document
+            log.warning(
+                "Skipping exhibits for %s %s: %s",
+                filing.form,
+                filing.accession,
+                exc,
+            )
+            continue
+        for exhibit in exhibits:
+            try:
+                add_document(
+                    client.fetch_exhibit(cik, filing, exhibit),
+                    filing,
+                    exhibit.filename,
+                    exhibit.exhibit_type,
+                )
+            except Exception as exc:  # noqa: BLE001 - log and retain the primary filing
+                log.warning(
+                    "Skipping %s %s %s: %s",
+                    filing.form,
+                    filing.accession,
+                    exhibit.filename,
+                    exc,
+                )
     return chunks
 
 

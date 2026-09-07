@@ -10,7 +10,7 @@ A single shared data core feeds two independent front ends:
 
 ```
 core/           Shared data core (build once, consume everywhere)
-  sec_pipeline/   Python package: scrape SEC EDGAR -> RAG -> LLM summaries
+   sec_pipeline/   Python package: scrape SEC EDGAR -> weighted RAG -> LLM summaries
   scripts/        build_data.py: XBRL + manual sheet -> canonical JSON
   notebooks/      run_pipeline.ipynb: thin interactive runner
 data/
@@ -24,8 +24,9 @@ deploy/           Dockerfiles, Firebase config, CI workflows
 
 ### Data flow
 
-1. `core/sec_pipeline` retrieves SEC filings, builds embeddings, runs RAG, and
-   writes `data/generated/insights.json`.
+1. `core/sec_pipeline` retrieves periodic SEC filings and material 8-K exhibits,
+   builds embeddings, uses weighted multi-query RAG with dedicated material-event
+   and forward-guidance recall channels, and writes `data/generated/insights.json`.
 2. `core/scripts/build_data.py` merges auto-sourced XBRL financials with the
    manual sheet and writes `data/generated/financials.json`.
    It writes `data/generated/buybacks.json` only when `--share-data` is passed.

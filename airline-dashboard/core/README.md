@@ -83,8 +83,161 @@ periods are skipped unless `--overwrite` is passed.
 ## Embedding backends
 
 `EMBEDDING_BACKEND=local` (default) uses `sentence-transformers` and requires no
-API calls. `EMBEDDING_BACKEND=openai` uses the OpenAI embeddings API. The chat
-summarization step always uses OpenAI.
+API calls. For generation runs, set `EMBEDDING_BACKEND=openai` to use the OpenAI
+embeddings API and improve retrieval consistency with the hosted summarization
+model. The chat summarization step always uses OpenAI. Keep the local default for
+tests and offline development.
+
+## SEC Retrieval and Summarization
+
+The insights pipeline uses a retrieval-augmented generation (RAG) flow:
+
+1. Retrieve the relevant 10-Q, 10-K, and 8-K filings for an airline-period.
+2. For each 8-K, retrieve material `EX-99.*` HTML/PDF attachments, including
+  earnings releases and investor presentations when present.
+3. Parse each filing and selected exhibit into cleaned text and overlapping chunks.
+4. Store chunk embeddings and deterministic provenance metadata in Chroma.
+5. Run several topic-focused retrieval queries against the collection.
+6. Fuse the query results, remove redundant chunks, and assemble a bounded context.
+7. Ask the summarization model to select and explain the material developments.
+
+The 8-K cover document is often only an incorporation-by-reference notice. The
+attached `EX-99.1` earnings release commonly contains the actual quarterly
+discussion, tables, and management guidance, so indexing only the primary 8-K
+would leave that material out of retrieval entirely. The exhibit collector admits
+only `EX-99.*` HTML/PDF attachments; it skips graphics, XBRL linkbases, extracted
+instance XML, and the complete-submission text file.
+
+### Retrieval queries and weights
+
+Queries cover the period overview, financial results, operations, labor, executive
+and board activity, route network, commercial strategy, MD&A explanations, unit
+economics, fuel, non-GAAP results, legal/risk disclosures, material 8-K events,
+and management forward guidance. The material 8-K query is a recall channel for
+period-specific events that may not be adequately represented in a 10-Q. The
+guidance query targets earnings-release outlooks for the next quarter or full
+year. Neither query requires an 8-K item in the final summary.
+
+Each query has a modest priority weight in `sec_pipeline.summarize.QUERY_WEIGHTS`.
+The weights affect retrieval ordering only. They do not force a topic into the
+output, and they do not override the model's evidence and materiality rules.
+The current priorities are:
+
+| Query family | Weight |
+| --- | ---: |
+| Broad period overview | 0.95 |
+| Financial results | 1.00 |
+| Capacity, traffic, and fleet | 0.90 |
+| Labor | 0.75 |
+| Executive and board | 0.45 |
+| Route network | 0.95 |
+| Commercial strategy and loyalty | 0.90 |
+| MD&A causes and offsets | 1.15 |
+| Unit economics | 0.95 |
+| Fuel | 1.00 |
+| Non-GAAP and special items | 0.80 |
+| Risk and legal | 0.65 |
+| Material 8-K developments | 1.05 |
+| Earnings-release guidance and outlook | 1.15 |
+
+### Reciprocal-rank fusion
+
+The same chunk may be returned by multiple queries. Rather than discarding later
+matches, the retriever treats repeated discovery as evidence that the passage is
+relevant. For a passage `p`, the fused retrieval score is:
+
+$$
+S(p) = \sum_{q \in Q_p}
+\frac{w_q}{k + r_{p,q}}
+$$
+
+where:
+
+- $Q_p$ is the set of queries that returned passage $p$;
+- $w_q$ is the configured weight for query $q$;
+- $r_{p,q}$ is the zero-based rank of the passage for query $q$;
+- $k=60$ is a smoothing constant that prevents rank-zero results from dominating.
+
+Higher scores therefore come from passages that rank well and are supported by
+multiple query families. If no weights are supplied by a caller, every query uses
+a default weight of `1.0`.
+
+### Passage provenance and deduplication
+
+Every indexed chunk retains deterministic metadata:
+
+- `form`, `accession`, and `filing_date`: filing provenance;
+- `source_id`: stable form/accession identity, with an `:EX-99.1` suffix for an
+  exhibit so it remains distinguishable from its 8-K cover filing;
+- `document_name` and `exhibit_type`: the source filename and `EX-99.*` type;
+- `reporting_period`: the requested airline-period, such as `2020Q2`;
+- `chunk_index` and `chunk_count`: position within the source filing.
+
+Exact duplicates are keyed by source identity plus normalized text, so identical
+language in two filings remains separately attributable. Near-duplicate chunks are
+merged only when they come from the same source and have adjacent chunk positions.
+This avoids collapsing similar language from different filings while reducing the
+effect of overlapping chunk windows within one filing.
+
+Retrieved metadata also records `query_index`, `query_rank`, `query_support`,
+`query_indices`, and `retrieval_score`. These fields are internal retrieval
+provenance and are not written into the user-facing summary.
+
+### Context assembly
+
+The context builder orders passages by fused retrieval score. Core evidence channels
+can contribute multiple passages; secondary channels are limited to one
+representative passage so the context does not become a checklist of every topic.
+The material 8-K and guidance queries are core channels. Before the general pass,
+the builder reserves up to two top-ranked guidance-query passages so detailed
+historical financial results cannot crowd management outlook out of the bounded
+context. This is targeted recall, not a general form-level preference for 8-Ks;
+10-Q and 10-K passages continue to compete by relevance and multi-query support.
+The assembled context is bounded by `MAX_CONTEXT_TOKENS` in `summarize.py`.
+
+### Summary selection contract
+
+The model is instructed to produce a useful, relatively complete picture rather
+than a fixed number of items. It should merge related facts into business stories,
+preserve exact population scope, distinguish quarterly from year-to-date figures,
+and assign each story to its primary business section. A figure or named specific
+supports specificity but is not by itself sufficient reason to include an item.
+
+The Wrap Up is intentionally self-contained so a reader can understand the central
+developments and tension without reading every numbered item. It first recaps the
+numbered stories in compressed form. When retrieved excerpts contain management
+guidance, it then adds a concise, clearly labeled overview that names the guided
+period and the most decision-relevant ranges, targets, or assumptions. Guidance is
+explicitly distinguished from reported results and must not replace the recap.
+
+### Completion-length safeguard
+
+The summarizer checks the OpenAI completion `finish_reason` before returning text.
+When the initial response ends with `"length"`, it reuses the same retrieved
+context once with a compact drafting instruction: no more than eight numbered
+items, aggressively merged facts, and a complete concise Wrap Up. A second
+length-limited response raises an error and is not persisted, preventing an
+incomplete summary from silently overwriting an existing result.
+
+### Filing windows
+
+`PeriodSpec` distinguishes the actual reporting end from the later filing cutoff
+used for retrieval. Q1-Q3 filing windows extend roughly one month after period
+end. Q4 begins on October 1 and, like FY, extends through March 31 of the next
+year so the annual 10-K is available. The prompt and retrieval queries use the
+actual reporting end, such as December 31, rather than the padded filing cutoff.
+The Q4 window intentionally overlaps October current reports; those filings may
+provide relevant context, while the 10-K supplies year-end and fourth-quarter data.
+
+### Summary quality checks
+
+`lint-summaries` measures generated markdown before and after retrieval/prompt
+changes. It reports per-summary and aggregate word/item counts, figure density,
+banned model-voice phrases, bold/body overlap, causal-attribution signals,
+truncation, repeated metric families, Wrap Up figure reuse, and cross-summary
+four-gram reuse. Use `--baseline` plus `--compare` for aggregate deltas and
+`--discover` to list repeated openers and phrases. These are review signals, not
+proof of factual accuracy; in particular, the causal-attribution metric is lexical.
 
 ## XBRL period matching behavior
 

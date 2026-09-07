@@ -15,6 +15,7 @@ from datetime import datetime
 from typing import Any
 
 import requests_cache
+from bs4 import BeautifulSoup
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from . import config
@@ -49,6 +50,14 @@ class Filing:
     @property
     def accession_nodashes(self) -> str:
         return self.accession.replace("-", "")
+
+
+@dataclass(frozen=True)
+class Exhibit:
+    """A material attachment listed in an SEC filing's document index."""
+
+    filename: str
+    exhibit_type: str
 
 
 class EdgarClient:
@@ -159,6 +168,38 @@ class EdgarClient:
     def fetch_document(self, cik: str, filing: Filing) -> bytes:
         """Download the primary document bytes for a filing."""
         return self._get(self.document_url(cik, filing)).content
+
+    def list_exhibits(self, cik: str, filing: Filing) -> list[Exhibit]:
+        """Return HTML/PDF EX-99 attachments from an 8-K filing index.
+
+        Earnings releases and their outlook tables are commonly filed as
+        EX-99.1 rather than included in the short primary 8-K document.
+        """
+        if filing.form != "8-K":
+            return []
+        html = self._get(self.filing_index_url(cik, filing)).text
+        soup = BeautifulSoup(html, "lxml")
+        exhibits: list[Exhibit] = []
+        for row in soup.select("table.tableFile tr"):
+            link = row.find("a", href=True)
+            if not link:
+                continue
+            exhibit_match = re.search(r"\bEX-99(?:\.\d+)?\b", row.get_text(" ", strip=True), re.I)
+            filename = link["href"].rsplit("/", 1)[-1]
+            if not exhibit_match or not filename.lower().endswith((".htm", ".html", ".pdf")):
+                continue
+            exhibits.append(Exhibit(filename=filename, exhibit_type=exhibit_match.group(0).upper()))
+        return exhibits
+
+    def fetch_exhibit(self, cik: str, filing: Filing, exhibit: Exhibit) -> bytes:
+        """Download one exhibit returned by :meth:`list_exhibits`."""
+        cik_int = int(self.normalize_cik(cik))
+        url = self.ARCHIVE_URL.format(
+            cik_int=cik_int,
+            acc=filing.accession_nodashes,
+            doc=exhibit.filename,
+        )
+        return self._get(url).content
 
     def instance_document_url(self, cik: str, filing: Filing) -> str:
         """URL of the filing's XBRL instance document.

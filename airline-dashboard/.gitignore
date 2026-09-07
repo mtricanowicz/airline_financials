@@ -24,6 +24,8 @@ core/**/chroma/
 core/**/*.sqlite3
 data/raw/
 data/embeddings/
+data/generated/insights.backup*
+core/INSIGHTS_PIPELINE_PORTING_GUIDE.md
 
 # ---- Node / Next.js ----
 node_modules/
