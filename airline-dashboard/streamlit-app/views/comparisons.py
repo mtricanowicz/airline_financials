@@ -130,10 +130,14 @@ with st.expander("Set filters", expanded=True):
             )
         with col6:
             compare = (
-                            st.toggle("Would you like to compare selected airlines' metrics against one of the airlines?", value=len(selected_airlines) > 1)
-                            if len(selected_airlines) > 1
-                            else False
-                        )
+                st.toggle(
+                    "Would you like to compare selected airlines' metrics against one of the airlines?",
+                    value=len(selected_airlines) > 1,
+                    wrap=True
+                )
+                if len(selected_airlines) > 1
+                else False
+            )
             base_airline = (
                 st.selectbox("Select Airline to compare against:", selected_airlines)
                 if compare

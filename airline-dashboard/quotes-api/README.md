@@ -27,6 +27,12 @@ uvicorn main:app --reload --port 8080
 
 Then visit `http://localhost:8080/quotes` or `http://localhost:8080/docs`.
 
+To activate the API, run the following command from the repo root in Powershell:
+```
+Set-Location ".\airline-dashboard\quotes-api"
+python -m uvicorn main:app --reload --port 8080
+```
+
 ## Configuration
 
 | Variable | Default | Description |
