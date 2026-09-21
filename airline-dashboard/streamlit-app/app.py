@@ -99,10 +99,8 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
     menu_items={
         "About": """
-        Financial data is assembled from airline SEC filings and standardized into a common quarterly and annual reporting structure. Automatically retrieved XBRL facts are supplemented with manually reviewed filing data where structured values are unavailable or unreliable.
-
-        Derived metrics are calculated from the underlying reported financial and operating data. Historical values may reflect later comparative disclosures, restatements, or issuer-specific reporting practices.
-
+        Explore U.S. airline financial performance.
+        
         **Created by:** Michael Tricanowicz
         """
     },

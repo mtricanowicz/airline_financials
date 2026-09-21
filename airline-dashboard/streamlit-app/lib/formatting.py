@@ -417,8 +417,13 @@ def about_sidebar_html() -> str:
             The dashboard combines:
         </p>
         <ul>
-            <li>Automatically retrieved financial metrics from SEC filings.</li>
-            <li>Manually curated financial and operating metrics sourced directly from SEC filings.</li>
+            <li>
+                Financial metrics, corporate events, disclosures, and management 
+                commentary automatically retrieved from SEC filings.
+            </li>
+            <li>
+                Manually curated financial and operating metrics sourced directly from SEC filings.
+            </li>
             <li>
                 Computed performance metrics such as margins, load factor, yield,
                 and unit performance derived from the sourced financial and operating data.
