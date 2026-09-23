@@ -403,8 +403,8 @@ def about_sidebar_html() -> str:
     return """
     <div style="font-size: 0.875rem;">
         <p>
-            Explore U.S. airline financial performance through clear and accessible
-            comparisons and the latest full-year and quarterly metrics.
+            Explore U.S. airline financial performance with interactive
+            comparisons, insights, and the latest full-year and quarterly metrics.
         </p>
         <p>
             The dashboard covers major publicly traded U.S. passenger airlines and includes data
