@@ -174,7 +174,7 @@ for col, page in zip(nav_cols, pages):
 # Define the list of stock tickers to display, excluding defunct airlines.
 STOCK_TICKERS = tuple(
     ticker
-    for ticker in AIRLINE_NAMES
+    for ticker in sorted(AIRLINE_NAMES)
     if ticker not in AIRLINE_GROUPS.get("Defunct Airlines", [])
 )
 # Define the stock ticker rendering function and schedule it to run every 60 seconds.
