@@ -81,26 +81,29 @@ AIRLINE_LOGO_FILES: dict[str, str] = {
     "SKYW": "logo_SKYW.png",
 }
 
+# Airline groupings for categorization in the dashboard follow the A4A (Airlines for America) classifications
 AIRLINE_GROUPS = {
-    "Major Global Airlines": [
+    "Global Network Carriers": [
         "AAL",
         "DAL",
         "UAL",
     ],
-    "Large National Airlines": [
+    "Low Cost Carriers": [
         "LUV",
-    ],
-    "Small & Midsize Airlines": [
-        "ALK",
         "JBLU",
-        "ULCC",
-        "HA",
-        "SAVE",
-        "ALGT",
-        "SNCY",
         "VA",
     ],
-    "Regional Airlines": [
+    "Lower Cost Network Carriers": [
+        "ALK",
+        "HA",
+    ],
+    "Ultra Low Cost Carriers": [
+        "ALGT",
+        "ULCC",
+        "SAVE",
+        "SNCY",
+    ],
+    "Regional Carriers": [
         "RJET",
         "SKYW",
     ],
@@ -411,7 +414,7 @@ def about_sidebar_html() -> str:
             beginning in 2014, a useful starting point for examining the industry
             following the major consolidation cycle of the 2000s and early 2010s when
             the legacy network airlines completed a series of mergers that reshaped
-            the industry.
+            the industry. Airlines are grouped according to the A4A (Airlines for America) classifications.
         </p>
         <p>
             The dashboard combines:
