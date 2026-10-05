@@ -177,7 +177,6 @@ with summary_col:
             f"**\\${avg_cost[airline]:.2f}**. "
             f"{sale_sentence}"
             f"{airline} last closed at **${close:.2f}**.<br>"
-            f"{auth_sentence}"
             f"Based on the current share price and sales made during the pandemic, "
             f"the repurchase campaign has netted {airline}:",
             unsafe_allow_html=True,
@@ -203,6 +202,7 @@ with summary_col:
             f"</h3></p>",
             unsafe_allow_html=True,
         )
+        st.markdown(f"{auth_sentence}<br>", unsafe_allow_html=True)
 
 with table_col:
     if fig_line is not None:
