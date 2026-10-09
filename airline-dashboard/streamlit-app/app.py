@@ -138,7 +138,7 @@ def _airline_sidebar_line(airline: str, earnings: dict) -> str:
                 f"<span style='display:block; "
                 f"margin-left:calc({logo_height_em}em + {gap_rem}rem); "
                 f"margin-top:-0.2rem; line-height:1;'>"
-                f"<small>{period_label} earnings {release_tense} on {date_label}</small></span>"
+                f"<small>{period_label} results {release_tense} on {date_label}</small></span>"
             )
         else:
             # Define the final information line
@@ -146,7 +146,7 @@ def _airline_sidebar_line(airline: str, earnings: dict) -> str:
                 f"<span style='display:block; "
                 f"margin-left:calc({logo_height_em}em + {gap_rem}rem); "
                 f"margin-top:-0.2rem; line-height:1;'>"
-                f"<small>Earnings release date TBA</small></span>"
+                f"<small>Earnings release date TBA.</small></span>"
             )
     # Construct the HTML label for the airline with its logo, name, and ticker.
     label = airline_label_html(
