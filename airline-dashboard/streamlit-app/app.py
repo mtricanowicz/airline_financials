@@ -19,6 +19,7 @@ import streamlit as st
 from lib.analytics import track_page_view
 from lib.data import (
     fetch_live_quotes,
+    fetch_earnings_dates,
 )
 
 from lib.formatting import (
@@ -36,6 +37,12 @@ _APP_DIR = Path(__file__).parent
 _ASSETS_DIR = _APP_DIR.parent / "assets"
 _BRANDING_DIR = _ASSETS_DIR / "branding"
 _MARKET_TZ = ZoneInfo("America/New_York")
+# Define the list of stock tickers, excluding defunct airlines, to use in the crawler and earnings dates.
+STOCK_TICKERS = tuple(
+    ticker
+    for ticker in sorted(AIRLINE_NAMES)
+    if ticker not in AIRLINE_GROUPS.get("Defunct Airlines", [])
+)
 
 
 def _is_market_open(now: dt.datetime | None = None) -> bool:
@@ -76,21 +83,84 @@ def _ticker_run_every() -> str:
     return f"{max(seconds, 60)}s"
 
 
-def _airline_sidebar_line(airline: str) -> str:
-    """Return one formatted airline line for the sidebar list."""
+def _airline_sidebar_line(airline: str, earnings: dict) -> str:
+    """Return one formatted airline line plus additional info for the sidebar list."""
+    # Define styling elements
+    logo_height_em = 1.05
+    gap_rem = 0.25
+    # Define the label and info lines for the sidebar entries
     if airline in AIRLINE_DEFUNCT_REASONS:
-        text = f"*{AIRLINE_NAMES.get(airline, airline)} ({airline}) - {AIRLINE_DEFUNCT_REASONS[airline]}*"
+        label_line = f"*{AIRLINE_NAMES.get(airline, airline)} ({airline})*"
+        info_line = (
+                f"<span style='display:block; "
+                f"margin-left:calc({logo_height_em}em + {gap_rem}rem); "
+                f"margin-top:-0.2rem; line-height:1;'>"
+                f"<small>*{AIRLINE_DEFUNCT_REASONS[airline]}*</small></span>"
+            )
     else:
-        text = f"{AIRLINE_NAMES.get(airline, airline)} ([{airline}]({AIRLINE_IR.get(airline, '#')}))"
-    return airline_label_html(
+        label_line = f"{AIRLINE_NAMES.get(airline, airline)} ([{airline}]({AIRLINE_IR.get(airline, '#')}))"
+        date_from = earnings.get("date_from")
+        date_to = earnings.get("date_to")
+        if date_from:
+            # Map fiscal periods to calendar dates
+            period_label = "Q4 and FY" if dt.date.fromisoformat(date_from).month <= 3 else (
+                "Q1" if dt.date.fromisoformat(date_from).month <= 6 else (
+                    "Q2" if dt.date.fromisoformat(date_from).month <= 9 else "Q3"
+                )
+            )
+            # Dynamic handling of earnings dates that are in the future or past
+            release_tense = "will be released" if dt.date.fromisoformat(date_from) >= dt.datetime.now(_MARKET_TZ).date() else "were released"
+            # Formatting the date or date ranges for readability
+            date_from_value = dt.date.fromisoformat(date_from)
+            date_to_value = dt.date.fromisoformat(date_to) if date_to else None
+            if date_to_value and date_to_value != date_from_value:
+                if (date_from_value.year, date_from_value.month) == (
+                    date_to_value.year,
+                    date_to_value.month,
+                ):
+                    date_label = (
+                        f"{date_from_value:%B %d}–{date_to_value:%d, %Y} (estimated)"
+                    )
+                elif date_from_value.year == date_to_value.year:
+                    date_label = (
+                        f"{date_from_value:%B %d}–"
+                        f"{date_to_value:%B %d, %Y} (estimated)"
+                    )
+                else:
+                    date_label = (
+                        f"{date_from_value:%B %d, %Y}–"
+                        f"{date_to_value:%B %d, %Y} (estimated)"
+                    )
+            else:
+                date_label = date_from_value.strftime("%B %d, %Y")
+            # Define the final information line
+            info_line = (
+                f"<span style='display:block; "
+                f"margin-left:calc({logo_height_em}em + {gap_rem}rem); "
+                f"margin-top:-0.2rem; line-height:1;'>"
+                f"<small>{period_label} earnings {release_tense} on {date_label}</small></span>"
+            )
+        else:
+            # Define the final information line
+            info_line = (
+                f"<span style='display:block; "
+                f"margin-left:calc({logo_height_em}em + {gap_rem}rem); "
+                f"margin-top:-0.2rem; line-height:1;'>"
+                f"<small>Earnings release date TBA</small></span>"
+            )
+    # Construct the HTML label for the airline with its logo, name, and ticker.
+    label = airline_label_html(
         airline,
-        text=text,
-        logo_height_em=1.05,
+        text=label_line,
+        logo_height_em=logo_height_em,
         logo_before_text=True,
-        gap_rem=0.25,
+        gap_rem=gap_rem,
         font_size="0.875rem",
         logo_alignment="flex-start",
     )
+    # Output the combined label and info line for the sidebar.
+    return label + info_line
+
 
 st.set_page_config(
     page_title="Airline Financial Dashboard",
@@ -129,10 +199,14 @@ with st.sidebar:
             unsafe_allow_html=True
         )
     with st.expander("Airlines Covered", expanded=True):
+        earnings_dates = fetch_earnings_dates(STOCK_TICKERS)
         for group in (g for g in AIRLINE_GROUPS if g != "Defunct Airlines"):
             st.markdown(f"#### {group}", unsafe_allow_html=True)
             for airline in sorted(AIRLINE_GROUPS[group], key=lambda airline: AIRLINE_NAMES.get(airline, airline)):
-                st.markdown(_airline_sidebar_line(airline), unsafe_allow_html=True)
+                st.markdown(
+                    _airline_sidebar_line(airline, earnings_dates.get(airline, {})),
+                    unsafe_allow_html=True,
+                )
         st.markdown("<small><br>Active airlines<br>*Defunct airlines*</small>", unsafe_allow_html=True)
     with st.expander("Other Industry Dashboards", expanded=True):
         st.markdown(
@@ -171,12 +245,6 @@ for col, page in zip(nav_cols, pages):
 
 
 # Stock ticker setup and rendering
-# Define the list of stock tickers to display, excluding defunct airlines.
-STOCK_TICKERS = tuple(
-    ticker
-    for ticker in sorted(AIRLINE_NAMES)
-    if ticker not in AIRLINE_GROUPS.get("Defunct Airlines", [])
-)
 # Define the stock ticker rendering function and schedule it to run every 60 seconds.
 @st.fragment(run_every=_ticker_run_every())
 def render_stock_ticker() -> None:
@@ -194,4 +262,3 @@ render_stock_ticker()
 
 # Run the current page.
 current_page.run()
-

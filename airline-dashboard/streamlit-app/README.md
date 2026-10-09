@@ -15,6 +15,9 @@ the reference and fallback front end. The primary front end is the Next.js app i
   `@st.cache_data`. The app never scrapes or recomputes at request time.
 - Live stock prices come from the separate [`../quotes-api`](../quotes-api)
   service rather than an in-process download.
+- Sidebar earnings dates use one batched request for all active tickers, cached
+  for 24 hours; individual airline labels only format the fetched data. The next
+  request after expiry refreshes the cache.
 
 ## Pages
 

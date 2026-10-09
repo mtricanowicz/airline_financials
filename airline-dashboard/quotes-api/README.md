@@ -11,9 +11,31 @@ static JSON by the core pipeline and served by the front ends directly.
 | --- | --- | --- |
 | GET | `/health` | Liveness probe, returns `{"status": "ok"}`. |
 | GET | `/quotes?tickers=AAL,DAL,UAL,LUV` | Last close, day change, and change percent per ticker. |
+| GET | `/earnings?tickers=AAL,DAL,UAL,LUV` | Next earnings date (or estimated date range) per ticker. |
 
 Quotes are cached in-memory for the current trading day, so the upstream provider
 is queried at most once per ticker per day.
+
+Earnings calendars are also cached in-memory for the current day. Dates come
+from Yahoo Finance via yfinance and may be estimates, missing, or returned as a
+range; they are not guaranteed confirmed release dates. For example:
+
+```json
+{
+  "earnings": [
+    {
+      "ticker": "AAL",
+      "date_from": "2026-10-22",
+      "date_to": "2026-10-23",
+      "error": null
+    }
+  ]
+}
+```
+
+If no upcoming date is available, `date_from` and `date_to` are `null` and
+`error` is `"no upcoming date"`. Provider failures return `"fetch failed"` and
+are not cached, allowing a later request to retry.
 
 ## Local development
 
