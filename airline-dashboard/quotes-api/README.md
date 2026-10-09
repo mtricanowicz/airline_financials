@@ -16,7 +16,10 @@ static JSON by the core pipeline and served by the front ends directly.
 Quotes are cached in-memory for the current trading day, so the upstream provider
 is queried at most once per ticker per day.
 
-Earnings calendars are also cached in-memory for the current day. Dates come
+Earnings calendars are cached in-memory per ticker for 24 hours from the fetch
+(not reset at midnight). Each fetch retries a few times; failures are never
+cached, an empty calendar is cached for only an hour, and the last known date is
+served if a refresh comes back empty before that date passes. Dates come
 from Yahoo Finance via yfinance and may be estimates, missing, or returned as a
 range; they are not guaranteed confirmed release dates. For example:
 
