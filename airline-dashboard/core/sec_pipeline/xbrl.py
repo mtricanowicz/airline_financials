@@ -78,11 +78,11 @@ DURATION_METRICS: dict[str, list[str]] = {
 
 INSTANT_METRICS: dict[str, list[str]] = {
     "Long-Term Debt": [
-        "LongTermDebt",
         "LongTermDebtNoncurrent",
         "LongTermDebtAndCapitalLeaseObligations",
-        "LongTermDebtAndFinanceLeaseObligationsNoncurrent",
         "LongTermDebtAndCapitalLeaseObligationsNoncurrent",
+        "LongTermDebtAndFinanceLeaseObligationsNoncurrent",
+        "LongTermDebt",
         "FinanceLeaseLiabilityNoncurrent",
     ],
     "Current Maturities": [

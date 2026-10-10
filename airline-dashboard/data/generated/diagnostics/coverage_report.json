@@ -39,11 +39,11 @@
   ],
   "exclude_future_periods": true,
   "summary_rows": 224,
-  "detail_rows": 2203,
+  "detail_rows": 2316,
   "reason_counts": {
+    "NO_AUTO_ROW": 744,
     "NO_MANUAL_ROW": 736,
-    "NO_AUTO_ROW": 660,
-    "NO_MANUAL_VALUE": 425,
-    "NO_AUTO_VALUE": 382
+    "NO_MANUAL_VALUE": 453,
+    "NO_AUTO_VALUE": 383
   }
 }

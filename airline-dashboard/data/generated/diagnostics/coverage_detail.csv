@@ -1,4 +1,33 @@
 airline,year,quarter,metric,source_type,reason_code
+AAL,2026,Q3,ASM,manual_only,NO_MANUAL_VALUE
+AAL,2026,Q3,Capital Expenditures,auto_xbrl,NO_AUTO_ROW
+AAL,2026,Q3,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
+AAL,2026,Q3,Current Maturities,auto_xbrl,NO_AUTO_ROW
+AAL,2026,Q3,Earnings Per Share,auto_xbrl,NO_AUTO_ROW
+AAL,2026,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
+AAL,2026,Q3,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
+AAL,2026,Q3,Net Income,auto_xbrl,NO_AUTO_ROW
+AAL,2026,Q3,Operating Cash Flow,auto_xbrl,NO_AUTO_ROW
+AAL,2026,Q3,Operating Expenses,auto_xbrl,NO_AUTO_ROW
+AAL,2026,Q3,Operating Income,auto_xbrl,NO_AUTO_ROW
+AAL,2026,Q3,Operating Revenue,auto_xbrl,NO_AUTO_ROW
+AAL,2026,Q3,Passenger Revenue,manual_only,NO_MANUAL_VALUE
+AAL,2026,Q3,Profit Sharing,manual_only,NO_MANUAL_VALUE
+AAL,2026,Q3,RPM,manual_only,NO_MANUAL_VALUE
+AAL,2026,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_ROW
+ALGT,2026,Q3,ASM,manual_only,NO_MANUAL_VALUE
+ALGT,2026,Q3,Capital Expenditures,auto_xbrl,NO_AUTO_ROW
+ALGT,2026,Q3,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
+ALGT,2026,Q3,Current Maturities,auto_xbrl,NO_AUTO_ROW
+ALGT,2026,Q3,Earnings Per Share,auto_xbrl,NO_AUTO_ROW
+ALGT,2026,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ALGT,2026,Q3,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
+ALGT,2026,Q3,Net Income,auto_xbrl,NO_AUTO_ROW
+ALGT,2026,Q3,Operating Cash Flow,auto_xbrl,NO_AUTO_ROW
+ALGT,2026,Q3,Operating Expenses,auto_xbrl,NO_AUTO_ROW
+ALGT,2026,Q3,Operating Income,auto_xbrl,NO_AUTO_ROW
+ALGT,2026,Q3,Operating Revenue,auto_xbrl,NO_AUTO_ROW
+ALGT,2026,Q3,Passenger Revenue,manual_only,NO_MANUAL_VALUE
 ALGT,2014,FY,Profit Sharing,manual_only,NO_MANUAL_VALUE
 ALGT,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_VALUE
 ALGT,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_VALUE
@@ -61,6 +90,8 @@ ALGT,2025,Q3,Profit Sharing,manual_only,NO_MANUAL_VALUE
 ALGT,2025,Q4,Profit Sharing,manual_only,NO_MANUAL_VALUE
 ALGT,2026,Q1,Profit Sharing,manual_only,NO_MANUAL_VALUE
 ALGT,2026,Q2,Profit Sharing,manual_only,NO_MANUAL_VALUE
+ALGT,2026,Q3,Profit Sharing,manual_only,NO_MANUAL_VALUE
+ALGT,2026,Q3,RPM,manual_only,NO_MANUAL_VALUE
 ALGT,2014,FY,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 ALGT,2014,Q1,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 ALGT,2014,Q2,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
@@ -82,6 +113,20 @@ ALGT,2017,Q2,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 ALGT,2017,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 ALGT,2017,Q4,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 ALGT,2018,Q1,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
+ALGT,2026,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_ROW
+ALK,2026,Q3,ASM,manual_only,NO_MANUAL_VALUE
+ALK,2026,Q3,Capital Expenditures,auto_xbrl,NO_AUTO_ROW
+ALK,2026,Q3,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
+ALK,2026,Q3,Current Maturities,auto_xbrl,NO_AUTO_ROW
+ALK,2026,Q3,Earnings Per Share,auto_xbrl,NO_AUTO_ROW
+ALK,2026,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
+ALK,2026,Q3,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
+ALK,2026,Q3,Net Income,auto_xbrl,NO_AUTO_ROW
+ALK,2026,Q3,Operating Cash Flow,auto_xbrl,NO_AUTO_ROW
+ALK,2026,Q3,Operating Expenses,auto_xbrl,NO_AUTO_ROW
+ALK,2026,Q3,Operating Income,auto_xbrl,NO_AUTO_ROW
+ALK,2026,Q3,Operating Revenue,auto_xbrl,NO_AUTO_ROW
+ALK,2026,Q3,Passenger Revenue,manual_only,NO_MANUAL_VALUE
 ALK,2014,FY,Profit Sharing,manual_only,NO_MANUAL_VALUE
 ALK,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_VALUE
 ALK,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_VALUE
@@ -144,6 +189,9 @@ ALK,2025,Q3,Profit Sharing,manual_only,NO_MANUAL_VALUE
 ALK,2025,Q4,Profit Sharing,manual_only,NO_MANUAL_VALUE
 ALK,2026,Q1,Profit Sharing,manual_only,NO_MANUAL_VALUE
 ALK,2026,Q2,Profit Sharing,manual_only,NO_MANUAL_VALUE
+ALK,2026,Q3,Profit Sharing,manual_only,NO_MANUAL_VALUE
+ALK,2026,Q3,RPM,manual_only,NO_MANUAL_VALUE
+ALK,2026,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_ROW
 DAL,2019,Q1,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 DAL,2025,FY,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 DAL,2025,Q1,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
@@ -152,6 +200,7 @@ DAL,2025,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 DAL,2025,Q4,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 DAL,2026,Q1,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 DAL,2026,Q2,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
+DAL,2026,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 HA,2014,FY,Profit Sharing,manual_only,NO_MANUAL_VALUE
 HA,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_VALUE
 HA,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_VALUE
@@ -204,6 +253,19 @@ HA,2023,Q3,Profit Sharing,manual_only,NO_MANUAL_VALUE
 HA,2023,Q4,Profit Sharing,manual_only,NO_MANUAL_VALUE
 HA,2024,Q1,Profit Sharing,manual_only,NO_MANUAL_VALUE
 HA,2024,Q2,Profit Sharing,manual_only,NO_MANUAL_VALUE
+JBLU,2026,Q3,ASM,manual_only,NO_MANUAL_VALUE
+JBLU,2026,Q3,Capital Expenditures,auto_xbrl,NO_AUTO_ROW
+JBLU,2026,Q3,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
+JBLU,2026,Q3,Current Maturities,auto_xbrl,NO_AUTO_ROW
+JBLU,2026,Q3,Earnings Per Share,auto_xbrl,NO_AUTO_ROW
+JBLU,2026,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
+JBLU,2026,Q3,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
+JBLU,2026,Q3,Net Income,auto_xbrl,NO_AUTO_ROW
+JBLU,2026,Q3,Operating Cash Flow,auto_xbrl,NO_AUTO_ROW
+JBLU,2026,Q3,Operating Expenses,auto_xbrl,NO_AUTO_ROW
+JBLU,2026,Q3,Operating Income,auto_xbrl,NO_AUTO_ROW
+JBLU,2026,Q3,Operating Revenue,auto_xbrl,NO_AUTO_ROW
+JBLU,2026,Q3,Passenger Revenue,manual_only,NO_MANUAL_VALUE
 JBLU,2014,FY,Profit Sharing,manual_only,NO_MANUAL_VALUE
 JBLU,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_VALUE
 JBLU,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_VALUE
@@ -266,8 +328,27 @@ JBLU,2025,Q3,Profit Sharing,manual_only,NO_MANUAL_VALUE
 JBLU,2025,Q4,Profit Sharing,manual_only,NO_MANUAL_VALUE
 JBLU,2026,Q1,Profit Sharing,manual_only,NO_MANUAL_VALUE
 JBLU,2026,Q2,Profit Sharing,manual_only,NO_MANUAL_VALUE
+JBLU,2026,Q3,Profit Sharing,manual_only,NO_MANUAL_VALUE
+JBLU,2026,Q3,RPM,manual_only,NO_MANUAL_VALUE
+JBLU,2026,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_ROW
+LUV,2026,Q3,ASM,manual_only,NO_MANUAL_VALUE
+LUV,2026,Q3,Capital Expenditures,auto_xbrl,NO_AUTO_ROW
+LUV,2026,Q3,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
+LUV,2026,Q3,Current Maturities,auto_xbrl,NO_AUTO_ROW
+LUV,2026,Q3,Earnings Per Share,auto_xbrl,NO_AUTO_ROW
+LUV,2026,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
+LUV,2026,Q3,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
+LUV,2026,Q3,Net Income,auto_xbrl,NO_AUTO_ROW
+LUV,2026,Q3,Operating Cash Flow,auto_xbrl,NO_AUTO_ROW
+LUV,2026,Q3,Operating Expenses,auto_xbrl,NO_AUTO_ROW
+LUV,2026,Q3,Operating Income,auto_xbrl,NO_AUTO_ROW
+LUV,2026,Q3,Operating Revenue,auto_xbrl,NO_AUTO_ROW
+LUV,2026,Q3,Passenger Revenue,manual_only,NO_MANUAL_VALUE
+LUV,2026,Q3,Profit Sharing,manual_only,NO_MANUAL_VALUE
+LUV,2026,Q3,RPM,manual_only,NO_MANUAL_VALUE
 LUV,2026,Q1,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 LUV,2026,Q2,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
+LUV,2026,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_ROW
 RJET,2014,FY,ASM,manual_only,NO_MANUAL_ROW
 RJET,2014,Q1,ASM,manual_only,NO_MANUAL_ROW
 RJET,2014,Q2,ASM,manual_only,NO_MANUAL_ROW
@@ -1631,6 +1712,22 @@ SNCY,2019,Q1,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 SNCY,2019,Q2,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 SNCY,2019,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 SNCY,2019,Q4,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
+UAL,2026,Q3,ASM,manual_only,NO_MANUAL_VALUE
+UAL,2026,Q3,Capital Expenditures,auto_xbrl,NO_AUTO_ROW
+UAL,2026,Q3,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
+UAL,2026,Q3,Current Maturities,auto_xbrl,NO_AUTO_ROW
+UAL,2026,Q3,Earnings Per Share,auto_xbrl,NO_AUTO_ROW
+UAL,2026,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
+UAL,2026,Q3,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
+UAL,2026,Q3,Net Income,auto_xbrl,NO_AUTO_ROW
+UAL,2026,Q3,Operating Cash Flow,auto_xbrl,NO_AUTO_ROW
+UAL,2026,Q3,Operating Expenses,auto_xbrl,NO_AUTO_ROW
+UAL,2026,Q3,Operating Income,auto_xbrl,NO_AUTO_ROW
+UAL,2026,Q3,Operating Revenue,auto_xbrl,NO_AUTO_ROW
+UAL,2026,Q3,Passenger Revenue,manual_only,NO_MANUAL_VALUE
+UAL,2026,Q3,Profit Sharing,manual_only,NO_MANUAL_VALUE
+UAL,2026,Q3,RPM,manual_only,NO_MANUAL_VALUE
+UAL,2026,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,FY,ASM,manual_only,NO_MANUAL_ROW
 ULCC,2014,Q1,ASM,manual_only,NO_MANUAL_ROW
 ULCC,2014,Q2,ASM,manual_only,NO_MANUAL_ROW
@@ -1661,6 +1758,7 @@ ULCC,2019,Q1,ASM,manual_only,NO_MANUAL_ROW
 ULCC,2019,Q2,ASM,manual_only,NO_MANUAL_ROW
 ULCC,2019,Q3,ASM,manual_only,NO_MANUAL_ROW
 ULCC,2019,Q4,ASM,manual_only,NO_MANUAL_ROW
+ULCC,2026,Q3,ASM,manual_only,NO_MANUAL_VALUE
 ULCC,2014,FY,Capital Expenditures,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Capital Expenditures,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Capital Expenditures,auto_xbrl,NO_AUTO_ROW
@@ -1691,6 +1789,7 @@ ULCC,2019,Q2,Capital Expenditures,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Capital Expenditures,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Capital Expenditures,auto_xbrl,NO_AUTO_VALUE
 ULCC,2026,Q2,Capital Expenditures,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q3,Capital Expenditures,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,FY,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
@@ -1715,6 +1814,7 @@ ULCC,2018,Q1,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
 ULCC,2018,Q2,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
 ULCC,2018,Q3,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
 ULCC,2026,Q2,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q3,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,FY,Current Maturities,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Current Maturities,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Current Maturities,auto_xbrl,NO_AUTO_ROW
@@ -1746,6 +1846,7 @@ ULCC,2019,Q2,Current Maturities,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Current Maturities,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Current Maturities,auto_xbrl,NO_AUTO_VALUE
 ULCC,2026,Q2,Current Maturities,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q3,Current Maturities,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,FY,Earnings Per Share,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Earnings Per Share,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Earnings Per Share,auto_xbrl,NO_AUTO_ROW
@@ -1776,6 +1877,7 @@ ULCC,2019,Q2,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
 ULCC,2026,Q2,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q3,Earnings Per Share,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,FY,Interest Expense,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Interest Expense,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Interest Expense,auto_xbrl,NO_AUTO_ROW
@@ -1806,6 +1908,7 @@ ULCC,2019,Q2,Interest Expense,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Interest Expense,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Interest Expense,auto_xbrl,NO_AUTO_VALUE
 ULCC,2026,Q2,Interest Expense,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q3,Interest Expense,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,FY,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
@@ -1837,6 +1940,7 @@ ULCC,2019,Q2,Long-Term Debt,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Long-Term Debt,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Long-Term Debt,auto_xbrl,NO_AUTO_VALUE
 ULCC,2026,Q2,Long-Term Debt,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q3,Long-Term Debt,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,FY,Net Income,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Net Income,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Net Income,auto_xbrl,NO_AUTO_ROW
@@ -1867,6 +1971,7 @@ ULCC,2019,Q2,Net Income,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Net Income,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Net Income,auto_xbrl,NO_AUTO_VALUE
 ULCC,2026,Q2,Net Income,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q3,Net Income,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,FY,Operating Cash Flow,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Operating Cash Flow,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Operating Cash Flow,auto_xbrl,NO_AUTO_ROW
@@ -1897,6 +2002,7 @@ ULCC,2019,Q2,Operating Cash Flow,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Operating Cash Flow,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Operating Cash Flow,auto_xbrl,NO_AUTO_VALUE
 ULCC,2026,Q2,Operating Cash Flow,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q3,Operating Cash Flow,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,FY,Operating Expenses,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Operating Expenses,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Operating Expenses,auto_xbrl,NO_AUTO_ROW
@@ -1927,6 +2033,7 @@ ULCC,2019,Q2,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
 ULCC,2026,Q2,Operating Expenses,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q3,Operating Expenses,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,FY,Operating Income,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Operating Income,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Operating Income,auto_xbrl,NO_AUTO_ROW
@@ -1957,6 +2064,7 @@ ULCC,2019,Q2,Operating Income,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Operating Income,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Operating Income,auto_xbrl,NO_AUTO_VALUE
 ULCC,2026,Q2,Operating Income,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q3,Operating Income,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,FY,Operating Revenue,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Operating Revenue,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Operating Revenue,auto_xbrl,NO_AUTO_ROW
@@ -1987,6 +2095,7 @@ ULCC,2019,Q2,Operating Revenue,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q3,Operating Revenue,auto_xbrl,NO_AUTO_VALUE
 ULCC,2019,Q4,Operating Revenue,auto_xbrl,NO_AUTO_VALUE
 ULCC,2026,Q2,Operating Revenue,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q3,Operating Revenue,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,FY,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ULCC,2014,Q1,Passenger Revenue,manual_only,NO_MANUAL_ROW
 ULCC,2014,Q2,Passenger Revenue,manual_only,NO_MANUAL_ROW
@@ -2022,6 +2131,7 @@ ULCC,2020,Q1,Passenger Revenue,manual_only,NO_MANUAL_VALUE
 ULCC,2020,Q2,Passenger Revenue,manual_only,NO_MANUAL_VALUE
 ULCC,2020,Q3,Passenger Revenue,manual_only,NO_MANUAL_VALUE
 ULCC,2020,Q4,Passenger Revenue,manual_only,NO_MANUAL_VALUE
+ULCC,2026,Q3,Passenger Revenue,manual_only,NO_MANUAL_VALUE
 ULCC,2014,FY,Profit Sharing,manual_only,NO_MANUAL_ROW
 ULCC,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_ROW
 ULCC,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_ROW
@@ -2084,6 +2194,7 @@ ULCC,2025,Q3,Profit Sharing,manual_only,NO_MANUAL_VALUE
 ULCC,2025,Q4,Profit Sharing,manual_only,NO_MANUAL_VALUE
 ULCC,2026,Q1,Profit Sharing,manual_only,NO_MANUAL_VALUE
 ULCC,2026,Q2,Profit Sharing,manual_only,NO_MANUAL_VALUE
+ULCC,2026,Q3,Profit Sharing,manual_only,NO_MANUAL_VALUE
 ULCC,2014,FY,RPM,manual_only,NO_MANUAL_ROW
 ULCC,2014,Q1,RPM,manual_only,NO_MANUAL_ROW
 ULCC,2014,Q2,RPM,manual_only,NO_MANUAL_ROW
@@ -2114,6 +2225,7 @@ ULCC,2019,Q1,RPM,manual_only,NO_MANUAL_ROW
 ULCC,2019,Q2,RPM,manual_only,NO_MANUAL_ROW
 ULCC,2019,Q3,RPM,manual_only,NO_MANUAL_ROW
 ULCC,2019,Q4,RPM,manual_only,NO_MANUAL_ROW
+ULCC,2026,Q3,RPM,manual_only,NO_MANUAL_VALUE
 ULCC,2014,FY,Short-Term Investments,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q1,Short-Term Investments,auto_xbrl,NO_AUTO_ROW
 ULCC,2014,Q2,Short-Term Investments,auto_xbrl,NO_AUTO_ROW
@@ -2176,6 +2288,7 @@ ULCC,2025,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 ULCC,2025,Q4,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 ULCC,2026,Q1,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
 ULCC,2026,Q2,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_ROW
 VA,2014,FY,Profit Sharing,manual_only,NO_MANUAL_VALUE
 VA,2014,Q1,Profit Sharing,manual_only,NO_MANUAL_VALUE
 VA,2014,Q2,Profit Sharing,manual_only,NO_MANUAL_VALUE
