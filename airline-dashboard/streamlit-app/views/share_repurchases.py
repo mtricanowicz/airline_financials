@@ -30,7 +30,7 @@ if repurchases.empty:
 
 # Post-pandemic repurchase authorization and resumption, sourced from filings.
 AUTHORIZATION = {"AAL": None, "DAL": datetime(2025, 4, 29), "UAL": datetime(2024, 10, 15)}
-RESUMPTION = {"AAL": None, "DAL": "2025Q2", "UAL": "2024Q4"}
+RESUMPTION = {"AAL": None, "DAL": None, "UAL": "2024Q4"}
 
 # Daily gain/loss history starts the quarter after buybacks were paused for Covid.
 COVID_START = "2020-04-01"
@@ -166,10 +166,15 @@ with summary_col:
             f"The average share price of sale was **\\${s_avg:.2f}**. "
         ) if s_shares else ""
         auth = AUTHORIZATION.get(airline)
+        resumption = RESUMPTION.get(airline)
+        resumption_sentence = (
+            f" and resumed share repurchases during **{resumption}**"
+            ) if auth and resumption else (
+                f" but no shares have been repurchased under this program"
+                ) if auth else ""
         auth_sentence = (
-            f"{airline} authorized its first post-pandemic share repurchase program on "
-            f"**{auth.strftime('%B %d, %Y')}** and resumed share repurchases during "
-            f"**{RESUMPTION[airline]}**.<br>"
+            f"{airline} authorized its first post-pandemic share repurchase program on **{auth.strftime('%B %d, %Y')}**"
+            + resumption_sentence + ".<br>"
         ) if auth else ""
         st.markdown(
             f"{airline} repurchased **{total_shares[airline]:.1f} million** shares at a total cost of "
