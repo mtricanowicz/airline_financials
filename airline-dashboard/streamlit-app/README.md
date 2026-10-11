@@ -15,9 +15,11 @@ the reference and fallback front end. The primary front end is the Next.js app i
   `@st.cache_data`. The app never scrapes or recomputes at request time.
 - Live stock prices come from the separate [`../quotes-api`](../quotes-api)
   service rather than an in-process download.
-- Sidebar earnings dates use one batched request for the active tickers. Each
-  ticker's date is cached process-wide for 24 hours from when it was fetched;
-  missing or failed tickers are not cached and are retried at most every 5
+- Sidebar earnings dates use one batched request (15s timeout) for the active
+  tickers. Each ticker's date, past or upcoming, is cached process-wide for 24
+  hours from when it was fetched. If the API returns no date, a cached date is
+  kept for another hour only while it is still upcoming; otherwise the ticker
+  shows TBA. Failed requests change nothing and are retried at most every 5
   minutes, while already-fetched dates keep being served. Individual airline
   labels only format the fetched data.
 
