@@ -193,7 +193,7 @@ with summary_col:
         ) / 1000
         net_values[airline] = round(net, 1)
         color = "green" if round(net, 1) > 0 else "red" if round(net, 1) < 0 else "black"
-        ratio = net / total_cost[airline] / 1000
+        ratio = net / (total_cost[airline] / 1000)
         emoji = (
             "🔥💰🔥" if round(net, 1) < 0
             else "🤷" if round(net, 1) == 0
