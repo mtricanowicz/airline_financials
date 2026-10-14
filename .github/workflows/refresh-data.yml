@@ -18,6 +18,27 @@ on:
       periods:
         description: "Space-separated periods, e.g. Q2 (defaults to latest completed period)"
         required: false
+      sources:
+        description: "Financial metric sources"
+        type: choice
+        options: [both, auto, manual]
+        default: both
+      overwrite:
+        description: "Replace supplied financial metrics in the selected slice (never erase with nulls)"
+        type: boolean
+        default: false
+      use_filing_parser:
+        description: "Enrich auto metrics with filing-level XBRL (skipped for manual-only)"
+        type: boolean
+        default: true
+      share_data:
+        description: "Rebuild the full, unscoped share repurchase/sale history"
+        type: boolean
+        default: false
+      generate_insights:
+        description: "Generate SEC/LLM insights before publishing"
+        type: boolean
+        default: true
   schedule:
     # 06:00 UTC on the 15th day of Feb, May, Aug, Nov
     - cron: "0 6 15 2,8,11 *"
@@ -47,6 +68,16 @@ jobs:
         run: pip install -e .
       - name: Determine run parameters
         id: params
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_AIRLINES: ${{ inputs.airlines }}
+          INPUT_YEARS: ${{ inputs.years }}
+          INPUT_PERIODS: ${{ inputs.periods }}
+          INPUT_SOURCES: ${{ inputs.sources }}
+          INPUT_OVERWRITE: ${{ inputs.overwrite }}
+          INPUT_FILING_PARSER: ${{ inputs.use_filing_parser }}
+          INPUT_SHARE_DATA: ${{ inputs.share_data }}
+          INPUT_INSIGHTS: ${{ inputs.generate_insights }}
         run: |
           month="$(date -u +%m)"
           year="$(date -u +%Y)"
@@ -70,17 +101,27 @@ jobs:
               ;;
           esac
 
-          if [ "${{ github.event_name }}" = "schedule" ]; then
-            airlines="AAL DAL UAL LUV ALK JBLU ULCC"
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            airlines="AAL DAL UAL LUV ALK JBLU ULCC ALGT RJET SKYW"
             years="$default_year"
             periods="$default_period"
+            sources="both"
+            overwrite="false"
+            filing_parser="false"
+            share_data="false"
+            insights="true"
           else
-            airlines="${{ github.event.inputs.airlines }}"
-            years="${{ github.event.inputs.years }}"
-            periods="${{ github.event.inputs.periods }}"
+            airlines="$INPUT_AIRLINES"
+            years="$INPUT_YEARS"
+            periods="$INPUT_PERIODS"
+            sources="${INPUT_SOURCES:-both}"
+            overwrite="${INPUT_OVERWRITE:-false}"
+            filing_parser="${INPUT_FILING_PARSER:-true}"
+            share_data="${INPUT_SHARE_DATA:-false}"
+            insights="${INPUT_INSIGHTS:-true}"
 
             if [ -z "$airlines" ]; then
-              airlines="AAL DAL UAL LUV ALK JBLU ULCC"
+              airlines="AAL DAL UAL LUV ALK JBLU ULCC ALGT RJET SKYW"
             fi
             if [ -z "$years" ]; then
               years="$default_year"
@@ -90,17 +131,80 @@ jobs:
             fi
           fi
 
-          echo "airlines=$airlines" >> "$GITHUB_OUTPUT"
-          echo "years=$years" >> "$GITHUB_OUTPUT"
-          echo "periods=$periods" >> "$GITHUB_OUTPUT"
+          for value in "$airlines" "$years" "$periods"; do
+            if [[ "$value" == *$'\n'* || "$value" == *$'\r'* ]]; then
+              echo "::error::Selections must be single-line, space-separated lists"
+              exit 1
+            fi
+          done
+          read -r -a airline_args <<< "$airlines"
+          read -r -a year_args <<< "$years"
+          read -r -a period_args <<< "$periods"
+          if (( ${#airline_args[@]} == 0 || ${#year_args[@]} == 0 || ${#period_args[@]} == 0 )); then
+            echo "::error::Selections must not be empty"
+            exit 1
+          fi
+          for airline in "${airline_args[@]}"; do
+            [[ "$airline" =~ ^[A-Z][A-Z0-9]*$ ]] || { echo "::error::Invalid airline: $airline"; exit 1; }
+          done
+          for year in "${year_args[@]}"; do
+            [[ "$year" =~ ^[0-9]{4}$ ]] || { echo "::error::Invalid year: $year"; exit 1; }
+          done
+          for period in "${period_args[@]}"; do
+            [[ "$period" =~ ^(Q[1-4]|FY)$ ]] || { echo "::error::Invalid period: $period"; exit 1; }
+          done
+          case "$sources" in
+            both) sources="auto manual" ;;
+            auto) ;;
+            manual) filing_parser="false" ;;
+            *) echo "::error::Invalid financial sources"; exit 1 ;;
+          esac
+          for flag in "$overwrite" "$filing_parser" "$share_data" "$insights"; do
+            [[ "$flag" == "true" || "$flag" == "false" ]] || { echo "::error::Invalid boolean input"; exit 1; }
+          done
+
+          echo "airlines=${airline_args[*]}" >> "$GITHUB_OUTPUT"
+          echo "years=${year_args[*]}" >> "$GITHUB_OUTPUT"
+          echo "periods=${period_args[*]}" >> "$GITHUB_OUTPUT"
+          echo "sources=$sources" >> "$GITHUB_OUTPUT"
+          echo "overwrite=$overwrite" >> "$GITHUB_OUTPUT"
+          echo "filing_parser=$filing_parser" >> "$GITHUB_OUTPUT"
+          echo "share_data=$share_data" >> "$GITHUB_OUTPUT"
+          echo "insights=$insights" >> "$GITHUB_OUTPUT"
 
           echo "Using airlines: $airlines"
           echo "Using years: $years"
           echo "Using periods: $periods"
-      - name: Build financials and buybacks
-        run: python -m scripts.build_data --airlines ${{ steps.params.outputs.airlines }} --years ${{ steps.params.outputs.years }} --periods ${{ steps.params.outputs.periods }}
+      - name: Build financials and optional buybacks
+        env:
+          AIRLINES: ${{ steps.params.outputs.airlines }}
+          YEARS: ${{ steps.params.outputs.years }}
+          PERIODS: ${{ steps.params.outputs.periods }}
+          SOURCES: ${{ steps.params.outputs.sources }}
+          OVERWRITE: ${{ steps.params.outputs.overwrite }}
+          FILING_PARSER: ${{ steps.params.outputs.filing_parser }}
+          SHARE_DATA: ${{ steps.params.outputs.share_data }}
+        run: |
+          read -r -a airlines <<< "$AIRLINES"
+          read -r -a years <<< "$YEARS"
+          read -r -a periods <<< "$PERIODS"
+          read -r -a sources <<< "$SOURCES"
+          flags=()
+          if [ "$OVERWRITE" = "true" ]; then flags+=(--overwrite); fi
+          if [ "$FILING_PARSER" = "true" ]; then flags+=(--use-filing-parser); fi
+          if [ "$SHARE_DATA" = "true" ]; then flags+=(--share-data); fi
+          python -m scripts.build_data --airlines "${airlines[@]}" --years "${years[@]}" --periods "${periods[@]}" --sources "${sources[@]}" "${flags[@]}"
       - name: Generate insights
-        run: python -m sec_pipeline.pipeline --airlines ${{ steps.params.outputs.airlines }} --years ${{ steps.params.outputs.years }} --periods ${{ steps.params.outputs.periods }}
+        if: steps.params.outputs.insights == 'true'
+        env:
+          AIRLINES: ${{ steps.params.outputs.airlines }}
+          YEARS: ${{ steps.params.outputs.years }}
+          PERIODS: ${{ steps.params.outputs.periods }}
+        run: |
+          read -r -a airlines <<< "$AIRLINES"
+          read -r -a years <<< "$YEARS"
+          read -r -a periods <<< "$PERIODS"
+          python -m sec_pipeline.pipeline --airlines "${airlines[@]}" --years "${years[@]}" --periods "${periods[@]}"
       - name: Commit refreshed generated data
         if: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' }}
         env:

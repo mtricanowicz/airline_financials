@@ -26,6 +26,30 @@ from the `paths`, `working-directory`, and `--source` values.
 | `deploy.yml` | manual / after CI on main | Deploy quotes-api, Streamlit, and the static site. |
 | `refresh-data.yml` | quarterly cron / manual | Rebuild datasets and insights, then redeploy Streamlit and the site. |
 
+### Manual refresh parameters
+
+In GitHub Actions, select **Refresh data > Run workflow**:
+
+| Input | Default | Behavior |
+| --- | --- | --- |
+| `airlines`, `years`, `periods` | Current airline set / latest completed period | Space-separated lists; all selected combinations are eligible for financial updates. |
+| `sources` | `both` | `both` maps to `--sources auto manual`; `auto` or `manual` runs only that source. |
+| `overwrite` | `false` | Replace supplied populated financial metrics only in the selected slice; otherwise fill gaps only. Nulls never erase stored values. |
+| `use_filing_parser` | `true` | Add `--use-filing-parser` for auto enrichment; automatically skipped when `sources=manual`. |
+| `share_data` | `false` | Add `--share-data` to rebuild the full, unscoped buyback/share-sale history. |
+| `generate_insights` | `true` | Run the SEC/LLM insights pipeline; disable for a metrics-only refresh. |
+
+For an offline manual-metrics update, select `sources=manual` and
+`generate_insights=false`. Existing insights and auto financial metrics are
+preserved, unless the manual input explicitly supplies those financial metrics
+and `overwrite=true`. Publishing and redeployment still run.
+
+Scheduled refreshes retain their previous settings: both financial sources,
+gap filling without overwrite, filing parser disabled, share history unchanged,
+and insights enabled. The enabled filing-parser default applies to the manual
+Run workflow form. The financial `overwrite` input does not overwrite existing
+insights.
+
 ## Required secrets
 
 | Secret | Used by | Description |

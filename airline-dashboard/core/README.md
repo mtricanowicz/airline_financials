@@ -55,9 +55,38 @@ python airline-dashboard\core\scripts\build_data.py `
   --overwrite
 ```
 For `airlines`, `years`, and `periods` choose any set of tickers, years, and periods separated by spaces.
-`--overwrite` is optional and, if omitted, the build merges only the requested key slice.
+`--sources auto manual` is the default. Use `--sources manual` to load manual financial
+metrics without SEC requests, or `--sources auto` to fetch auto metrics without merging
+manual financial metrics.
+`--overwrite` is optional. Without it, incoming populated values fill only null or
+missing metrics; existing populated values (including zero) are preserved. With it,
+incoming populated values replace existing metrics only for the selected
+airline/year/period combinations. Incoming nulls never erase existing values.
+Metrics not supplied by the selected sources and rows outside the selection are
+preserved in both modes. New rows are added in both modes.
+Derived metrics are recalculated for updated rows using the combined stored and
+incoming values, even without `--overwrite`.
 `--share-data` is optional and, if passed, writes the full static buybacks/share-sales history to `../data/generated/buybacks.json`.
 `--use-filing-parser` is optional and, if passed, additionally fetches Passenger Revenue and Cargo Revenue via per-filing XBRL parsing (`sec_pipeline/filing_parser.py`) for tickers with a verified current or historical mapping. This is expensive (one filing fetch per ticker per quarter/year, versus one company-facts call per ticker without it) and is off by default. Passenger Revenue remains eligible to fall back to the manual sheet; Cargo Revenue has no manual fallback.
+The filing parser is automatically skipped with `--sources manual`, even if
+`--use-filing-parser` is passed.
+
+For example, from `airline-dashboard\core`, add manual metrics after an auto build:
+
+```powershell
+python -m scripts.build_data --sources auto --airlines AAL --years 2025 --periods Q2
+python -m scripts.build_data --sources manual --airlines AAL --years 2025 --periods Q2
+
+# Correct supplied manual values for just AAL 2025Q2, keeping its auto metrics.
+python -m scripts.build_data --sources manual --airlines AAL --years 2025 --periods Q2 --overwrite
+```
+
+Multiple airlines, years, and periods select their Cartesian product. When both
+sources are loaded, auto values remain authoritative over manual values within
+the incoming data, with manual values filling auto gaps. Without `--overwrite`,
+populated persisted values still take precedence over either incoming source.
+Coverage diagnostics describe the final stored selection, record the requested
+sources, and mark missing metrics from unselected sources as `SOURCE_NOT_SELECTED`.
 
 The default airline list is the current refresh set. For a development historical backfill, explicitly include former issuers such as `HA`, `SAVE`, `SNCY`, and `VA` in `--airlines`; their absence from the default does not remove existing generated records.
 

@@ -17,10 +17,20 @@ reads the individual CSV files:
    `share_repurchases`, and `share_sales`, or
 2. `manual_metrics.csv`, `share_repurchases.csv`, and `share_sales.csv`.
 
-`manual_metrics.csv` is always considered during the financial build.
+Manual financial metrics are considered by default (`--sources auto manual`).
+Use `--sources manual` to apply them separately without fetching SEC data, or
+`--sources auto` to exclude them from a financial build.
 `share_repurchases.csv` and `share_sales.csv` are written to
 `data/generated/buybacks.json` only when `--share-data` is passed to
 `core/scripts/build_data.py`.
+
+Financial updates are scoped by `--airlines`, `--years`, and `--periods`.
+Without `--overwrite`, manual values fill only missing/null stored metrics.
+With it, populated supplied values replace stored values only within that
+selection; blank cells do not erase existing values, and metrics absent from
+the manual input remain unchanged. Derived metrics use the combined values.
+The `--share-data` option remains a separate, full-history rebuild, regardless
+of financial source selection or airline/year/period filters.
 
 ## Schemas
 

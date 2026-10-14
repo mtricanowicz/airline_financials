@@ -1,6 +1,6 @@
 """Build the canonical dashboard datasets consumed by both front ends.
 
-Combines three sources:
+Combines financial sources selected with --sources (default: auto manual):
 
 * Auto (SEC XBRL company facts): Operating Revenue, Operating Expenses,
   Net Income, Long-Term Debt.
@@ -20,6 +20,8 @@ Outputs to ``data/generated/``:
 
 Where the manual sheet also carries one of the four auto metrics, a mismatch
 beyond a relative tolerance is reported so the sources can be reconciled.
+Updates fill gaps in existing financials unless --overwrite is passed; either
+mode preserves unrelated rows and never erases stored values with incoming nulls.
 """
 
 from __future__ import annotations
@@ -227,7 +229,7 @@ def _report_mismatches(merged: pd.DataFrame) -> None:
     # for some airlines, so reconcile it too.
     for metric in AUTO_METRICS + ["Passenger Revenue"]:
         manual_col = f"{metric}_manual"
-        if manual_col not in merged.columns:
+        if manual_col not in merged.columns or metric not in merged.columns:
             continue
         auto_vals = pd.to_numeric(merged[metric], errors="coerce")
         manual_vals = pd.to_numeric(merged[manual_col], errors="coerce")
@@ -251,6 +253,12 @@ def _report_mismatches(merged: pd.DataFrame) -> None:
 def merge_sources(auto: pd.DataFrame, manual: pd.DataFrame) -> pd.DataFrame:
     """Merge auto and manual metrics on airline/year/quarter, auto authoritative."""
     keys = ["Airline", "Year", "Quarter"]
+    if auto.empty:
+        merged = manual.copy()
+        for column in keys + MANUAL_METRICS:
+            if column not in merged.columns:
+                merged[column] = pd.Series(index=merged.index, dtype=object)
+        return merged
     if manual.empty:
         merged = auto.copy()
         for m in MANUAL_METRICS:
@@ -269,6 +277,8 @@ def merge_sources(auto: pd.DataFrame, manual: pd.DataFrame) -> pd.DataFrame:
     for metric in overlap:
         if metric in merged.columns and f"{metric}_manual" in merged.columns:
             merged[metric] = merged[metric].fillna(merged[f"{metric}_manual"])
+        elif f"{metric}_manual" in merged.columns:
+            merged[metric] = merged[f"{metric}_manual"]
 
     return merged
 
@@ -276,7 +286,11 @@ def merge_sources(auto: pd.DataFrame, manual: pd.DataFrame) -> pd.DataFrame:
 def add_derived(df: pd.DataFrame) -> pd.DataFrame:
     """Compute the derived metrics using the legacy formulas."""
     def col(name: str) -> pd.Series:
-        return pd.to_numeric(df[name], errors="coerce") if name in df.columns else pd.Series(pd.NA, index=df.index)
+        return (
+            pd.to_numeric(df[name], errors="coerce")
+            if name in df.columns
+            else pd.Series(float("nan"), index=df.index, dtype=float)
+        )
 
     op_rev, op_exp = col("Operating Revenue"), col("Operating Expenses")
     op_inc = col("Operating Income")
@@ -396,6 +410,7 @@ def _build_coverage_diagnostics(
     airlines: list[str],
     years: list[int],
     periods: list[str],
+    sources: tuple[str, ...] = ("auto", "manual"),
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any]]:
     """Build coverage diagnostics for requested airline/year/period slice."""
     key_cols = ["Airline", "Year", "Quarter"]
@@ -462,12 +477,20 @@ def _build_coverage_diagnostics(
                     continue
 
                 missing += 1
-                if source_type == "manual_only":
+                auto_selected = "auto" in sources and (
+                    source_type == "auto_xbrl" or metric == "Passenger Revenue"
+                )
+                manual_selected = "manual" in sources and (
+                    source_type == "manual_only" or metric in manual.columns
+                )
+                if not auto_selected and not manual_selected:
+                    reason = "SOURCE_NOT_SELECTED"
+                elif manual_selected and (
+                    not auto_selected or source_type == "manual_only"
+                ):
                     reason = "NO_MANUAL_ROW" if key not in manual_keys else "NO_MANUAL_VALUE"
-                elif source_type == "auto_xbrl":
-                    reason = "NO_AUTO_ROW" if key not in auto_keys else "NO_AUTO_VALUE"
                 else:
-                    reason = "MISSING_VALUE"
+                    reason = "NO_AUTO_ROW" if key not in auto_keys else "NO_AUTO_VALUE"
 
                 detail_rows.append(
                     {
@@ -530,6 +553,7 @@ def _build_coverage_diagnostics(
         "requested_airlines": airlines,
         "requested_years": years,
         "requested_periods": periods,
+        "requested_sources": list(sources),
         "exclude_future_periods": config.DIAGNOSTICS_EXCLUDE_FUTURE_PERIODS,
         "summary_rows": int(len(summary_df)),
         "detail_rows": int(len(detail_df)),
@@ -545,6 +569,7 @@ def _write_coverage_diagnostics(
     airlines: list[str],
     years: list[int],
     periods: list[str],
+    sources: tuple[str, ...] = ("auto", "manual"),
 ) -> None:
     """Write diagnostics tables and report under data/generated/diagnostics."""
     DIAGNOSTICS_DIR.mkdir(parents=True, exist_ok=True)
@@ -555,6 +580,7 @@ def _write_coverage_diagnostics(
         airlines=airlines,
         years=years,
         periods=periods,
+        sources=sources,
     )
     summary_df.to_csv(DIAGNOSTICS_SUMMARY_CSV, index=False)
     detail_df.to_csv(DIAGNOSTICS_DETAIL_CSV, index=False)
@@ -578,17 +604,22 @@ def _load_existing_financials() -> pd.DataFrame:
     return df
 
 
-def _merge_financials(existing: pd.DataFrame, new: pd.DataFrame) -> pd.DataFrame:
+def _merge_financials(
+    existing: pd.DataFrame, new: pd.DataFrame, overwrite: bool = False
+) -> pd.DataFrame:
+    """Merge populated values by key, never erasing data with incoming nulls."""
     if existing.empty:
         return new
     if new.empty:
         return existing
 
     key = ["Airline", "Year", "Quarter"]
-    new = new.drop_duplicates(subset=key, keep="last")
-    existing = existing.copy()
-    existing = existing[~existing.set_index(key).index.isin(new.set_index(key).index)]
-    merged = pd.concat([existing, new], ignore_index=True, sort=False)
+    new_idx = new.drop_duplicates(subset=key, keep="last").set_index(key)
+    existing_idx = existing.set_index(key)
+    if overwrite:
+        merged = new_idx.combine_first(existing_idx).reset_index()
+    else:
+        merged = existing_idx.combine_first(new_idx).reset_index()
     if "Period" not in merged.columns:
         merged["Period"] = merged["Year"].astype(str) + merged["Quarter"].astype(str)
     return merged.sort_values(["Airline", "Year", "Quarter"])
@@ -630,46 +661,59 @@ def build(
     overwrite: bool = False,
     share_data: bool = False,
     use_filing_parser: bool = False,
+    sources: tuple[str, ...] = ("auto", "manual"),
 ) -> None:
-    auto = load_auto(airlines, years, periods)
-    if use_filing_parser:
+    if not sources or any(source not in {"auto", "manual"} for source in sources):
+        raise ValueError("sources must contain auto, manual, or both")
+    auto = load_auto(airlines, years, periods) if "auto" in sources else pd.DataFrame()
+    if use_filing_parser and "auto" in sources:
         filing_parser_df = load_filing_parser(airlines, years, periods)
         auto = _overlay_filing_parser(auto, filing_parser_df)
-    manual_metrics, repurchases, sales = load_manual()
-    repurchases_full = repurchases.copy()
-    sales_full = sales.copy()
+    elif use_filing_parser:
+        log.info("Skipping filing parser for manual-only sources")
+    manual_metrics, repurchases, sales = (
+        load_manual()
+        if "manual" in sources or share_data
+        else (pd.DataFrame(), pd.DataFrame(), pd.DataFrame())
+    )
+    if "manual" not in sources:
+        manual_metrics = pd.DataFrame()
 
     # Scope manual metrics to the requested slice so subset runs are idempotent.
     manual_metrics = _scope_frame(manual_metrics, airlines, years, periods)
 
     merged = merge_sources(auto, manual_metrics)
-    merged = add_derived(merged)
-
     drop = [c for c in merged.columns if c.endswith("_manual")]
     merged = merged.drop(columns=drop).sort_values(["Airline", "Year", "Quarter"])
 
     # Final guard: only requested keys are eligible to update persisted financials.
     merged = _scope_frame(merged, airlines, years, periods)
+    existing_financials = _load_existing_financials()
+    final = _merge_financials(existing_financials, merged, overwrite=overwrite)
+    if not merged.empty:
+        keys = ["Airline", "Year", "Quarter"]
+        affected = final.set_index(keys).index.isin(merged.set_index(keys).index)
+        updated = add_derived(final.loc[affected].copy())
+        final = pd.concat([final.loc[~affected], updated], ignore_index=True, sort=False)
+    else:
+        log.warning("No incoming financial metrics for the requested sources and slice")
+    final = _reorder_columns(final.sort_values(["Airline", "Year", "Quarter"]))
 
     # Diagnostics are always produced for the requested slice.
     _write_coverage_diagnostics(
-        merged=merged,
+        merged=_scope_frame(final, airlines, years, periods),
         auto=auto,
         manual=manual_metrics,
         airlines=airlines,
         years=years,
         periods=periods,
+        sources=sources,
     )
 
-    if not overwrite:
-        existing_financials = _load_existing_financials()
-        merged = _merge_financials(existing_financials, merged)
-        merged = _reorder_columns(merged)
-
-    _write(FINANCIALS_PATH, _records(merged))
+    _write(FINANCIALS_PATH, _records(final))
 
     if share_data:
-        buybacks = build_buybacks(repurchases_full, sales_full)
+        buybacks = build_buybacks(repurchases, sales)
         _write(BUYBACKS_PATH, buybacks)
 
 
@@ -678,9 +722,28 @@ def main() -> None:
     parser.add_argument("--airlines", nargs="+", default=["AAL", "DAL", "UAL", "LUV", "ALK", "JBLU", "ULCC", "ALGT", "RJET", "SKYW"])
     parser.add_argument("--years", nargs="+", type=int, required=True)
     parser.add_argument("--periods", nargs="+", default=["Q1", "Q2", "Q3", "Q4", "FY"])
-    parser.add_argument("--overwrite", action="store_true", help="Overwrite existing generated outputs instead of merging with existing data.")
+    parser.add_argument(
+        "--sources", nargs="+", choices=["auto", "manual"], default=["auto", "manual"],
+        help="Financial metric sources to load (default: auto manual).",
+    )
+    parser.add_argument(
+        "--overwrite", action="store_true",
+        help=(
+            "Replace populated metrics supplied by the selected sources only within "
+            "the requested airline/year/period slice. Incoming nulls never erase "
+            "existing values; without this flag, only gaps are filled."
+        ),
+    )
     parser.add_argument("--share-data", action="store_true", help="Optionally write full static share repurchase/sale history from manual files (unscoped). If omitted, existing buybacks.json is left unchanged.")
-    parser.add_argument("--use-filing-parser", action="store_true", help="Fetch Passenger Revenue and Cargo Revenue via per-filing dimensional XBRL parsing (sec_pipeline.filing_parser). Expensive -- one filing fetch per ticker per quarter/year -- and only covers tickers with a verified dimensional mapping. Off by default.")
+    parser.add_argument(
+        "--use-filing-parser", action="store_true",
+        help=(
+            "Fetch Passenger Revenue and Cargo Revenue via per-filing dimensional "
+            "XBRL parsing (sec_pipeline.filing_parser). Expensive -- one filing fetch "
+            "per ticker per quarter/year -- and only covers tickers with a verified "
+            "dimensional mapping. Off by default; skipped for manual-only sources."
+        ),
+    )
     args = parser.parse_args()
     build(
         args.airlines,
@@ -689,6 +752,7 @@ def main() -> None:
         overwrite=args.overwrite,
         share_data=args.share_data,
         use_filing_parser=args.use_filing_parser,
+        sources=tuple(args.sources),
     )
 
 
