@@ -264,7 +264,7 @@ def scale_metric_for_display(df: pd.DataFrame, metric: str) -> tuple[pd.DataFram
     display_col = metric
     if metric in _MILLIONS_METRIC_SET:
         df[metric] = pd.to_numeric(df[metric], errors="coerce") / 1_000_000
-        display_col = f'{metric.replace("'", "\u2019")} (millions)'
+        display_col = metric.replace("'", "\u2019") + " (millions)"
         df.rename(columns={metric: display_col}, inplace=True)
     elif metric in _CENTS_METRIC_SET:
         df[metric] = pd.to_numeric(df[metric], errors="coerce") * 100
