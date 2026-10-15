@@ -144,6 +144,7 @@ CURRENCY_METRICS = [
     "Capital Expenditures",
     "Free Cash Flow",
     "Profit Sharing",
+    "Stockholders' Equity"
 ]
 
 # Metrics scaled into millions for display but shown without a currency symbol.
@@ -209,6 +210,14 @@ METRIC_DEFINITIONS: list[tuple[str, str]] = [
     ("Operating Margin", "Operating Income divided by Operating Revenue"),
     ("Net Margin", "Percentage of profit earned for each dollar in revenue. Net Income divided by Operating Revenue."),
     ("Earnings Per Share", "Net income allocated to each basic share outstanding."),
+    ("Revenue Passenger Mile (RPM)*", "A basic measure of sales volume. One RPM represents one passenger flown one mile."),
+    ("Available Seat Mile (ASM)*", "A basic measure of production. One ASM represents one seat flown one mile."),
+    ("Load Factor*", "The percentage of available seats that are filled with revenue passengers. RPMs divided by ASMs."),
+    ("Yield*", "A measure of airline revenue derived by dividing Passenger Revenue by RPMs."),
+    ("Total Revenue per Available Seat Mile (TRASM)*", "Operating Revenue divided by ASMs."),
+    ("Passenger Revenue per Available Seat Mile (PRASM)*", "Passenger Revenue divided by ASMs."),
+    ("Cost per Available Seat Mile (CASM)*", "Operating Expenses divided by ASMs."),
+    ("Profit Sharing*", "Amount of income set aside to fund employee profit sharing programs. NOTE: Quarterly reporting by AAL and UAL of this metric is inconsistent. Data provided may have been obtained from internal sources or estimated by proportioning the annual profit sharing reported by the quarterly operating income reported."),
     ("Long-Term Debt", "Total long-term debt net of current maturities."),
     ("Current Maturities", "Portion of debt due within the next 12 months."),
     ("Total Debt", "Total debt obligations. Long-Term Debt plus Current Maturities."),
@@ -220,14 +229,7 @@ METRIC_DEFINITIONS: list[tuple[str, str]] = [
     ("Operating Cash Flow", "Net cash provided by operating activities."),
     ("Capital Expenditures", "Cash outflows for property, equipment, and other long-lived assets."),
     ("Free Cash Flow", "Operating Cash Flow minus Capital Expenditures."),
-    ("Profit Sharing*", "Amount of income set aside to fund employee profit sharing programs. NOTE: Quarterly reporting by AAL and UAL of this metric is inconsistent. Data provided may have been obtained from internal sources or estimated by proportioning the annual profit sharing reported by the quarterly operating income reported."),
-    ("Revenue Passenger Mile (RPM)*", "A basic measure of sales volume. One RPM represents one passenger flown one mile."),
-    ("Available Seat Mile (ASM)*", "A basic measure of production. One ASM represents one seat flown one mile."),
-    ("Load Factor*", "The percentage of available seats that are filled with revenue passengers. RPMs divided by ASMs."),
-    ("Yield*", "A measure of airline revenue derived by dividing Passenger Revenue by RPMs."),
-    ("Total Revenue per Available Seat Mile (TRASM)*", "Operating Revenue divided by ASMs."),
-    ("Passenger Revenue per Available Seat Mile (PRASM)*", "Passenger Revenue divided by ASMs."),
-    ("Cost per Available Seat Mile (CASM)*", "Operating Expenses divided by ASMs."),
+    ("Stockholders' Equity", "The residual interest in the assets of the entity after deducting liabilities."),
     ("\\*", "Could not be retrieved automatically from SEC filing data. This metric is sourced directly from SEC filings through manual review or derived from filing data collected manually.")
 ]
 
@@ -262,7 +264,7 @@ def scale_metric_for_display(df: pd.DataFrame, metric: str) -> tuple[pd.DataFram
     display_col = metric
     if metric in _MILLIONS_METRIC_SET:
         df[metric] = pd.to_numeric(df[metric], errors="coerce") / 1_000_000
-        display_col = f"{metric} (millions)"
+        display_col = f"{metric.replace("'", "\u2019")} (millions)"
         df.rename(columns={metric: display_col}, inplace=True)
     elif metric in _CENTS_METRIC_SET:
         df[metric] = pd.to_numeric(df[metric], errors="coerce") * 100

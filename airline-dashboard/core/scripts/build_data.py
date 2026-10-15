@@ -352,6 +352,7 @@ _PREFERRED_COLUMN_ORDER = [
     "Operating Cash Flow",
     "Capital Expenditures",
     "Free Cash Flow",
+    "Stockholders' Equity",
 ]
 _COLUMNS_TO_DROP = ["Unrestricted Cash", "Restricted Cash"]
 

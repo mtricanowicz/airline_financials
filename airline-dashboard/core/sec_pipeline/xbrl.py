@@ -112,6 +112,9 @@ INSTANT_METRICS: dict[str, list[str]] = {
         "MarketableSecuritiesCurrent",
         "DebtSecuritiesAvailableForSaleCurrent",
     ],
+    "Stockholders' Equity": [
+        "StockholdersEquity",
+    ],
 }
 
 ALL_METRICS = tuple(DURATION_METRICS) + tuple(INSTANT_METRICS)
