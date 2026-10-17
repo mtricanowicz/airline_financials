@@ -26,7 +26,7 @@ core/
   notebooks/
     run_pipeline.ipynb  thin runner for interactive use
   tests/             pytest suite for the deterministic parts
-  scripts/           build_data.py (Phase 2) and other entry points
+  scripts/           build_data.py, build_earnings_dates.py, and other entry points
 ```
 
 ## Setup
@@ -89,6 +89,29 @@ Coverage diagnostics describe the final stored selection, record the requested
 sources, and mark missing metrics from unselected sources as `SOURCE_NOT_SELECTED`.
 
 The default airline list is the current refresh set. For a development historical backfill, explicitly include former issuers such as `HA`, `SAVE`, `SNCY`, and `VA` in `--airlines`; their absence from the default does not remove existing generated records.
+
+### Build Earnings Dates (earnings_dates.json)
+
+```powershell
+pip install -e ".[earnings]"   # one-time: adds yfinance
+python airline-dashboard\core\scripts\build_earnings_dates.py `
+  --tickers AAL DAL UAL LUV ALK JBLU ULCC ALGT RJET SKYW
+```
+Fetches the next earnings date (or estimated date range) for each ticker from the
+yfinance earnings calendar and writes `../data/generated/earnings_dates.json`, shaped as
+`{ticker: {"date_from": "YYYY-MM-DD", "date_to": "YYYY-MM-DD"}}`. `date_to` equals
+`date_from` for a single date and ends the range for an estimate. The Streamlit
+sidebar reads this file instead of calling the quotes-api at page load.
+`--tickers` is optional and defaults to the active airlines shown in the dashboard sidebar.
+`--output` is optional and overrides the output path.
+
+Existing entries are kept when a ticker's fetch fails or returns no date, and a stored
+upcoming date is never replaced by a date already in the past. The file contains no
+timestamps, so unchanged dates produce an identical file. The script exits non-zero,
+leaving the file untouched, only if no ticker could be fetched at all.
+
+The `Refresh earnings dates` GitHub workflow runs this daily on weekdays, commits the
+file only when it changed, and redeploys Streamlit only in that case.
 
 ### SEC Pipeline (insights.json)
 
