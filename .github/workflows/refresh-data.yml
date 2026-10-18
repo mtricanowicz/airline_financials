@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       airlines:
-        description: "Space-separated airlines, e.g. AAL DAL UAL LUV ALK JBLU ULCC"
+        description: "Space-separated airlines, e.g. AAL DAL UAL (defaults to AAL DAL UAL LUV ALK JBLU ULCC ALGT RJET SKYW)"
         required: false
       years:
         description: "Space-separated years, e.g. 2026 (defaults to latest completed period year)"
@@ -41,8 +41,7 @@ on:
         default: true
   schedule:
     # 06:00 UTC on the 15th day of Feb, May, Aug, Nov
-    - cron: "0 6 15 2,8,11 *"
-    - cron: "0 6 15 5 *"
+    - cron: "0 6 15 2,5,8,11 *"
 
 permissions:
   contents: write
@@ -107,7 +106,7 @@ jobs:
             periods="$default_period"
             sources="both"
             overwrite="false"
-            filing_parser="false"
+            filing_parser="true"
             share_data="false"
             insights="true"
           else
