@@ -44,10 +44,9 @@ For an offline manual-metrics update, select `sources=manual` and
 preserved, unless the manual input explicitly supplies those financial metrics
 and `overwrite=true`. Publishing and redeployment still run.
 
-Scheduled refreshes retain their previous settings: both financial sources,
-gap filling without overwrite, filing parser disabled, share history unchanged,
-and insights enabled. The enabled filing-parser default applies to the manual
-Run workflow form. The financial `overwrite` input does not overwrite existing
+Scheduled refreshes use both financial sources, gap filling without overwrite,
+the filing parser enabled, share history unchanged, and insights enabled. The
+filing parser is also enabled by default on the manual Run workflow form. The financial `overwrite` input does not overwrite existing
 insights.
 
 ## Required secrets

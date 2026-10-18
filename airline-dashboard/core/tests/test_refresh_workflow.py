@@ -112,7 +112,7 @@ def test_workflow_dispatch_defaults_and_schedule_compatibility(bash, tmp_path):
     assert result.returncode == 0, result.stdout + result.stderr
     outputs = dict(line.split("=", 1) for line in (tmp_path / "outputs").read_text().splitlines())
     assert outputs["sources"] == "auto manual"
-    assert outputs["filing_parser"] == "false"
+    assert outputs["filing_parser"] == "true"
     assert outputs["overwrite"] == "false"
     assert outputs["share_data"] == "false"
     assert outputs["insights"] == "true"
