@@ -1,6 +1,6 @@
 {
   "requested_airlines": [
-    "AAL"
+    "LUV"
   ],
   "requested_years": [
     2026
@@ -14,8 +14,8 @@
   ],
   "exclude_future_periods": true,
   "summary_rows": 16,
-  "detail_rows": 8,
+  "detail_rows": 1,
   "reason_counts": {
-    "NO_AUTO_VALUE": 8
+    "NO_AUTO_VALUE": 1
   }
 }

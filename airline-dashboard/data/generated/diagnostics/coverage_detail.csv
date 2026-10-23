@@ -1,9 +1,2 @@
 airline,year,quarter,metric,source_type,reason_code
-AAL,2026,Q3,Capital Expenditures,auto_xbrl,NO_AUTO_VALUE
-AAL,2026,Q3,Cash & Cash Equivalents,auto_xbrl,NO_AUTO_VALUE
-AAL,2026,Q3,Current Maturities,auto_xbrl,NO_AUTO_VALUE
-AAL,2026,Q3,Earnings Per Share,auto_xbrl,NO_AUTO_VALUE
-AAL,2026,Q3,Interest Expense,auto_xbrl,NO_AUTO_VALUE
-AAL,2026,Q3,Operating Cash Flow,auto_xbrl,NO_AUTO_VALUE
-AAL,2026,Q3,Operating Income,auto_xbrl,NO_AUTO_VALUE
-AAL,2026,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
+LUV,2026,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE

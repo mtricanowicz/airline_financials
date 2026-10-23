@@ -1,17 +1,17 @@
 airline,metric,source_type,expected_periods,populated_periods,missing_periods,coverage_pct
-AAL,Capital Expenditures,auto_xbrl,1,0,1,0.0
-AAL,Cash & Cash Equivalents,auto_xbrl,1,0,1,0.0
-AAL,Current Maturities,auto_xbrl,1,0,1,0.0
-AAL,Earnings Per Share,auto_xbrl,1,0,1,0.0
-AAL,Interest Expense,auto_xbrl,1,0,1,0.0
-AAL,Long-Term Debt,auto_xbrl,1,1,0,100.0
-AAL,Net Income,auto_xbrl,1,1,0,100.0
-AAL,Operating Cash Flow,auto_xbrl,1,0,1,0.0
-AAL,Operating Expenses,auto_xbrl,1,1,0,100.0
-AAL,Operating Income,auto_xbrl,1,0,1,0.0
-AAL,Operating Revenue,auto_xbrl,1,1,0,100.0
-AAL,Short-Term Investments,auto_xbrl,1,0,1,0.0
-AAL,ASM,manual_only,1,1,0,100.0
-AAL,Passenger Revenue,manual_only,1,1,0,100.0
-AAL,Profit Sharing,manual_only,1,1,0,100.0
-AAL,RPM,manual_only,1,1,0,100.0
+LUV,Capital Expenditures,auto_xbrl,1,1,0,100.0
+LUV,Cash & Cash Equivalents,auto_xbrl,1,1,0,100.0
+LUV,Current Maturities,auto_xbrl,1,1,0,100.0
+LUV,Earnings Per Share,auto_xbrl,1,1,0,100.0
+LUV,Interest Expense,auto_xbrl,1,1,0,100.0
+LUV,Long-Term Debt,auto_xbrl,1,1,0,100.0
+LUV,Net Income,auto_xbrl,1,1,0,100.0
+LUV,Operating Cash Flow,auto_xbrl,1,1,0,100.0
+LUV,Operating Expenses,auto_xbrl,1,1,0,100.0
+LUV,Operating Income,auto_xbrl,1,1,0,100.0
+LUV,Operating Revenue,auto_xbrl,1,1,0,100.0
+LUV,Short-Term Investments,auto_xbrl,1,0,1,0.0
+LUV,ASM,manual_only,1,1,0,100.0
+LUV,Passenger Revenue,manual_only,1,1,0,100.0
+LUV,Profit Sharing,manual_only,1,1,0,100.0
+LUV,RPM,manual_only,1,1,0,100.0
