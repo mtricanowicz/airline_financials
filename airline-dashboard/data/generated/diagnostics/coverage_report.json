@@ -1,51 +1,21 @@
 {
   "requested_airlines": [
-    "AAL",
-    "DAL",
-    "UAL",
-    "LUV",
-    "ALK",
-    "JBLU",
-    "ULCC",
-    "ALGT",
-    "RJET",
-    "SKYW",
-    "HA",
-    "VA",
-    "SAVE",
-    "SNCY"
+    "AAL"
   ],
   "requested_years": [
-    2014,
-    2015,
-    2016,
-    2017,
-    2018,
-    2019,
-    2020,
-    2021,
-    2022,
-    2023,
-    2024,
-    2025,
     2026
   ],
   "requested_periods": [
-    "Q1",
-    "Q2",
-    "Q3",
-    "Q4",
-    "FY"
+    "Q3"
   ],
   "requested_sources": [
-    "auto"
+    "auto",
+    "manual"
   ],
   "exclude_future_periods": true,
-  "summary_rows": 224,
-  "detail_rows": 2204,
+  "summary_rows": 16,
+  "detail_rows": 8,
   "reason_counts": {
-    "SOURCE_NOT_SELECTED": 926,
-    "NO_AUTO_ROW": 727,
-    "NO_AUTO_VALUE": 551
+    "NO_AUTO_VALUE": 8
   }
 }

@@ -37,11 +37,19 @@ from __future__ import annotations
 import logging
 import re
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, NotRequired, TypedDict
 
 from .edgar_client import EdgarClient, Filing
 
 log = logging.getLogger("filing_parser")
+
+
+class DimensionalRevenueMapping(TypedDict):
+    concept: str
+    axis: str
+    member: str
+    legacy_concepts: NotRequired[tuple[str, ...]]
+    legacy_dimensions: NotRequired[tuple[tuple[str | None, str | None], ...]]
 
 # ---------------------------------------------------------------------------
 # Passenger Revenue and Cargo Revenue: verified per-ticker dimensional XBRL
@@ -53,7 +61,7 @@ log = logging.getLogger("filing_parser")
 # the member's value, plus the other disaggregated members on the same axis,
 # must sum to the filing's non-dimensional total revenue for that period.
 # ---------------------------------------------------------------------------
-PASSENGER_REVENUE_DIMENSIONAL_MAP: dict[str, dict[str, str]] = {
+PASSENGER_REVENUE_DIMENSIONAL_MAP: dict[str, DimensionalRevenueMapping] = {
     "ALK": {
         "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
         "axis": "us-gaap:ContractWithCustomerSalesChannelAxis",
@@ -76,7 +84,9 @@ PASSENGER_REVENUE_DIMENSIONAL_MAP: dict[str, dict[str, str]] = {
     "AAL": {
         "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
         "axis": "srt:ProductOrServiceAxis",
-        "member": "aal:PassengerTravelMember",
+        "member": "us-gaap:PassengerMember",
+        "legacy_concepts": ("PassengerRevenue",),
+        "legacy_dimensions": ((None, None),),
     },
     "DAL": {
         "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
@@ -137,7 +147,7 @@ PASSENGER_REVENUE_DIMENSIONAL_MAP: dict[str, dict[str, str]] = {
 #   revenue as cargo.
 # - SKYW, RJET: excluded for the same business-model reason as the passenger
 #   map (see module docstring).
-CARGO_REVENUE_DIMENSIONAL_MAP: dict[str, dict[str, str]] = {
+CARGO_REVENUE_DIMENSIONAL_MAP: dict[str, DimensionalRevenueMapping] = {
     "AAL": {
         "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
         "axis": "srt:ProductOrServiceAxis",
@@ -247,7 +257,7 @@ def _context_matches_period(ctx: dict[str, Any], year: int, period: str) -> bool
 
 def _extract_dimensional_revenue_component(
     instance_xml: str,
-    mapping: dict[str, str] | None,
+    mapping: DimensionalRevenueMapping | None,
     year: int,
     period: str,
     direct_fallback_concepts: tuple[str, ...] = (),
@@ -288,7 +298,13 @@ def _extract_dimensional_revenue_component(
             if not ctx or not _context_matches_period(ctx, year, period):
                 continue
             members = dict(ctx["members"])
-            if members.get(axis) == member:
+            if axis is None and member is None:
+                matches = not members
+            elif axis is not None and member is not None:
+                matches = members.get(axis) == member
+            else:
+                continue
+            if matches:
                 legacy_candidates.append((len(members), val))
     if legacy_candidates:
         legacy_candidates.sort(key=lambda c: c[0])
