@@ -1,6 +1,6 @@
 {
   "requested_airlines": [
-    "LUV"
+    "JBLU"
   ],
   "requested_years": [
     2026
@@ -16,6 +16,6 @@
   "summary_rows": 16,
   "detail_rows": 1,
   "reason_counts": {
-    "NO_AUTO_VALUE": 1
+    "NO_MANUAL_VALUE": 1
   }
 }
