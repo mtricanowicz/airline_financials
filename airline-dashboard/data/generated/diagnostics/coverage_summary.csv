@@ -1,17 +1,17 @@
 airline,metric,source_type,expected_periods,populated_periods,missing_periods,coverage_pct
-JBLU,Capital Expenditures,auto_xbrl,1,1,0,100.0
-JBLU,Cash & Cash Equivalents,auto_xbrl,1,1,0,100.0
-JBLU,Current Maturities,auto_xbrl,1,1,0,100.0
-JBLU,Earnings Per Share,auto_xbrl,1,1,0,100.0
-JBLU,Interest Expense,auto_xbrl,1,1,0,100.0
-JBLU,Long-Term Debt,auto_xbrl,1,1,0,100.0
-JBLU,Net Income,auto_xbrl,1,1,0,100.0
-JBLU,Operating Cash Flow,auto_xbrl,1,1,0,100.0
-JBLU,Operating Expenses,auto_xbrl,1,1,0,100.0
-JBLU,Operating Income,auto_xbrl,1,1,0,100.0
-JBLU,Operating Revenue,auto_xbrl,1,1,0,100.0
-JBLU,Short-Term Investments,auto_xbrl,1,1,0,100.0
-JBLU,ASM,manual_only,1,1,0,100.0
-JBLU,Passenger Revenue,manual_only,1,1,0,100.0
-JBLU,Profit Sharing,manual_only,1,0,1,0.0
-JBLU,RPM,manual_only,1,1,0,100.0
+ULCC,Capital Expenditures,auto_xbrl,2,2,0,100.0
+ULCC,Cash & Cash Equivalents,auto_xbrl,2,2,0,100.0
+ULCC,Current Maturities,auto_xbrl,2,2,0,100.0
+ULCC,Earnings Per Share,auto_xbrl,2,2,0,100.0
+ULCC,Interest Expense,auto_xbrl,2,2,0,100.0
+ULCC,Long-Term Debt,auto_xbrl,2,2,0,100.0
+ULCC,Net Income,auto_xbrl,2,2,0,100.0
+ULCC,Operating Cash Flow,auto_xbrl,2,2,0,100.0
+ULCC,Operating Expenses,auto_xbrl,2,2,0,100.0
+ULCC,Operating Income,auto_xbrl,2,2,0,100.0
+ULCC,Operating Revenue,auto_xbrl,2,2,0,100.0
+ULCC,Short-Term Investments,auto_xbrl,2,0,2,0.0
+ULCC,ASM,manual_only,2,2,0,100.0
+ULCC,Passenger Revenue,manual_only,2,2,0,100.0
+ULCC,Profit Sharing,manual_only,2,0,2,0.0
+ULCC,RPM,manual_only,2,2,0,100.0

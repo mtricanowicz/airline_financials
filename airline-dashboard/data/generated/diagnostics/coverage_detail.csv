@@ -1,2 +1,5 @@
 airline,year,quarter,metric,source_type,reason_code
-JBLU,2026,Q3,Profit Sharing,manual_only,NO_MANUAL_VALUE
+ULCC,2026,Q2,Profit Sharing,manual_only,NO_MANUAL_VALUE
+ULCC,2026,Q3,Profit Sharing,manual_only,NO_MANUAL_VALUE
+ULCC,2026,Q2,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE
+ULCC,2026,Q3,Short-Term Investments,auto_xbrl,NO_AUTO_VALUE

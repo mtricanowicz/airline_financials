@@ -1,11 +1,12 @@
 {
   "requested_airlines": [
-    "JBLU"
+    "ULCC"
   ],
   "requested_years": [
     2026
   ],
   "requested_periods": [
+    "Q2",
     "Q3"
   ],
   "requested_sources": [
@@ -14,8 +15,9 @@
   ],
   "exclude_future_periods": true,
   "summary_rows": 16,
-  "detail_rows": 1,
+  "detail_rows": 4,
   "reason_counts": {
-    "NO_MANUAL_VALUE": 1
+    "NO_MANUAL_VALUE": 2,
+    "NO_AUTO_VALUE": 2
   }
 }
