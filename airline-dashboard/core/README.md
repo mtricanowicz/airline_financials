@@ -7,8 +7,9 @@ insights with an LLM. It also extracts the auto-sourceable financial metrics fro
 XBRL company facts, including liquidity and cash flow tags plus an EPS fallback
 for Q4 when needed.
 
-Both front ends (the Streamlit cleanup track and the Next.js track) consume the
-JSON this package writes to `../data/generated/`.
+The Streamlit app consumes the JSON this package writes to
+`../data/generated/`. A local Next.js prototype is excluded from version
+control and is not part of the active deployment.
 
 ## Layout
 
@@ -32,22 +33,22 @@ core/
 ## Setup
 
 ```powershell
+# From the airline-dashboard folder:
 cd core
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -e .            # add ".[local-embeddings]" for offline embeddings
-copy .env.example .env      # then fill in SEC_USER_AGENT and OPENAI_API_KEY
 ```
 
-All secrets are read from `core/.env`, which is git-ignored. Never commit
-credentials.
+Create `core/.env` and set `SEC_USER_AGENT` and `OPENAI_API_KEY` for networked
+SEC and insights runs. The file is git-ignored; never commit credentials.
 
 ## Running
 
 ### Build Data (financials.json & buybacks.json)
 
 ```powershell
-python airline-dashboard\core\scripts\build_data.py `
+python -m scripts.build_data `
   --airlines AAL DAL UAL LUV ALK JBLU ULCC ALGT RJET SKYW `
   --years 2014 2015 2016 2017 2018 2019 2020 2021 2022 2023 2024 2025 2026 `
   --periods Q1 Q2 Q3 Q4 FY `
@@ -94,7 +95,7 @@ The default airline list is the current refresh set. For a development historica
 
 ```powershell
 pip install -e ".[earnings]"   # one-time: adds yfinance
-python airline-dashboard\core\scripts\build_earnings_dates.py `
+python -m scripts.build_earnings_dates `
   --tickers AAL DAL UAL LUV ALK JBLU ULCC ALGT RJET SKYW
 ```
 Fetches the next earnings date (or estimated date range) for each ticker from the
@@ -311,7 +312,7 @@ Environment switches:
 
 | Source | Metrics |
 | --- | --- |
-| Auto (XBRL company facts) | Operating Revenue, Operating Expenses, Net Income, Earnings Per Share, Long-Term Debt, Current Maturities, Cash & Cash Equivalents, Unrestricted Cash, Restricted Cash, Short-Term Investments, Operating Cash Flow, Capital Expenditures |
+| Auto (XBRL company facts) | Operating Revenue, Operating Expenses, Net Income, Earnings Per Share, Long-Term Debt, Current Maturities, Cash & Cash Equivalents, Unrestricted Cash, Restricted Cash, Short-Term Investments, Interest Expense, Operating Cash Flow, Capital Expenditures |
 | Filing-level XBRL (`--use-filing-parser`) | Passenger Revenue and Cargo Revenue where a verified current or historical mapping exists |
 | Manual sheet (`../data/manual/`) | Passenger Revenue fallback, RPM, ASM, Profit Sharing, buybacks and share sales |
 | Derived (build_data) | Operating Income, margins, Load Factor, Yield, TRASM, PRASM, CASM, Total Debt, Total Liquidity, Net Debt, Free Cash Flow |

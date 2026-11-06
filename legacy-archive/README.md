@@ -1,3 +1,14 @@
+# Archived legacy application
+
+This directory preserves the previous dashboard implementation, notebooks,
+data snapshots, and supporting assets for historical reference. It is not the
+active application or deployment path.
+
+The current dashboard, data pipeline, and component-specific instructions are
+documented in the [repository README](../README.md) and under
+[`../airline-dashboard/`](../airline-dashboard/).
+
+
 # Airline Financial Dashboard
 Compare financial metrics for US airlines.<br>
 Explore the dashboard at: [https://www.airlinefinancialdashboard.com/](https://www.airlinefinancialdashboard.com/)

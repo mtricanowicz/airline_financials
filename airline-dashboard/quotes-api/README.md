@@ -11,10 +11,15 @@ static JSON by the core pipeline and served by the front ends directly.
 | --- | --- | --- |
 | GET | `/health` | Liveness probe, returns `{"status": "ok"}`. |
 | GET | `/quotes?tickers=AAL,DAL,UAL,LUV` | Last close, day change, and change percent per ticker. |
+| GET | `/live-quotes?tickers=AAL,DAL,UAL,LUV` | Intraday quotes during market hours and the latest close when the market is closed. |
+| GET | `/history?tickers=AAL,DAL,UAL,LUV&start=2020-01-01` | Daily closing-price history from the requested start date. |
 | GET | `/earnings?tickers=AAL,DAL,UAL,LUV` | Next earnings date (or estimated date range) per ticker. |
 
-Quotes are cached in-memory for the current trading day, so the upstream provider
-is queried at most once per ticker per day.
+Successful `/quotes` results are cached in memory for the current date. Live
+quotes are cached for 60 seconds during market hours; a successful close is
+cached until the next market open. `/history` results are cached for the current
+date by ticker list and start date, and only complete successful responses are
+cached. These endpoints use Yahoo Finance through yfinance.
 
 Earnings calendars are fetched in parallel (up to 5 tickers at a time) and
 cached in-memory per ticker for 24 hours from the fetch (not reset at midnight).

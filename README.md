@@ -3,24 +3,28 @@ Compare financial and operating metrics for major US airlines.
 Live app: https://airline.industryfinancials.com/
 
 ## Overview
-This repository now centers on the v2 platform under [airline-dashboard](airline-dashboard), which separates data generation, APIs, and front ends into maintainable components.
+The active platform is under [airline-dashboard](airline-dashboard). It separates
+data generation, the quotes API, and the Streamlit front end into components.
 
-Financial statement series in the generated dataset starts in 2014, which reflects the post legacy airline consolidation era for major US carriers. Share repurchase history can include earlier periods from manual files to fully cover the 2010s share buyback programs. The current v2 supports the tickers for all of the publicly traded US passenger airlines that were active since 2014, whether currently active or defunct, separated by scale:
-- Major Global Airlines
+Financial statement series in the generated dataset starts in 2014. Share
+repurchase history may include earlier periods from manual files. The dataset
+covers current airlines and former issuers with historical data:
+- Global Network Carriers
     - AAL
     - DAL
     - UAL
-- Large National Airlines
+- Low Cost Carriers
+    - JBLU
     - LUV
-- Small and Midsize Airlines
-    - ALGT
+    - _VA (defunct)_
+- Lower Cost Network Carriers
     - ALK
     - _HA (defunct)_
-    - JBLU
+- Ultra Low Cost Carriers
+    - ALGT
+    - ULCC
     - _SAVE (defunct)_
     - _SNCY (defunct)_
-    - ULCC
-    - _VA (defunct)_
 - Regional Airlines
     - RJET
     - SKYW
@@ -31,14 +35,18 @@ Unless noted, metrics are sourced or derived from SEC filings (10-Q, 8-K, 10-K),
 The v2 stack is organized as:
 - [airline-dashboard/core](airline-dashboard/core): shared Python data and insights pipeline
 - [airline-dashboard/quotes-api](airline-dashboard/quotes-api): FastAPI service for live quote data
-- [airline-dashboard/streamlit-app](airline-dashboard/streamlit-app): Primary app entry point Streamlit front end UI
-- [airline-dashboard/web](airline-dashboard/web): Next.js web front end (in development target end state UI)
+- [airline-dashboard/streamlit-app](airline-dashboard/streamlit-app): active multipage Streamlit front end
+- [airline-dashboard/web](airline-dashboard/web): Next.js web front end (in development experimental front end)
 - [airline-dashboard/data](airline-dashboard/data): shared manual and generated data
 - [airline-dashboard/deploy](airline-dashboard/deploy): deployment configs and runbooks
 
+The Next.js/Firebase front end is currently excluded from version control by
+`airline-dashboard/.gitignore`; the deploy workflows skip its build and deploy
+when its lockfile is absent.
+
 Data flow summary:
 1. Core pipeline generates canonical JSON in `airline-dashboard/data/generated`.
-2. Both front ends read the generated JSON.
+2. The Streamlit app reads the generated JSON.
 3. Live quote views call `quotes-api`.
 
 ## Financial Metrics
@@ -72,7 +80,7 @@ Source data remains curated from filings and merged into generated outputs by th
 
 ## Metric sourcing model
 v2 uses a hybrid model:
-- Auto (XBRL company facts): Operating Revenue, Operating Expenses, Net Income, Earnings Per Share, Long-Term Debt, Current Maturities, Cash & Cash Equivalents, Unrestricted Cash, Restricted Cash, Short-Term Investments, Operating Cash Flow, Capital Expenditures
+- Auto (XBRL company facts): Operating Revenue, Operating Expenses, Net Income, Earnings Per Share, Long-Term Debt, Current Maturities, Cash & Cash Equivalents, Unrestricted Cash, Restricted Cash, Short-Term Investments, Interest Expense, Operating Cash Flow, Capital Expenditures
 - Auto (filing-level XBRL, opt-in): Passenger Revenue and Cargo Revenue where a verified dimensional or historical mapping exists
 - Manual sheet: Passenger Revenue fallback, RPM, ASM, Profit Sharing, buybacks, share sales
 - Derived: Operating Income, margins, Load Factor, Yield, TRASM, PRASM, CASM, Total Debt, Total Liquidity, Net Debt, Free Cash Flow
@@ -81,7 +89,7 @@ v2 uses a hybrid model:
 Current production deployment is based on the v2 components:
 - Cloud Run for `quotes-api`
 - Cloud Run for `streamlit-app`
-- GitHub Actions workflows in [.github/workflows](.github/workflows) for CI, deploy, and data refresh automation
+- GitHub Actions workflows in [.github/workflows](.github/workflows) for CI, deployment, data refresh, and earnings-date refresh
 
 For operational details, see [airline-dashboard/deploy/README.md](airline-dashboard/deploy/README.md).
 
@@ -95,7 +103,6 @@ Start here for component-level documentation:
 - [airline-dashboard/README.md](airline-dashboard/README.md)
 - [airline-dashboard/core/README.md](airline-dashboard/core/README.md)
 - [airline-dashboard/streamlit-app/README.md](airline-dashboard/streamlit-app/README.md)
-- [airline-dashboard/web/README.md](airline-dashboard/web/README.md)
 - [airline-dashboard/deploy/README.md](airline-dashboard/deploy/README.md)
 
 ## Sources

@@ -1,30 +1,31 @@
 # Deployment
 
-All components target Google Cloud. The primary front end is a static site on
-Firebase Hosting; the two services run on Cloud Run; data is refreshed by a
-scheduled GitHub Actions workflow.
+The tracked production deployment runs the Streamlit app and quotes API on
+Cloud Run. GitHub Actions refreshes the generated data and redeploys Streamlit.
+The workflows also contain optional Firebase Hosting deployment steps for a
+Next.js app, but `airline-dashboard/web/`, `firebase.json`, and `.firebaserc` are
+excluded from version control; those steps skip when the web lockfile is absent.
 
 ## Components and hosting
 
 | Component | Path | Hosting |
 | --- | --- | --- |
-| Static site (primary) | `web/` | Firebase Hosting (`web/out`) |
+| Next.js static site (optional, currently excluded from Git) | `web/` | Firebase Hosting, when `web/package-lock.json` is present |
 | Quotes API | `quotes-api/` | Cloud Run |
-| Streamlit app (fallback) | `streamlit-app/` | Cloud Run |
+| Streamlit app (active front end) | `streamlit-app/` | Cloud Run |
 | Data build + insights | `core/` | GitHub Actions (scheduled) |
 
 ## Workflows
 
-The workflows in `.github/workflows/` assume the repository root contains the
-`airline-dashboard/` folder. If `airline-dashboard/` is itself the repository
-root, move `.github/` up one level and drop the `airline-dashboard/` prefixes
-from the `paths`, `working-directory`, and `--source` values.
+The workflows in `.github/workflows/` are configured for this repository's
+layout, with `airline-dashboard/` under the repository root.
 
 | Workflow | Trigger | Purpose |
 | --- | --- | --- |
-| `ci.yml` | push / PR | Run core tests and the web type-check and build. |
-| `deploy.yml` | manual / after CI on main | Deploy quotes-api, Streamlit, and the static site. |
-| `refresh-data.yml` | quarterly cron / manual | Rebuild datasets and insights, then redeploy Streamlit and the site. |
+| `ci.yml` | push / PR | Run core tests; run the web type-check and build only when its lockfile is present. |
+| `deploy.yml` | manual / after successful CI on main | Deploy quotes-api and Streamlit; deploy the static site only when its lockfile is present. |
+| `refresh-data.yml` | quarterly cron / manual | Rebuild datasets and insights, then redeploy Streamlit; optionally deploy the static site when its lockfile is present. |
+| `refresh-earnings-dates.yml` | weekdays / manual | Refresh earnings-date JSON and redeploy Streamlit only when the file changes. |
 
 ### Manual refresh parameters
 
@@ -56,7 +57,7 @@ insights.
 | `GCP_PROJECT_ID` | deploy, refresh | Google Cloud / Firebase project id. |
 | `GCP_WORKLOAD_IDP` | deploy, refresh | Workload Identity Federation provider resource. |
 | `GCP_DEPLOY_SA` | deploy, refresh | Deploy service account email. |
-| `FIREBASE_SERVICE_ACCOUNT` | deploy, refresh | Firebase Hosting deploy credentials (JSON). |
+| `FIREBASE_SERVICE_ACCOUNT` | deploy, refresh (optional web job) | Firebase Hosting deploy credentials (JSON); used only when the optional web app is present. |
 | `QUOTES_API_URL` | deploy, refresh | Public URL of the deployed quotes-api, used by Streamlit and baked into the web build. |
 | `SEC_USER_AGENT` | refresh | Contact string for SEC EDGAR requests. |
 | `OPENAI_API_KEY` | refresh | Key for embeddings and insight summarization. |
@@ -74,7 +75,7 @@ $env:QUOTES_API_URL = "https://quotes-xxxx.run.app"
 $env:STREAMLIT_TAG = "manual-001"
 gcloud builds submit . --config deploy/cloudbuild.streamlit.yaml --substitutions=SHORT_SHA="$env:STREAMLIT_TAG",_QUOTES_API_URL="$env:QUOTES_API_URL"
 
-# 3. Static site
+# 3. Optional static site (requires the excluded web app and Firebase config)
 cd web
 npm ci
 $env:NEXT_PUBLIC_QUOTES_API_URL = "https://quotes-xxxx.run.app"

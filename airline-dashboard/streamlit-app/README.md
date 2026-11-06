@@ -1,8 +1,8 @@
-# streamlit-app (Track A: cleanup)
+# streamlit-app
 
 A faithful, faster rebuild of the original single-file Streamlit dashboard. It is
-the reference and fallback front end. The primary front end is the Next.js app in
-[`../web`](../web).
+the active front end. The previous single-file app is preserved in
+[`../../legacy-archive`](../../legacy-archive).
 
 ## What changed from the original
 
@@ -15,13 +15,10 @@ the reference and fallback front end. The primary front end is the Next.js app i
   `@st.cache_data`. The app never scrapes or recomputes at request time.
 - Live stock prices come from the separate [`../quotes-api`](../quotes-api)
   service rather than an in-process download.
-- Sidebar earnings dates use one batched request (15s timeout) for the active
-  tickers. Each ticker's date, past or upcoming, is cached process-wide for 24
-  hours from when it was fetched. If the API returns no date, a cached date is
-  kept for another hour only while it is still upcoming; otherwise the ticker
-  shows TBA. Failed requests change nothing and are retried at most every 5
-  minutes, while already-fetched dates keep being served. Individual airline
-  labels only format the fetched data.
+- Sidebar earnings dates are loaded from
+  `../data/generated/earnings_dates.json`, not fetched from the quotes API. The
+  `refresh-earnings-dates` workflow updates the file on weekdays and redeploys
+  Streamlit when its contents change. Missing dates are shown as TBA.
 
 ## Pages
 
@@ -52,7 +49,7 @@ fully written.
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `DASHBOARD_DATA_DIR` | `../data/generated` | Directory containing `financials.json`, `buybacks.json`, `insights.json`. |
+| `DASHBOARD_DATA_DIR` | `../data/generated` | Directory containing `financials.json`, `buybacks.json`, `insights.json`, and `earnings_dates.json`. |
 | `QUOTES_API_URL` | `http://localhost:8080` | Base URL of the quotes-api service. |
 
 ## Container

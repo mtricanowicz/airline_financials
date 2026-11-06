@@ -74,7 +74,7 @@ value remains authoritative.
 
 | Source | Metrics |
 | --- | --- |
-| Auto (XBRL company facts) | Operating Revenue, Operating Expenses, Net Income, Earnings Per Share, Long-Term Debt, Current Maturities, Cash & Cash Equivalents, Unrestricted Cash, Restricted Cash, Short-Term Investments, Operating Cash Flow, Capital Expenditures |
+| Auto (XBRL company facts) | Operating Revenue, Operating Expenses, Net Income, Earnings Per Share, Long-Term Debt, Current Maturities, Cash & Cash Equivalents, Unrestricted Cash, Restricted Cash, Short-Term Investments, Interest Expense, Operating Cash Flow, Capital Expenditures |
 | Auto (filing parser, opt-in via `--use-filing-parser`) | Passenger Revenue and Cargo Revenue where a verified current or historical XBRL mapping exists; Cargo Revenue has no manual fallback -- see `core/sec_pipeline/filing_parser.py` |
 | Manual (this folder) | Passenger Revenue (fallback), RPM, ASM, Profit Sharing, buybacks, share sales |
 | Derived (build_data) | Operating Income, Operating Margin, Net Margin, Load Factor, Yield, TRASM, PRASM, CASM, Total Debt, Total Liquidity, Net Debt, Free Cash Flow |
