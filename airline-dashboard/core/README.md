@@ -317,8 +317,15 @@ Environment switches:
 | Manual sheet (`../data/manual/`) | Passenger Revenue fallback, RPM, ASM, Profit Sharing, buybacks and share sales |
 | Derived (build_data) | Operating Income, margins, Load Factor, Yield, TRASM, PRASM, CASM, Total Debt, Total Liquidity, Net Debt, Free Cash Flow |
 
-RPM, ASM, and Profit Sharing are not part of the us-gaap XBRL taxonomy and must
-be supplied manually.
+RPM, ASM, and Profit Sharing remain manual: the pipeline has no verified XBRL
+mappings for them. RPM and ASM are generally disclosed in operating-statistics
+tables rather than consistently tagged facts. Some airlines tag Profit Sharing,
+but concepts, definitions, and quarterly coverage differ; a tagged amount may
+include payroll taxes or represent a liability rather than an expense. Filling
+these gaps would require parsing unstructured filing text and HTML tables whose
+layouts, labels, units, and periods vary across carriers and filings. Building,
+validating, and maintaining carrier-specific parsers would be error-prone and
+costly for limited coverage, so manual entry remains the preferred approach.
 
 ## Diagnostics output
 
