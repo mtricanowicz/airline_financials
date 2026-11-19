@@ -58,5 +58,10 @@ See `core/README.md` for the pipeline and data build, and
 
 ## Security
 
-Never commit secrets. Create `core/.env` with `SEC_USER_AGENT` and
-`OPENAI_API_KEY` for SEC and insights pipeline runs. `.env` is gitignored.
+Never commit secrets. Create `core/.env` with required environment variables for SEC and insights pipeline runs. At minimum:
+
+- `SEC_USER_AGENT`: User-Agent header for SEC EDGAR API
+- `OPENAI_API_KEY`: OpenAI API key for LLM summary generation
+- `OPENAI_CHAT_MODEL`: Chat model selection (default: `gpt-6-luna`, can be customized)
+
+The `.env` file is gitignored and should never be committed.

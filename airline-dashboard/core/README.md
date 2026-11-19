@@ -40,8 +40,13 @@ python -m venv .venv
 pip install -e .            # add ".[local-embeddings]" for offline embeddings
 ```
 
-Create `core/.env` and set `SEC_USER_AGENT` and `OPENAI_API_KEY` for networked
-SEC and insights runs. The file is git-ignored; never commit credentials.
+Create `core/.env` with required and optional environment variables. At minimum, set:
+
+- `SEC_USER_AGENT`: User-Agent header for SEC EDGAR requests (required for networked SEC retrieval)
+- `OPENAI_API_KEY`: OpenAI API key (required for summary generation)
+- `OPENAI_CHAT_MODEL`: Chat model selection (default: `gpt-6-luna`, can be overridden)
+
+The `.env` file is git-ignored; never commit credentials.
 
 ## Running
 
@@ -140,6 +145,20 @@ API calls. For generation runs, set `EMBEDDING_BACKEND=openai` to use the OpenAI
 embeddings API and improve retrieval consistency with the hosted summarization
 model. The chat summarization step always uses OpenAI. Keep the local default for
 tests and offline development.
+
+## LLM and embedding model configuration
+
+The pipeline uses the following environment-driven settings for OpenAI API calls:
+
+| Environment Variable | Default | Purpose |
+| --- | --- | --- |
+| `OPENAI_CHAT_MODEL` | `gpt-6-luna` | Chat Completions model for summary generation |
+| `OPENAI_EMBEDDING_MODEL` | `text-embedding-3-small` | Embeddings model for retrieval (OpenAI backend only) |
+| `SUMMARY_TEMPERATURE` | `0.55` | Sampling temperature for reproducible, focused summaries |
+| `SUMMARY_SEED` | `7` | Deterministic seed for reproducible generations |
+| `SUMMARY_REASONING_EFFORT` | `none` | Extended reasoning effort level (can be overridden per generation) |
+
+The chat model `gpt-6-luna` supports extended thinking for high-reasoning summaries; the pipeline currently uses standard reasoning mode (`none`) for cost-effectiveness. To enable extended reasoning, set `SUMMARY_REASONING_EFFORT=medium` or `high`, which will increase both token consumption and latency.
 
 ## SEC Retrieval and Summarization
 
